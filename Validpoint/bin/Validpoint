@@ -19,6 +19,9 @@ require( "strict-mode" )(
         parser.init(
             function() // init callback
             {
+				const CW_Runner = require( "../../classes/CW_Runner.js" );
+				const runner = new CW_Runner();
+
 				// `this` is an instance of the InputParser
 				// TODO: Needs a try/catch
 				config = this.parseJsonString();
@@ -29,8 +32,8 @@ require( "strict-mode" )(
                     process.exit( 1 ); // TODO: Needs to bubble an exception
 				}
 				
-                // console.log( `NAME: ${config.name}` );
-				// console.log( `URL:  ${config.url}` );
+                // console.log( `NAME:   ${config.name}` );
+				// console.log( `DOMAIN: ${config.domain}` );
 				
 				// parse the requested command from the command line arguments, then run it
 				let cmd = "all";
@@ -39,7 +42,7 @@ require( "strict-mode" )(
 					cmd = process.argv[2];
 				}
 
-				CW_InputParser.runCommand( cmd );
+				runner.runCommand( cmd );
             }
         );
 
