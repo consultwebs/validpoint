@@ -38,7 +38,7 @@ class CW_Runner
                 {
                     console.log( value );
                 });
-            process.exit( 1 ); // TODO: Bubble an exception
+            process.exit( 1 );
         }
 
         // If we know what to do, do it

@@ -38,7 +38,7 @@ class CW_InputParser
                 {
                     if( error )
                     {
-                        throw error;
+                        throw new Error( error.message );
                     }
                     passedThis.mInputString = data;
                     callback.bind( passedThis )();
@@ -46,8 +46,8 @@ class CW_InputParser
         }
         catch( exception )
         {
-            console.log( "COULD NOT INITIALIZE THE PARSER: ", exception.stack );
-            process.exit( 1 ); // TODO: Needs to bubble an exception
+			exception.message = "COULD NOT READ INPUT FILE: " + exception.message;
+			throw new Error( exception.message );
         }
     }
 
@@ -67,8 +67,8 @@ class CW_InputParser
         }
         catch( exception )
         {
-            console.log( "COULD NOT PARSE JSON: ", exception.stack );
-            process.exit( 1 ); // TODO: Needs to bubble an exception
+			exception.message = "COULD NOT PARSE JSON: " + exception.message;
+			throw new Error( exception.message );
         }
         
         return returnValue;

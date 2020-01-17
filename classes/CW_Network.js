@@ -65,7 +65,6 @@ class CW_Network
 						if( !error ) // Default is "down" so there's nothing to change for an error response
 						{
 							msg = "up";
-							
 						}
 						resolve( msg );
 					}
