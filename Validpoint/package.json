@@ -2,7 +2,7 @@
   "name": "Validpoint",
   "version": "1.0.0",
   "description": "CLI service validator",
-  "license": "Proprietary",
+  "license": "MIT",
   "bin": {
     "Validpoint": "bin/Validpoint"
   },
