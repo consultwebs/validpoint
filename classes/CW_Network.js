@@ -5,6 +5,7 @@
  */
 
 const PING_HOST = "8.8.4.4"; // Google public DNS server
+const DNS_HOST = "www.google.com";
 
 class CW_Network
 {
@@ -27,7 +28,7 @@ class CW_Network
     async checkLocalNetwork()
     {
 		return new Promise(
-			(resolve, reject )=>
+			(resolve, reject ) =>
 			{
 				// Set the default status to "down"
 				let ping = require( "ping" );
@@ -47,7 +48,31 @@ class CW_Network
 				);
 			}
 		);	
-    }
+	}
+	
+	async checkDns()
+	{
+		return new Promise(
+			( resolve, reject ) =>
+			{
+				let dns = require( "dns" );
+				let msg = "down";
+
+				dns.resolve4( DNS_HOST,
+					( error, addresses ) =>
+					{
+						// We don't care about the content of the response, just whether or not there was an error
+						if( !error ) // Default is "down" so there's nothing to change for an error response
+						{
+							msg = "up";
+							
+						}
+						resolve( msg );
+					}
+				);
+			}
+		);
+	}
 
 
 }

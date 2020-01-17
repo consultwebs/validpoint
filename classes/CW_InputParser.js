@@ -101,22 +101,26 @@ class CW_InputParser
 
         // If we know what to do, do it
 		let async = require( "async" );
+		const CW_Network = require( "./CW_Network.js" );
+		const network = new CW_Network();
 		
 		switch( command )
 		{
 			case "local":
-				const CW_Network = require( "./CW_Network.js" );
-				const network = new CW_Network();
-				let response = 
-					network.checkLocalNetwork()
-						.then( 
-							( result ) => 
-							{ 
-								console.log( "PING result: " + result );
-							});
+				network.checkLocalNetwork()
+					.then( 
+						( result ) => 
+						{ 
+							console.log( `LOCAL PING result: ${result}` );
+						});
 				break;
 			case "dns":
-				console.log( "DNS not yet implemented" );
+				network.checkDns()
+					.then( 
+						( result ) => 
+						{ 
+							console.log( `LOCAL DNS result: ${result}` );
+						});
 				break;
 			case "http":
 				console.log( "HTTP not yet implemented" );
