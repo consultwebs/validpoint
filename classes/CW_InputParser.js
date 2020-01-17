@@ -74,7 +74,15 @@ class CW_InputParser
         return returnValue;
 	}
 	
-	static runCommand( command )
+	/**
+	 * Run a command
+	 * 
+	 * TODO: refactor sanity checking
+	 * TODO: refactor case statements
+	 * TODO: return a JSON string for API-type use
+	 * @param {*} command 
+	 */
+	static async runCommand( command )
     {
         // sanity check the requested command
         let validCommands = [ "all", "local", "dns", "http", "https" ];
@@ -99,25 +107,13 @@ class CW_InputParser
 			case "local":
 				const CW_Network = require( "./CW_Network.js" );
 				const network = new CW_Network();
-
-				async.waterfall(
-					[
-						( callback ) =>
-						{
-							let response = network.checkLocalNetwork();
-							callback( null, response );
-						},
-						( result, callback ) =>
-						{
-							let response = network.checkResult( result );
-							callback( null, response );
-						}
-					],
-					( error, result ) =>
-					{
-						console.log( `RESULT: ${result}` );
-					}
-				);
+				let response = 
+					network.checkLocalNetwork()
+						.then( 
+							( result ) => 
+							{ 
+								console.log( "PING result: " + result );
+							});
 				break;
 			case "dns":
 				console.log( "DNS not yet implemented" );

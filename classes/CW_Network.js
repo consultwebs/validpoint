@@ -4,8 +4,11 @@
  * @author costmo
  */
 
+const PING_HOST = "8.8.4.4"; // Google public DNS server
+
 class CW_Network
 {
+	
     /**
      * Create a new instance
      * 
@@ -17,40 +20,33 @@ class CW_Network
 
 	/**
 	 * Ping a server that's known to accept ICMP packets and never go down to make sure the local Internet connection is working.
-	 * Using a Google public DNS server
 	 * 
 	 * @author costmo
 	 * @returns string
 	 */
-    checkLocalNetwork()
+    async checkLocalNetwork()
     {
-			// TODO: Figure out why my system is throwing "Cannot find module 'ping'" even though it's clearly installed"
-			// let ping = require( "ping" );
+		return new Promise(
+			(resolve, reject )=>
+			{
+				// Set the default status to "down"
+				let ping = require( "ping" );
+				let msg = "down";
 
-			console.log( "PINGING" );
-
-			let msg = "down";
-
-			// ping.sys.probe( "8.8.4.4",
-			// 	( isAlive ) =>
-			// 	{
-			// 		console.log( "CHECKING" );
-			// 		if( isAlive )
-			// 		{
-			// 			console.log( "IS ALIVE" );
-			// 			msg = "up";
-			// 		}
-			// 		return msg;
-			// 	}
-			// );
-
-			return msg;
-    }
-
-	// This will be removed once "ping" is working locally
-    checkResult( input )
-    {
-		return input;
+				// Perform a ping to prove the default status
+				ping.sys.probe( PING_HOST,
+					async ( isAlive ) =>
+					{
+						if( isAlive )
+						{
+							msg = "up";
+						}
+						
+						resolve( msg );
+					}
+				);
+			}
+		);	
     }
 
 
