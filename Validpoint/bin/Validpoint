@@ -5,6 +5,8 @@
  * 
  * Invoking: ./bin/Validpoint [command]
  * Invocation without "command" is synonymous with "all" as the command
+ * 
+ * TODO: handle unhandled Promise rejections
  */
 
 require( "strict-mode" )(
@@ -43,7 +45,7 @@ require( "strict-mode" )(
 						cmd = process.argv[2];
 					}
 
-					runner.runCommand( cmd );
+					runner.runCommand( cmd, config );
 				}
 				catch( exception )
 				{

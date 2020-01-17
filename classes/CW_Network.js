@@ -23,7 +23,7 @@ class CW_Network
 	 * Ping a server that's known to accept ICMP packets and never go down to make sure the local Internet connection is working.
 	 * 
 	 * @author costmo
-	 * @returns string
+	 * @returns Promise
 	 */
     async checkLocalNetwork()
     {
@@ -50,6 +50,12 @@ class CW_Network
 		);	
 	}
 	
+	/**
+	 * Make sure the local Internet connection can resolve a hostname
+	 * 
+	 * @author costmo
+	 * @returns Promise
+	 */
 	async checkDns()
 	{
 		return new Promise(
@@ -67,6 +73,80 @@ class CW_Network
 							msg = "up";
 						}
 						resolve( msg );
+					}
+				);
+			}
+		);
+	}
+
+	/**
+	 * Verify that the user's website is responding and get the average connection latency
+	 * 
+	 * @author costmo
+	 * @returns Promise
+	 * @param {*} domain		The domain name of the site to check
+	 * @param {*} port			The port to check (80 or 443)
+	 */
+	async checkWebsiteAvailability( domain, port )
+	{
+		return new Promise(
+			( resolve, reject ) =>
+			{
+				let tcpPing = require( "tcp-ping" );
+				let returnValue;
+
+				// Ping configuration parameters
+				let tcpConfig = 
+				{
+					address: domain,
+					port: port,
+					attempts: 3
+				}
+
+				tcpPing.ping( tcpConfig,
+					( error, response ) =>
+					{
+						if( !error ) // Default is "down" so there's nothing to change for an error response
+						{
+							// We're sending back more than a simple string. Construct the return object
+							returnValue = 
+							{
+								result: "",
+								result_advice: "",
+								response_time: 0,
+								raw_response: ""
+							};
+
+							// Failed ping results in valid result with "NaN" for the timing values
+							if( parseFloat( response.avg ) + "" !== "NaN" ) // Node has no isNan()?
+							{
+								// Site is up
+								returnValue.result = "up";
+								returnValue.response_time = response.avg;
+								returnValue.raw_response = response;
+							}
+							else
+							{
+								// Site is down
+								returnValue = 
+								{
+									result: "down",
+									response_time: 0,
+									raw_response: response
+								}
+							}
+
+							resolve( returnValue );
+						}
+
+						// Return "Down" if there's an error
+						returnValue = 
+						{
+							result: "down",
+							response_time: 0,
+							raw_response: response
+						}
+						resolve( returnValue );
 					}
 				);
 			}

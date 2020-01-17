@@ -21,10 +21,10 @@ class CW_Runner
 	 * 
 	 * TODO: refactor sanity checking
 	 * TODO: refactor case statements
-	 * TODO: return a JSON string for API-type use
 	 * @param {*} command 		The command to run
+	 * @param {*} config		An object holding the ingested configuration values
 	 */
-	async runCommand( command )
+	async runCommand( command, config )
     {
         // sanity check the requested command
         let validCommands = [ "all", "local", "dns", "http", "https" ];
@@ -41,10 +41,8 @@ class CW_Runner
             process.exit( 1 );
         }
 
-        // If we know what to do, do it
+        // We know what to do, so do it
 		let async = require( "async" );
-		const CW_Network = require( "./CW_Network.js" );
-		const network = new CW_Network();
 
 		// TODO: populate the reponse object with values from a helper class instead if individual lines in each 'case'
 		let responseObject = 
@@ -52,8 +50,14 @@ class CW_Runner
 			test: "",
 			description: "",
 			result: "",
-			result_advice: ""
+			result_advice: "",
+			response_time: 0,
+			raw_response: ""
 		};
+
+		const CW_Network = require( "./CW_Network.js" );
+		const network = new CW_Network();
+
 		
 		switch( command )
 		{
@@ -90,10 +94,37 @@ class CW_Runner
 						});
 				break;
 			case "http":
-				console.log( "HTTP not yet implemented" );
+				responseObject.test = "http";
+				responseObject.description = "Non-secure website availability test";
+
+				network.checkWebsiteAvailability( config.domain, 80 )
+						.then(
+							( result ) =>
+							{
+								responseObject.result = result.result;
+								responseObject.result_advice = result.result_advice;
+								responseObject.response_time = result.response_time;
+								responseObject.raw_response = result.raw_response;
+								console.log( JSON.stringify( responseObject ) );
+							}
+						);
 				break;
 			case "https":
-				console.log( "HTTPS not yet implemented" );
+				case "https":
+				responseObject.test = "https";
+				responseObject.description = "Secure website availability test";
+
+				network.checkWebsiteAvailability( config.domain, 443 )
+						.then(
+							( result ) =>
+							{
+								responseObject.result = result.result;
+								responseObject.result_advice = result.result_advice;
+								responseObject.response_time = result.response_time;
+								responseObject.raw_response = result.raw_response;
+								console.log( JSON.stringify( responseObject ) );
+							}
+						);
 				break;
 			case "all":
 				console.log( "ALL not yet implemented" );
