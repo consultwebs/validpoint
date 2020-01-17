@@ -1,0 +1,19 @@
+{
+  "name": "Validpoint",
+  "version": "1.0.0",
+  "description": "CLI service validator",
+  "license": "Proprietary",
+  "bin": {
+    "Validpoint": "bin/Validpoint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/consultwebs/validpoint"
+  },
+  "scripts": {},
+  "dependencies": {
+    "async": "^3.1.0",
+    "ping": ">=0.2.2",
+    "strict-mode": ">=1.1.4"
+  }
+}

@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+
+/**
+ * CW website validator access hub.
+ * 
+ * Invoking: ./bin/Validpoint [command]
+ * Invocation without "command" is synonymous with "all" as the command
+ */
+
+require( "strict-mode" )(
+    () =>
+    {
+        const CW_InputParser =  require( "../../classes/CW_InputParser.js" );
+		const parser = new CW_InputParser( "input.json" );
+		
+		let config = null;
+
+		// Since the async file system calls return before completing, wrap parser functionality inside of an init completion/callback
+        parser.init(
+            function() // init callback
+            {
+				// `this` is an instance of the InputParser
+				// TODO: Needs a try/catch
+				config = this.parseJsonString();
+
+				if( config == null )
+				{
+					console.log( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
+                    process.exit( 1 ); // TODO: Needs to bubble an exception
+				}
+				
+                // console.log( `NAME: ${config.name}` );
+				// console.log( `URL:  ${config.url}` );
+				
+				// parse the requested command from the command line arguments, then run it
+				let cmd = "all";
+				if( process.argv.length >= 3 )
+				{
+					cmd = process.argv[2];
+				}
+
+				CW_InputParser.runCommand( cmd );
+            }
+        );
+
+    }
+);
