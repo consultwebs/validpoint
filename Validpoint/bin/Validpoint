@@ -16,7 +16,9 @@ require( "strict-mode" )(
 
 		const CW_InputParser =  require( "../../classes/CW_InputParser.js" );
 		let config = null;
-		const parser = new CW_InputParser( "input.json" );
+
+		// TODO: We'll want a file iterator instead of hard-coding a single file name
+		const parser = new CW_InputParser( "consultwebs.com.json" );
 
 		parser.init(
 			function() // init callback
