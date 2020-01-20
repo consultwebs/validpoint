@@ -37,9 +37,6 @@ require( "strict-mode" )(
 						process.exit( 1 );
 					}
 					
-					// console.log( `NAME:   ${config.name}` );
-					// console.log( `DOMAIN: ${config.domain}` );
-					
 					// parse the requested command from the command line arguments, then run it
 					let cmd = "all";
 					if( process.argv.length >= 3 )

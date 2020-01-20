@@ -27,7 +27,7 @@ class CW_Runner
 	async runCommand( command, config )
     {
         // sanity check the requested command
-        let validCommands = [ "all", "local", "dns", "http", "https", "http-response", "https-response" ];
+        let validCommands = [ "all", "local", "dns", "http", "https", "http-response", "https-response", "website", "secure-website" ];
 
         if( validCommands.indexOf( command ) < 0 )
         {
@@ -59,9 +59,117 @@ class CW_Runner
 
 		const CW_Network = require( "./CW_Network.js" );
 		const network = new CW_Network();
+
+		let outputObject;
 		
+		// TODO: Refactor. With this many cases, each one should be 1-3 lines of code.
 		switch( command )
 		{
+			case "website":
+				// http, then http-response
+				responseObject.test = "website";
+				responseObject.description = "Non-secure website availability and response test";
+
+				outputObject = responseObject;
+
+				async.waterfall(
+					[
+						( comlpetion ) =>
+						{
+							network.checkWebsiteAvailability( config.domain, 80 )
+									.then(
+										( result ) =>
+										{
+											responseObject.result = result.result;
+											responseObject.result_advice = result.result_advice;
+											responseObject.response_time = result.response_time;
+											responseObject.raw_response = result.raw_response;
+
+											outputObject = responseObject;
+											comlpetion( null, responseObject );
+										}
+									);
+						},
+						( result, completion ) =>
+						{
+							network.checkWebsiteResponse( config.url, 80 )
+									.then(
+										( result ) =>
+										{
+											outputObject.result = result.result;
+											outputObject.result_advice += " " + result.result_advice;
+											responseObject.status_code = result.status_code;
+											responseObject.redirect_location = result.redirect_location;
+
+											console.log( JSON.stringify( responseObject ) );
+											completion( null );
+										}
+									);
+						}
+					],
+					( error ) =>
+					{
+						// TODO: Handle errors
+						if( error )
+						{
+							console.log( error );
+						}
+					}
+				);
+
+				break;
+			case "secure-website":
+				// https, then https-response
+				responseObject.test = "secure-website";
+				responseObject.description = "Secure website availability and response test";
+
+				outputObject = responseObject;
+
+				async.waterfall(
+					[
+						( comlpetion ) =>
+						{
+							network.checkWebsiteAvailability( config.domain, 443 )
+									.then(
+										( result ) =>
+										{
+											responseObject.result = result.result;
+											responseObject.result_advice = result.result_advice;
+											responseObject.response_time = result.response_time;
+											responseObject.raw_response = result.raw_response;
+
+											outputObject = responseObject;
+											comlpetion( null, responseObject );
+										}
+									);
+						},
+						( result, completion ) =>
+						{
+							network.checkWebsiteResponse( config.url, 443 )
+									.then(
+										( result ) =>
+										{
+											outputObject.result = result.result;
+											outputObject.result_advice += " " + result.result_advice;
+											responseObject.status_code = result.status_code;
+											responseObject.redirect_location = result.redirect_location;
+
+											console.log( JSON.stringify( responseObject ) );
+											completion( null );
+										}
+									);
+						}
+					],
+					( error ) =>
+					{
+						// TODO: Handle errors
+						if( error )
+						{
+							console.log( error );
+						}
+					}
+				);
+				break;
 			case "local":
 				responseObject.test = "local-network";
 				responseObject.description = "Local network connectivity check";
