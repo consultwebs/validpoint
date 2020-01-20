@@ -27,7 +27,7 @@ class CW_Runner
 	async runCommand( command, config )
     {
         // sanity check the requested command
-        let validCommands = [ "all", "local", "dns", "http", "https" ];
+        let validCommands = [ "all", "local", "dns", "http", "https", "http-response", "https-response" ];
 
         if( validCommands.indexOf( command ) < 0 )
         {
@@ -52,12 +52,13 @@ class CW_Runner
 			result: "",
 			result_advice: "",
 			response_time: 0,
-			raw_response: ""
+			raw_response: "",
+			status_code: "",
+			redirect_location: ""
 		};
 
 		const CW_Network = require( "./CW_Network.js" );
 		const network = new CW_Network();
-
 		
 		switch( command )
 		{
@@ -110,7 +111,6 @@ class CW_Runner
 						);
 				break;
 			case "https":
-				case "https":
 				responseObject.test = "https";
 				responseObject.description = "Secure website availability test";
 
@@ -126,6 +126,43 @@ class CW_Runner
 							}
 						);
 				break;
+			case "http-response":
+				responseObject.test = "http-reponse";
+				responseObject.description = "Website response test";
+
+				network.checkWebsiteResponse( config.url, 80 )
+						.then(
+							( result ) =>
+							{
+								responseObject.result = result.result;
+								responseObject.result_advice = result.result_advice;
+								responseObject.response_time = result.response_time;
+								// responseObject.raw_response = result.raw_response; // skip this until we want/need to deal with JSON "circular references"
+								responseObject.status_code = result.status_code;
+								responseObject.redirect_location = result.redirect_location;
+
+								console.log( JSON.stringify( responseObject ) );
+							}
+						);
+				break;
+			case "https-response":
+					responseObject.test = "https-reponse";
+					responseObject.description = "Secure website response test";
+	
+					network.checkWebsiteResponse( config.url, 443 )
+							.then(
+								( result ) =>
+								{
+									responseObject.result = result.result;
+									responseObject.result_advice = result.result_advice;
+									responseObject.response_time = result.response_time;
+									// responseObject.raw_response = result.raw_response; // skip this until we want/need to deal with JSON "circular references"
+									responseObject.status_code = result.status_code;
+									responseObject.redirect_location = result.redirect_location;
+									console.log( JSON.stringify( responseObject ) );
+								}
+							);
+					break;
 			case "all":
 				console.log( "ALL not yet implemented" );
 				break;

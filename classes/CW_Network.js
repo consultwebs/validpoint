@@ -80,6 +80,101 @@ class CW_Network
 	}
 
 	/**
+	 * Verify that the user's website status and redirect URL
+	 * 
+	 * @author costmo
+	 * @returns Promise
+	 * @param {*} domain		The domain name of the site to check
+	 * @param {*} port			The port to check (80 or 443)
+	 */
+	async checkWebsiteResponse( domain, port )
+	{
+		return new Promise(
+			( resolve, reject ) =>
+			{
+				let returnValue;
+				let protocol;
+				if( port == 80 )
+				{
+					protocol = require( "http" );
+				}
+				else
+				{
+					protocol = require( "https" );
+				}
+
+				let options = 
+				{
+					hostname: domain,
+					port: port,
+					path: "/",
+					method: "GET"
+				};
+
+				const request = protocol.request( options,
+					( response ) =>
+					{
+						// If you don't have an on.data - even if you're not doing anything with the data - node never fires on.end
+						response.on( "data", ( data ) => {} );
+
+						response.on( "end",
+							() =>
+							{
+								// Pull out the headers
+								let headers = response.headers;
+
+								returnValue = 
+								{
+									result: "up",
+									result_advice: "",
+									response_time: 0,
+									raw_response: response,
+									status_code: response.statusCode,
+									redirect_location: (undefined == headers.location) ? "" : headers.location
+								};
+
+								// 400-level errors
+								if( response.statusCode.toString().startsWith( "4" ) )
+								{
+									returnValue.result = "down";
+									returnValue.result_advice = "The home page of your website is not currently available. Contact your website hosting provider immediately.";
+								}
+								else if( response.statusCode.toString().startsWith( "5" ) ) // 500-level errors
+								{
+									returnValue.result = "down";
+									returnValue.result_advice = "Your website is experiencing a technical issue that is preventing people from using it. Contact your website hosting provider immediately.";
+								}
+								else if( response.statusCode.toString().startsWith( "3" ) ) // Redirects
+								{
+									returnValue.result = "redirect";
+									returnValue.result_advice = "Your website is redirecting. This is not necessarily a problem, but it may cause an SEO penalty. Please contact your SEO specialist.";
+								}
+								else if( response.statusCode != 200 ) // Everything else that's not '200'
+								{
+									returnValue.result = "down";
+									returnValue.result_advice = "Your website is not available to users for an unusual technical reason. Contact your website hosting provider.";
+								}
+								
+								resolve( returnValue );
+							}
+						);
+					}
+				);
+
+				request.end();
+
+				request.on( "error",
+					( error ) =>
+					{
+						// TODO: Reject, don't resolve
+						console.log( error );
+						resolve( returnValue );
+					}
+				);
+			});
+	}
+
+	/**
 	 * Verify that the user's website is responding and get the average connection latency
 	 * 
 	 * @author costmo
