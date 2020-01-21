@@ -87,7 +87,7 @@ class CW_Network
 	 * @param {*} domain		The domain name of the site to check
 	 * @param {*} port			The port to check (80 or 443)
 	 */
-	async checkWebsiteResponse( domain, port )
+	async checkWebsiteResponse( { domain = null, port = 80 } )
 	{
 		return new Promise(
 			( resolve, reject ) =>
@@ -182,7 +182,7 @@ class CW_Network
 	 * @param {*} domain		The domain name of the site to check
 	 * @param {*} port			The port to check (80 or 443)
 	 */
-	async checkWebsiteAvailability( domain, port )
+	async checkWebsiteAvailability( { domain = null, port = 80 } )
 	{
 		return new Promise(
 			( resolve, reject ) =>

@@ -44,7 +44,7 @@ require( "strict-mode" )(
 						cmd = process.argv[2];
 					}
 
-					runner.runCommand( cmd, config );
+					runner.runCommand( { command: cmd, configObject: config } );
 				}
 				catch( exception )
 				{
