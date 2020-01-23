@@ -22,6 +22,7 @@ class CW_Runner
 	 * Run a command
 	 * 
 	 * TODO: refactor sanity checking
+	 * TODO: input checking and delegating work to adaptors needs to negate the need to add to the validCommands array and add a new case
 	 * @author costmo
 	 * @param {*} command 			The command to run
 	 * @param {*} configObject		An object holding the ingested configuration values
@@ -29,7 +30,10 @@ class CW_Runner
 	async runCommand( { command = "", configObject = null } )
     {
         // sanity check the requested command
-        let validCommands = [ "all", "local", "dns", "http", "https", "http-response", "https-response", "website", "secure-website" ];
+        let validCommands = [ 
+			"all", "local", "dns", "http", "https", "http-response", "https-response", 
+			"website", "secure-website" , "domain"
+		];
 
         if( validCommands.indexOf( command ) < 0 )
         {
@@ -81,6 +85,9 @@ class CW_Runner
 				break;
 			case "https-response":
 				this.command_WebsiteResponse( { configObject: configObject, responseObject: responseObject, port: 80 } );
+				break;
+			case "domain":
+				this.command_Domain( { configObject: configObject, responseObject: responseObject } );
 				break;
 			case "all":
 				console.log( "ALL not yet implemented" );
@@ -219,6 +226,300 @@ class CW_Runner
 	} // command_localNetwork()
 
 	/**
+	  * 
+	  * TODO: Refactor all the string slices into a utility function
+	  * @param {*} param0 
+	  */
+	 command_Domain( { configObject = null, responseObject =  null } )
+	 {
+		let async = require( "async" );
+
+		responseObject.test = "domain";
+		responseObject.description = "Technical domain tests";
+
+		responseObject.servers = new Object();
+		responseObject.servers.ns = new Array(); // list of name servers
+		responseObject.servers.tld_cname = new Array(); // list of cname records for @
+		responseObject.servers.www_cname = new Array(); // list of cname records for www
+		responseObject.servers.mx = new Array(); // list of Mail eXchange servers
+		responseObject.servers.tld_a = new Array(); // list of A records for the domain
+		responseObject.servers.www_a = new Array(); // list of A records for www.<domain>
+ 
+		// Using ANY as the argument to dig is remarkably unreliable in retrieving complete records. 
+		// The only way to get complete records reliably is to perform individual TYPE queries against an authoritative name server.
+		// TODO: Refactor each of these completion blocks into individual methods so the code is easier to read/follow
+		async.waterfall(
+			[
+				( completion ) =>
+				{
+					// get nameserver records first so that we can get all the other data from an authority because non-authorities don't always answer completely
+					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "NS", queryServer: null } )
+					.then(
+						( result ) =>
+						{
+							result.forEach( 
+								resultItem =>
+								{
+									if (resultItem.value[ (resultItem.value.length - 1) ] === ".")
+									{
+										resultItem.value = resultItem.value.slice( 0, -1 );
+									}
+
+									responseObject.servers.ns.push( resultItem.value );
+								});
+								completion( null, responseObject );
+						}
+					);
+				},
+				( result, completion ) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
+				{
+					if( result.servers.ns.length > 0 && result.servers.ns[0].length > 0 )
+					{
+						result.servers.ns[0] = result.servers.ns[0];
+					}
+					else
+					{
+						// TODO: Reject or throw because there were no records
+					}
+
+					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX", queryServer: result.servers.ns[0] } )
+					.then(
+						( result ) =>
+						{
+							result.forEach( 
+								resultItem =>
+								{
+									if (resultItem.value[ (resultItem.value.length - 1) ] === ".")
+									{
+										resultItem.value = resultItem.value.slice( 0, -1 );
+									}
+
+									responseObject.servers.mx.push( resultItem.value );
+									
+								});
+								completion( null, responseObject );
+						}
+					);
+
+				},
+				( result, completion ) => // Step 3. Perform a dig query against an authoritative name server to get an A record for the domain (should be the @ record)
+				{
+					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "A", queryServer: result.servers.ns[0] } )
+					.then(
+						( result ) =>
+						{
+							// This happens if there is no CNAME record, which is OK if there is an A record
+							if( undefined !== result )
+							{
+								result.forEach( 
+									resultItem =>
+									{
+										// get rid of the trailing dot in the record value
+										if (resultItem.value[ (resultItem.value.length - 1) ] === ".")
+										{
+											resultItem.value = resultItem.value.slice( 0, -1 );
+										}
+
+										responseObject.servers.tld_a.push( resultItem.value );
+									});
+									completion( null, responseObject );
+							}
+						});
+				},
+				( result, completion ) => // Step 4. Perform a dig query against an authoritative name server to get an A record for the www.<domain> 
+				{
+					CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "A", queryServer: result.servers.ns[0] } )
+					.then(
+						( result ) =>
+						{
+							if( undefined !== result )
+							{
+								// We should get a CNAME as the first response result and an A record as the second
+								if( result.length > 1 )
+								{
+									if (result[0].value[ (result[0].value.length - 1) ] === ".")
+									{
+										result[0].value = result[0].value.slice( 0, -1 );
+									}
+									if (result[1].value[ (result[1].value.length - 1) ] === ".")
+									{
+										result[1].value = result[1].value.slice( 0, -1 );
+									}
+
+									
+									if( (result[0].type == "CNAME" && result[1].type == "A") )
+									{
+										responseObject.servers.www_cname.push( result[0].value );
+										responseObject.servers.www_a.push( result[1].value );
+									}
+									else if(result[0].type == "A" && result[1].type == "CNAME" ) // In theory, these can arrive in reverse order
+									{
+										responseObject.servers.www_cname.push( result[1].value );
+										responseObject.servers.www_a.push( result[0].value );
+									}
+								}
+								completion( null, responseObject );
+							}
+							else
+							{
+								completion( null, responseObject );
+							}
+						});
+				},
+				( result, completion ) => // Step 5. Perform a dig query against an authoritative name server to get a CNAME record for the URL
+				{
+					CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "CNAME", queryServer: result.servers.ns[0] } )
+					.then(
+						( result ) =>
+						{
+							if( undefined !== result )
+							{
+								result.forEach( 
+									resultItem =>
+									{
+										if (resultItem.value[ (resultItem.value.length - 1) ] === ".")
+										{
+											resultItem.value = resultItem.value.slice( 0, -1 );
+										}
+										responseObject.servers.www_cname.push( resultItem.value );
+									});
+									completion( null, responseObject );
+							}
+							else
+							{
+								completion( null, responseObject );
+							}
+						});
+				},
+				( result, completion ) => // Step 6. Perform a dig query against an authoritative name server to get a CNAME record for the domain
+				{
+					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "CNAME", queryServer: result.servers.ns[0] } )
+					.then(
+						( result ) =>
+						{
+							// This should be undefined
+							if( undefined !== result )
+							{
+								result.forEach( 
+									resultItem =>
+									{
+										if (resultItem.value[ (resultItem.value.length - 1) ] === ".")
+										{
+											resultItem.value = resultItem.value.slice( 0, -1 );
+										}
+										responseObject.servers.tld_cname.push( resultItem.value );
+									});
+									completion( null, responseObject );
+							}
+							else
+							{
+								completion( null, responseObject );
+							}
+						});
+				}
+				// ( result, completion ) =>
+				// {
+				// }
+			],
+			( error, result ) =>
+			{
+				// TODO: Handle errors
+				if( error )
+				{
+					console.log( "E" );
+					console.log( error );
+				}
+				else
+				{
+					// Look over the results and offer some advice if necessary
+					result.raw_response = result.servers;
+
+					// TODO: Advice needs to be refactored into its own class
+					if( result.servers.ns.length < 1 )
+					{
+						result.result_advice += " Your domain does not have any name servers defined, so people will not be able to reach your website. Contact your website hosting provider.";
+					}
+					if( result.servers.tld_cname.length > 0 )
+					{
+						// TODO: make sure the only record(s) point to an IP address and not a domain name. It's normal for a dig query to receive an IP address here when there is no CNAME actually defined
+						// result.result_advice += " Your domain name is currently configured as an alias (CNAME) to another address. This may not be a problem, but it isn't normal. You should contact your website hosting provider if you have a concern.";
+					}
+
+					if( result.servers.www_cname.length < 1 )
+					{
+						result.result_advice += " You have not configured a \"www\" address for people to reach your website. People may still be able to reach your website by not typing the \"www,\" but many Internet users expect URLs to begin with those characters and type them, even when they don't need to do so. To make sure you are maximising your traffic, you should contact your website hosting provider and have them add a \"CNAME\" record for your domain.";
+					}
+					else
+					{
+						let foundDomain = false;
+						result.servers.www_cname.forEach(
+							cname =>
+							{
+								if( cname == configObject.domain )
+								{
+									foundDomain = true;
+								}
+							}
+						);
+						if( !foundDomain )
+						{
+							result.result_advice += " Your \"www\" alias is not currently pointing to your top-level domain. This may not be a problem, but it isn't normal. You should contact your website hosting provider if you have a concern.";
+						}
+					}
+
+					if( result.servers.mx.length < 1 )
+					{
+						result.result_advice += " You have not configured any Mail Exchange (MX) records. This means that people will not be able to send you email messages using your domain name. Contact your website or email hosting provider for more information.";
+					}
+					if( result.servers.tld_a.length < 1 )
+					{
+						result.result_advice += " Your domain name does not have its own \"A\" record in your domain's DNS records. This may not be a problem, but it isn't normal. You should contact your website hosting provider if you have a concern.";
+					}
+					if( result.servers.www_a.length > 0 ) // make sure the www "A" record matches the TLD record
+					{
+						let haveMatch = false;
+
+						if( result.servers.tld_a.length > 0 )
+						{
+							result.servers.tld_a.forEach(
+								server =>
+								{
+									// We're only trying to match against the first www A record. Having more than one would be weird.
+									if( result.servers.www_a[0] == result.servers.tld_a[0] )
+									{
+										haveMatch = true;
+									}
+								}
+							);
+						}
+
+						if( !haveMatch )
+						{
+							result.result_advice += " Your \"www\" DNS record does not match your domain's top-level IP address. This may not be a problem, but it isn't normal. You should contact your website hosting provider if you have a concern.";
+						}
+					}
+
+					if( result.result_advice.length < 1 )
+					{
+						result.result_advice = "none";
+						result.result = "pass";
+					}
+					else
+					{
+						result.result = "advice";
+					}
+
+					console.log( "R:" )
+					console.log( result );
+				}
+			}
+		);
+		 
+ 
+
+	 }
+
+	/**
 	 * Check website availability, response time and redirect status
 	 * This wraps the 'website availability' and 'website response' checks into single chained request
 	 * (Convenience method to decouple logic from the runCommand switch list)
@@ -246,7 +547,7 @@ class CW_Runner
 
 		async.waterfall(
 			[
-				( comlpetion ) =>
+				( completion ) =>
 				{
 					CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } )
 							.then(
@@ -258,7 +559,7 @@ class CW_Runner
 									responseObject.raw_response = result.raw_response;
 
 									outputObject = responseObject;
-									comlpetion( null, responseObject );
+									completion( null, responseObject );
 								}
 							);
 				},

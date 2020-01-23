@@ -17,7 +17,7 @@ class CW_Network
      */
     constructor()
     {
-    }
+	}
 
 	/**
 	 * Ping a server that's known to accept ICMP packets and never go down to make sure the local Internet connection is working.
@@ -48,7 +48,7 @@ class CW_Network
 				);
 			}
 		);	
-	}
+	} // checkLocalNetwork()
 	
 	/**
 	 * Make sure the local Internet connection can resolve a hostname
@@ -77,7 +77,7 @@ class CW_Network
 				);
 			}
 		);
-	}
+	} // checkDns()
 
 	/**
 	 * Verify that the user's website status and redirect URL
@@ -172,7 +172,7 @@ class CW_Network
 					}
 				);
 			});
-	}
+	} // checkWebsiteResponse()
 
 	/**
 	 * Verify that the user's website is responding and get the average connection latency
@@ -244,6 +244,49 @@ class CW_Network
 						resolve( returnValue );
 					}
 				);
+			}
+		);
+	} // checkWebsiteAvailability()
+
+	/**
+	 * Perform a `dig` query to get domain information
+	 * 
+	 * @returns Promise
+	 * @param {*} domain		The domain/URL to query
+	 * @param {*} recordType	The type of record to find ("A", "CNAME", "MX" etc.)
+	 * @param {*} queryServer	The server to query. If null, will use the current user's configured DNS server
+	 */
+	async checkDomain( { domain = null, recordType = null, queryServer = null } )
+	{
+		return new Promise(
+			( resolve, reject ) =>
+			{
+				let dig = require( "node-dig-dns" );
+
+				// Doing a query from local dig does not provide every result for "ANY"
+				//    so we will get the domain's NS records first, then we can dig for everything except a CNAME list using
+				//    `dig @authority_server domain ANY`
+
+				if( queryServer == null )
+				{
+					dig( [ domain, recordType ] )
+						.then(
+							( result ) =>
+							{
+								resolve( result.answer );
+							}
+						);
+				}
+				else
+				{
+					dig( [ queryServer, domain, recordType ] )
+						.then(
+							( result ) =>
+							{
+								resolve( result.answer );
+							}
+						);
+				}
 			}
 		);
 	}
