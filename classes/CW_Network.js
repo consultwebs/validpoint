@@ -4,6 +4,15 @@
  * @author costmo
  */
 
+ /*
+ // TODO: Refactor complicated function definitions that are used as input parameters.
+ Having really complicated code (a fully-formed function) as an input parameter to a function/method call creates code that becomes incresingly more difficult to test and maintain.
+ I know that's the Java/javascript way, but it doesn't have to be. For example, this:
+ return new Promise( (resolve, reject) => { <80 lines of code go here> } ); // The way Java has taught us to write code, but other OO languages not care for
+ Should be more like this:
+ return this.promiseResolver( this.someOtherFunction( input ) ); // Move meaningful code to someOtherFunction() - promiseResolver returns Promise
+ */
+
 const PING_HOST = "8.8.4.4"; // Google public DNS server
 const DNS_HOST = "www.google.com";
 
@@ -247,6 +256,50 @@ class CW_Network
 			}
 		);
 	} // checkWebsiteAvailability()
+
+	/**
+	 * Perform a whois query for the given domain. Currently (only) used to check pending domaind expiration.
+	 * 
+	 * IMPORTANT NOTE: The keys and values that are returned by the query are strings that have no rules from registrar from registrar or OS to OS (the implementation of the local whois executable makes a difference). This parser is likely to fail for some registrars.
+	 * 
+	 * TODO: Update this so a caller can tell the parser which bit of data it wants returned.
+	 * 
+	 * @author costmo
+	 * @returns Promise
+	 * @param {*} domain		The domain name to lookup 
+	 */
+	async getWhoisInfo( { domain = null } )
+	{
+		return new Promise(
+			( resolve, reject ) =>
+			{
+				const whois = require( "whois" );
+				const whoisParser = require( "parser-whoisv2" );
+
+				whois.lookup(
+					domain,
+					( error, response ) =>
+					{
+
+						let lineItems = whoisParser.parseWhoIsData( response )
+						lineItems.forEach(
+								item => 
+								{
+									let lowerCaseAttribute = item.attribute.toLowerCase();
+									if( lowerCaseAttribute.includes( "expiration" ) )
+									{
+										resolve( item.value );
+									}
+								}
+							);
+
+
+						// TODO: Handle errors
+					}
+				);
+			}
+		);
+	}
 
 	/**
 	 * Perform a `dig` query to get domain information

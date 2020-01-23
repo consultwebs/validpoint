@@ -416,6 +416,24 @@ class CW_Runner
 								completion( null, responseObject );
 							}
 						});
+				},
+				( result, completion ) => // Step 7. Perform a whois lookup to get the domain expiration
+				{
+					CW_Runner.network.getWhoisInfo( { domain: configObject.domain } )
+					.then(
+						( result ) =>
+						{
+							responseObject.expiration = result;
+
+							let parsedDate = Date.parse( responseObject.expiration );
+							let now = Date.now();
+							let timeDiff = Math.abs( now - parsedDate );
+							let daysTilExpiry = Math.floor( timeDiff/(86400 * 1000) ); // '* 1000' because timeDiff is in microseconds
+
+							responseObject.days_til_expiry = daysTilExpiry;
+
+							completion( null, responseObject );
+						});
 				}
 				// ( result, completion ) =>
 				// {
@@ -509,7 +527,6 @@ class CW_Runner
 						result.result = "advice";
 					}
 
-					console.log( "R:" )
 					console.log( result );
 				}
 			}
