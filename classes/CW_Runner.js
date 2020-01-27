@@ -81,10 +81,10 @@ class CW_Runner
 				this.command_WebsiteAvailability( { configObject: configObject, responseObject: responseObject, port: 443 } );
 				break;
 			case "http-response":
-				this.command_WebsiteResponse( { configObject: configObject, responseObject: responseObject, port: 80 } );
+				this.command_WebsiteResponse( { configObject: configObject.url, responseObject: responseObject, port: 80 } );
 				break;
 			case "https-response":
-				this.command_WebsiteResponse( { configObject: configObject, responseObject: responseObject, port: 80 } );
+				this.command_WebsiteResponse( { configObject: configObject.url, responseObject: responseObject, port: 443 } );
 				break;
 			case "domain":
 				this.command_Domain( { configObject: configObject, responseObject: responseObject } );
@@ -123,7 +123,7 @@ class CW_Runner
 			responseObject.description = "Secure website response test";
 		}
 
-		CW_Runner.network.checkWebsiteResponse( { domain: configObject.url, port: port } )
+		CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
 				.then(
 					( result ) =>
 					{
@@ -237,6 +237,8 @@ class CW_Runner
 		responseObject.test = "domain";
 		responseObject.description = "Technical domain tests";
 
+		responseObject.http_response_time = -1;
+		responseObject.https_response_time = -1;
 		responseObject.servers = new Object();
 		responseObject.servers.ns = new Array(); // list of name servers
 		responseObject.servers.tld_cname = new Array(); // list of cname records for @
@@ -244,6 +246,7 @@ class CW_Runner
 		responseObject.servers.mx = new Array(); // list of Mail eXchange servers
 		responseObject.servers.tld_a = new Array(); // list of A records for the domain
 		responseObject.servers.www_a = new Array(); // list of A records for www.<domain>
+
  
 		// Using ANY as the argument to dig is remarkably unreliable in retrieving complete records. 
 		// The only way to get complete records reliably is to perform individual TYPE queries against an authoritative name server.
@@ -517,6 +520,18 @@ class CW_Runner
 						}
 					}
 
+					if( result.days_til_expiry < 91 )
+					{
+						if( result.days_til_expiry < 1 )
+						{
+							result.result_advice += " Your domain name has expired and people will not be able to reach your website. If you do not renew your domain name soon, their may be a large \"redemption\" fee. Contact your hosting provider immediately for assistance.";
+						}
+						else
+						{
+							result.result_advice += " Your domain name is going to expire in " + result.days_til_expiry + " days. If you do not renew your domain name, people will not be able to reach your website. Contact your hosting provider immediately for assistance.";
+						}
+					}
+
 					if( result.result_advice.length < 1 )
 					{
 						result.result_advice = "none";
@@ -526,9 +541,8 @@ class CW_Runner
 					{
 						result.result = "advice";
 					}
-
-					console.log( result );
 				}
+				console.log( result );
 			}
 		);
 		 
@@ -566,7 +580,7 @@ class CW_Runner
 			[
 				( completion ) =>
 				{
-					CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } )
+					CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } )
 							.then(
 								( result ) =>
 								{
@@ -582,7 +596,7 @@ class CW_Runner
 				},
 				( result, completion ) =>
 				{
-					CW_Runner.network.checkWebsiteResponse( { domain: configObject.url, port: port } )
+					CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
 							.then(
 								( result ) =>
 								{

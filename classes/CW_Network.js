@@ -13,8 +13,10 @@
  return this.promiseResolver( this.someOtherFunction( input ) ); // Move meaningful code to someOtherFunction() - promiseResolver returns Promise
  */
 
+ // TODO: Add an array of hosts to ping, iterate and check them until we find one that responds or there are none left to check
 const PING_HOST = "8.8.4.4"; // Google public DNS server
 const DNS_HOST = "www.google.com";
+const MAX_HTTTP_RESPONSE_TIME = 5000;
 
 class CW_Network
 {
@@ -93,28 +95,24 @@ class CW_Network
 	 * 
 	 * @author costmo
 	 * @returns Promise
-	 * @param {*} domain		The domain name of the site to check
+	 * @param {*} url			The URL of the site to check
 	 * @param {*} port			The port to check (80 or 443)
 	 */
-	async checkWebsiteResponse( { domain = null, port = 80 } )
+	async checkWebsiteResponse( { url = null, port = 80 } )
 	{
 		return new Promise(
 			( resolve, reject ) =>
 			{
 				let returnValue;
-				let protocol;
-				if( port == 80 )
-				{
-					protocol = require( "http" );
-				}
-				else
+				let protocol= require( "http" );
+				if( port == 443 )
 				{
 					protocol = require( "https" );
 				}
 
 				let options = 
 				{
-					hostname: domain,
+					hostname: url,
 					port: port,
 					path: "/",
 					method: "GET"
@@ -228,6 +226,11 @@ class CW_Network
 								returnValue.result = "up";
 								returnValue.response_time = response.avg;
 								returnValue.raw_response = response;
+
+								if( response.avg > MAX_HTTTP_RESPONSE_TIME )
+								{
+									returnValue.result_advice = "Your website is taking much longer than it should to respond, and it may be entirely down. Contact your hosting provider for immediate assistance.";
+								}
 							}
 							else
 							{
