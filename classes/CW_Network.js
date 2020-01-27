@@ -14,9 +14,6 @@
  */
 
  // TODO: Add an array of hosts to ping, iterate and check them until we find one that responds or there are none left to check
-const PING_HOST = "8.8.4.4"; // Google public DNS server
-const DNS_HOST = "www.google.com";
-const MAX_HTTTP_RESPONSE_TIME = 5000;
 
 class CW_Network
 {
@@ -29,26 +26,6 @@ class CW_Network
     constructor()
     {
 	}
-
-	// Promise resolver for the local network test
-	// resolve_localNetwork( resolve, reject )
-	// {
-	// 	// Set the default status to "down"
-	// 	let ping = require( "ping" );
-	// 	let msg = "down";
-
-	// 	// Perform a ping to prove the default status
-	// 	ping.sys.probe( PING_HOST,
-	// 		async ( isAlive ) =>
-	// 		{
-	// 			if( isAlive )
-	// 			{
-	// 				msg = "up";
-	// 			}
-	// 			resolve( msg );
-	// 		}
-	// 	);
-	// }
 
 	/**
 	 * Ping a server that's known to accept ICMP packets and never go down to make sure the local Internet connection is working.
@@ -80,12 +57,11 @@ class CW_Network
 		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
 		let resolver = new CW_PromiseResolver();
 
-		return new Promise(
-			( resolve, reject ) =>
+		return new Promise( 
+			(resolve, reject ) => 
 			{
 				resolver.resolve_checkDns( resolve, reject );
-			}
-		);
+			});
 	} // checkDns()
 
 	/**
@@ -98,84 +74,13 @@ class CW_Network
 	 */
 	async checkWebsiteResponse( { url = null, port = 80 } )
 	{
-		return new Promise(
-			( resolve, reject ) =>
+		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
+		let resolver = new CW_PromiseResolver();
+
+		return new Promise( 
+			( resolve, reject ) => 
 			{
-				let returnValue;
-				let protocol= require( "http" );
-				if( port == 443 )
-				{
-					protocol = require( "https" );
-				}
-
-				let options = 
-				{
-					hostname: url,
-					port: port,
-					path: "/",
-					method: "GET"
-				};
-
-				const request = protocol.request( options,
-					( response ) =>
-					{
-						// If you don't have an on.data - even if you're not doing anything with the data - node never fires on.end
-						response.on( "data", ( data ) => {} );
-
-						response.on( "end",
-							() =>
-							{
-								// Pull out the headers
-								let headers = response.headers;
-
-								returnValue = 
-								{
-									result: "up",
-									result_advice: "",
-									response_time: 0,
-									raw_response: response,
-									status_code: response.statusCode,
-									redirect_location: (undefined == headers.location) ? "" : headers.location
-								};
-
-								// 400-level errors
-								if( response.statusCode.toString().startsWith( "4" ) )
-								{
-									returnValue.result = "down";
-									returnValue.result_advice = "The home page of your website is not currently available. Contact your website hosting provider immediately.";
-								}
-								else if( response.statusCode.toString().startsWith( "5" ) ) // 500-level errors
-								{
-									returnValue.result = "down";
-									returnValue.result_advice = "Your website is experiencing a technical issue that is preventing people from using it. Contact your website hosting provider immediately.";
-								}
-								else if( response.statusCode.toString().startsWith( "3" ) ) // Redirects
-								{
-									returnValue.result = "redirect";
-									returnValue.result_advice = "Your website is redirecting. This is not necessarily a problem, but it may cause an SEO penalty. Please contact your SEO specialist.";
-								}
-								else if( response.statusCode != 200 ) // Everything else that's not '200'
-								{
-									returnValue.result = "down";
-									returnValue.result_advice = "Your website is not available to users for an unusual technical reason. Contact your website hosting provider.";
-								}
-								
-								resolve( returnValue );
-							}
-						);
-					}
-				);
-
-				request.end();
-
-				request.on( "error",
-					( error ) =>
-					{
-						// TODO: Reject, don't resolve
-						console.log( error );
-						resolve( returnValue );
-					}
-				);
+				resolver.resolve_checkWebsiteResponse( resolve, reject, { url: url, port: port } );
 			});
 	} // checkWebsiteResponse()
 
@@ -189,73 +94,14 @@ class CW_Network
 	 */
 	async checkWebsiteAvailability( { domain = null, port = 80 } )
 	{
-		return new Promise(
-			( resolve, reject ) =>
+		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
+		let resolver = new CW_PromiseResolver();
+
+		return new Promise( 
+			( resolve, reject ) => 
 			{
-				let tcpPing = require( "tcp-ping" );
-				let returnValue;
-
-				// Ping configuration parameters
-				let tcpConfig = 
-				{
-					address: domain,
-					port: port,
-					attempts: 3
-				}
-
-				tcpPing.ping( tcpConfig,
-					( error, response ) =>
-					{
-						if( !error ) // Default is "down" so there's nothing to change for an error response
-						{
-							// We're sending back more than a simple string. Construct the return object
-							returnValue = 
-							{
-								result: "",
-								result_advice: "",
-								response_time: 0,
-								raw_response: ""
-							};
-
-							// Failed ping results in valid result with "NaN" for the timing values
-							if( parseFloat( response.avg ) + "" !== "NaN" ) // Node has no isNan()?
-							{
-								// Site is up
-								returnValue.result = "up";
-								returnValue.response_time = response.avg;
-								returnValue.raw_response = response;
-
-								if( response.avg > MAX_HTTTP_RESPONSE_TIME )
-								{
-									returnValue.result_advice = "Your website is taking much longer than it should to respond, and it may be entirely down. Contact your hosting provider for immediate assistance.";
-								}
-							}
-							else
-							{
-								// Site is down
-								returnValue = 
-								{
-									result: "down",
-									response_time: 0,
-									raw_response: response
-								}
-							}
-
-							resolve( returnValue );
-						}
-
-						// Return "Down" if there's an error
-						returnValue = 
-						{
-							result: "down",
-							response_time: 0,
-							raw_response: response
-						}
-						resolve( returnValue );
-					}
-				);
-			}
-		);
+				resolver.resolve_checkWebsiteAvailability( resolve, reject, { domain: domain, port: port } );
+			});
 	} // checkWebsiteAvailability()
 
 	/**
@@ -271,33 +117,13 @@ class CW_Network
 	 */
 	async getWhoisInfo( { domain = null } )
 	{
+		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
+		let resolver = new CW_PromiseResolver();
+		
 		return new Promise(
 			( resolve, reject ) =>
 			{
-				const whois = require( "whois" );
-				const whoisParser = require( "parser-whoisv2" );
-
-				whois.lookup(
-					domain,
-					( error, response ) =>
-					{
-
-						let lineItems = whoisParser.parseWhoIsData( response )
-						lineItems.forEach(
-								item => 
-								{
-									let lowerCaseAttribute = item.attribute.toLowerCase();
-									if( lowerCaseAttribute.includes( "expiration" ) )
-									{
-										resolve( item.value );
-									}
-								}
-							);
-
-
-						// TODO: Handle errors
-					}
-				);
+				resolver.resolve_getWhoisInfo( resolve, reject, { domain: domain } );
 			}
 		);
 	}
@@ -312,35 +138,13 @@ class CW_Network
 	 */
 	async checkDomain( { domain = null, recordType = null, queryServer = null } )
 	{
+		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
+		let resolver = new CW_PromiseResolver();
+
 		return new Promise(
 			( resolve, reject ) =>
 			{
-				let dig = require( "node-dig-dns" );
-
-				// Doing a query from local dig does not provide every result for "ANY"
-				//    so we will get the domain's NS records first, then we can dig for everything except a CNAME list using
-				//    `dig @authority_server domain ANY`
-
-				if( queryServer == null )
-				{
-					dig( [ domain, recordType ] )
-						.then(
-							( result ) =>
-							{
-								resolve( result.answer );
-							}
-						);
-				}
-				else
-				{
-					dig( [ queryServer, domain, recordType ] )
-						.then(
-							( result ) =>
-							{
-								resolve( result.answer );
-							}
-						);
-				}
+				resolver.resolve_checkDomain( resolve, reject, { domain: domain, recordType: recordType, queryServer: queryServer } );
 			}
 		);
 	}

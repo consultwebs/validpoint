@@ -81,10 +81,10 @@ class CW_Runner
 				this.command_WebsiteAvailability( { configObject: configObject, responseObject: responseObject, port: 443 } );
 				break;
 			case "http-response":
-				this.command_WebsiteResponse( { configObject: configObject.url, responseObject: responseObject, port: 80 } );
+				this.command_WebsiteResponse( { configObject: configObject, responseObject: responseObject, port: 80 } );
 				break;
 			case "https-response":
-				this.command_WebsiteResponse( { configObject: configObject.url, responseObject: responseObject, port: 443 } );
+				this.command_WebsiteResponse( { configObject: configObject, responseObject: responseObject, port: 443 } );
 				break;
 			case "domain":
 				this.command_Domain( { configObject: configObject, responseObject: responseObject } );
