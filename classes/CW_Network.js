@@ -30,6 +30,26 @@ class CW_Network
     {
 	}
 
+	// Promise resolver for the local network test
+	// resolve_localNetwork( resolve, reject )
+	// {
+	// 	// Set the default status to "down"
+	// 	let ping = require( "ping" );
+	// 	let msg = "down";
+
+	// 	// Perform a ping to prove the default status
+	// 	ping.sys.probe( PING_HOST,
+	// 		async ( isAlive ) =>
+	// 		{
+	// 			if( isAlive )
+	// 			{
+	// 				msg = "up";
+	// 			}
+	// 			resolve( msg );
+	// 		}
+	// 	);
+	// }
+
 	/**
 	 * Ping a server that's known to accept ICMP packets and never go down to make sure the local Internet connection is working.
 	 * 
@@ -38,25 +58,13 @@ class CW_Network
 	 */
     async checkLocalNetwork()
     {
+		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
+		let resolver = new CW_PromiseResolver();
+	
 		return new Promise(
 			(resolve, reject ) =>
 			{
-				// Set the default status to "down"
-				let ping = require( "ping" );
-				let msg = "down";
-
-				// Perform a ping to prove the default status
-				ping.sys.probe( PING_HOST,
-					async ( isAlive ) =>
-					{
-						if( isAlive )
-						{
-							msg = "up";
-						}
-						
-						resolve( msg );
-					}
-				);
+				resolver.resolve_localNetwork( resolve, reject );
 			}
 		);	
 	} // checkLocalNetwork()
@@ -69,23 +77,13 @@ class CW_Network
 	 */
 	async checkDns()
 	{
+		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
+		let resolver = new CW_PromiseResolver();
+
 		return new Promise(
 			( resolve, reject ) =>
 			{
-				let dns = require( "dns" );
-				let msg = "down";
-
-				dns.resolve4( DNS_HOST,
-					( error, addresses ) =>
-					{
-						// We don't care about the content of the response, just whether or not there was an error
-						if( !error ) // Default is "down" so there's nothing to change for an error response
-						{
-							msg = "up";
-						}
-						resolve( msg );
-					}
-				);
+				resolver.resolve_checkDns( resolve, reject );
 			}
 		);
 	} // checkDns()
