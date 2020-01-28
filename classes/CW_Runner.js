@@ -45,7 +45,6 @@ class CW_Runner
 	/**
 	 * Run a command
 	 * 
-	 * TODO: refactor sanity checking
 	 * TODO: input checking and delegating work to adaptors needs to negate the need to add to the validCommands array and add a new case
 	 * @author costmo
 	 * @param {*} command 			The command to run

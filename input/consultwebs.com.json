@@ -1,5 +1,10 @@
 {
     "name": "Consultwebs",
 	"domain": "consultwebs.com",
-	"url": "www.consultwebs.com"
+	"url": "www.consultwebs.com",
+	"alerts": 
+	{
+		"dns": "warn",
+		"foo": "bar"
+	}
 }

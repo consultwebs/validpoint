@@ -26,39 +26,50 @@ require( "strict-mode" )(
 		let cmd = (argv.c) ? argv.c : "all";
 		let domain = (argv.d) ? argv.d : "all";
 
-		let runObjects = CW_InputParser.makeRunnerObjects( domain );
-		runObjects.forEach(
-			runObject =>
+		CW_InputParser.makeRunnerObjects( domain ).then(
+			( runObjects ) =>
 			{
-				let parser = new CW_InputParser( runObject.file );
+				if( runObjects && runObjects.length > 0 )
+				{
+					runObjects.forEach(
+						runObject =>
+						{
+							let parser = new CW_InputParser( runObject.file );
 
-				parser.init(
-					function() // init callback
-					{
-						try
-						{
-		
-							// `this` is an instance of the InputParser
-							config = this.parseJsonString();
-		
-							if( config == null )
-							{
-								throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
-								process.exit( 1 );
-							}
-		
-		
-							runner.runCommand( { command: cmd, configObject: config } );
+							parser.init(
+								function() // init callback
+								{
+									try
+									{
+					
+										// `this` is an instance of the InputParser
+										config = this.parseJsonString();
+					
+										if( config == null )
+										{
+											throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
+											process.exit( 1 );
+										}
+
+										runner.runCommand( { command: cmd, configObject: config } );
+									}
+									catch( exception )
+									{
+										console.log( `Process exception:\n${exception}` );
+										process.exit( 1 );
+									}
+								}
+							);
 						}
-						catch( exception )
-						{
-							console.log( `Process exception:\n${exception}` );
-							process.exit( 1 );
-						}
-					}
-				);
+					);
+				}
+				else // We didn't get any JSON files for input
+				{
+					throw new Error( "COULD NOT FIND ANY CONFIGURATION FILES TO RUN." );
+				}
 			}
 		);
+		
 		
 			
 
