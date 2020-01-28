@@ -17,6 +17,30 @@ class CW_Runner
     {
 		
 	}
+
+	/**
+	 * A maintained array of known commands for validation. If the requested command cannot be found,
+	 *    returns "all"
+	 * 
+	 * @returns string
+	 * @param {*} input		The command to sanitize 
+	 */
+	sanitizeCommand( input )
+	{
+		let returnValue = "all";
+
+		let validCommands = [ 
+			"all", "local", "dns", "http", "https", "http-response", "https-response", 
+			"website", "secure-website" , "domain"
+		];
+
+		if( validCommands.indexOf( input ) >= 0 )
+        {
+            returnValue = input;
+		}
+		
+		return returnValue;
+	}
 	
 	/**
 	 * Run a command
@@ -30,24 +54,9 @@ class CW_Runner
 	async runCommand( { command = "", configObject = null } )
     {
         // sanity check the requested command
-        let validCommands = [ 
-			"all", "local", "dns", "http", "https", "http-response", "https-response", 
-			"website", "secure-website" , "domain"
-		];
+        command = this.sanitizeCommand( command );
 
-        if( validCommands.indexOf( command ) < 0 )
-        {
-            console.log( `INVALID COMMAND: '${command}'` );
-            console.log( "VALID CHOICES:" );
-            validCommands.forEach(
-                ( value, index ) =>
-                {
-                    console.log( value );
-                });
-            process.exit( 1 );
-        }
-
-		// TODO: populate the reponse object with values from a helper class instead if individual lines in each 'case'
+		// TODO: populate the reponse object with values from a helper class instead of individual lines in each 'case'
 		let responseObject = 
 		{
 			test: "",

@@ -3,18 +3,6 @@
  * 
  * @author costmo
  */
-
- /*
- // TODO: Refactor complicated function definitions that are used as input parameters.
- Having really complicated code (a fully-formed function) as an input parameter to a function/method call creates code that becomes incresingly more difficult to test and maintain.
- I know that's the Java/javascript way, but it doesn't have to be. For example, this:
- return new Promise( (resolve, reject) => { <80 lines of code go here> } ); // The way Java has taught us to write code, but other OO languages not care for
- Should be more like this:
- return this.promiseResolver( this.someOtherFunction( input ) ); // Move meaningful code to someOtherFunction() - promiseResolver returns Promise
- */
-
- // TODO: Add an array of hosts to ping, iterate and check them until we find one that responds or there are none left to check
-
 class CW_Network
 {
 	

@@ -12,47 +12,71 @@
 require( "strict-mode" )(
     () =>
     {
-		// Since the async file system calls return before completing, wrap parser functionality inside of an init completion/callback
+		// Get an instance of the runner
+		const CW_Runner = require( "../../classes/CW_Runner.js" );
+		const runner = new CW_Runner();
 
+		// And an instance of the parser
 		const CW_InputParser =  require( "../../classes/CW_InputParser.js" );
 		let config = null;
 
-		// TODO: We'll want a file iterator instead of hard-coding a single file name
-		const parser = new CW_InputParser( "consultwebs.com.json" );
+		// parse the requested command from the command line arguments, then run the command
+		let argv = require( "yargs" ).argv;
 
-		parser.init(
-			function() // init callback
+		let cmd = (argv.c) ? argv.c : "all";
+		let domain = (argv.d) ? argv.d : "all";
+		let parser;
+
+		let runObjects = [];
+
+		// Parse `domain` from command line input
+		// Request for a specific domain
+		if( domain != "all" )
+		{
+			let runObject = {
+				"domain": domain,
+				"file": domain + ".json"
+			};
+			runObjects.push( runObject );
+		}
+		else // request all domains
+		{
+
+		}
+
+		runObjects.forEach(
+			runObject =>
 			{
-				try
-				{
-					const CW_Runner = require( "../../classes/CW_Runner.js" );
-					const runner = new CW_Runner();
+				parser = new CW_InputParser( runObject.file );
 
-					// `this` is an instance of the InputParser
-					config = this.parseJsonString();
-
-					if( config == null )
+				parser.init(
+					function() // init callback
 					{
-						throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
-						process.exit( 1 );
+						try
+						{
+		
+							// `this` is an instance of the InputParser
+							config = this.parseJsonString();
+		
+							if( config == null )
+							{
+								throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
+								process.exit( 1 );
+							}
+		
+		
+							runner.runCommand( { command: cmd, configObject: config } );
+						}
+						catch( exception )
+						{
+							console.log( `Process exception:\n${exception}` );
+							process.exit( 1 );
+						}
 					}
-					
-					// parse the requested command from the command line arguments, then run it
-					let cmd = "all";
-					if( process.argv.length >= 3 )
-					{
-						cmd = process.argv[2];
-					}
-
-					runner.runCommand( { command: cmd, configObject: config } );
-				}
-				catch( exception )
-				{
-					console.log( `Process exception:\n${exception}` );
-					process.exit( 1 );
-				}
+				);
 			}
 		);
+		
 			
 
     }
