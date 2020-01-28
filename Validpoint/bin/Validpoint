@@ -3,8 +3,8 @@
 /**
  * CW website validator access hub.
  * 
- * Invoking: ./bin/Validpoint [command]
- * Invocation without "command" is synonymous with "all" as the command
+ * Invoking: ./bin/Validpoint -c [command] (-d [domain1,[domain2,[domain3...]]])
+ * Invocation without "command" or "domain" is synonymous with "all" as the command or domain
  * 
  * TODO: handle unhandled Promise rejections
  */
@@ -25,29 +25,12 @@ require( "strict-mode" )(
 
 		let cmd = (argv.c) ? argv.c : "all";
 		let domain = (argv.d) ? argv.d : "all";
-		let parser;
 
-		let runObjects = [];
-
-		// Parse `domain` from command line input
-		// Request for a specific domain
-		if( domain != "all" )
-		{
-			let runObject = {
-				"domain": domain,
-				"file": domain + ".json"
-			};
-			runObjects.push( runObject );
-		}
-		else // request all domains
-		{
-
-		}
-
+		let runObjects = CW_InputParser.makeRunnerObjects( domain );
 		runObjects.forEach(
 			runObject =>
 			{
-				parser = new CW_InputParser( runObject.file );
+				let parser = new CW_InputParser( runObject.file );
 
 				parser.init(
 					function() // init callback

@@ -73,6 +73,78 @@ class CW_InputParser
         
         return returnValue;
 	}
+
+	/**
+	 * Parse the domain name or domain list from command line input
+	 * 
+	 * // TPDO: Needs to resolve a promise for filesystem access
+	 * 
+	 * @author costmo
+	 * @returns Array
+	 * @param {*} domain 			The domain, comma-separated list of domains, or "all".
+	 */
+	static makeRunnerObjects( domain )
+	{
+		let returnValue = [];
+
+		// Parse `domain` from command line input
+		// Request for a specific domain
+		if( domain != "all" )
+		{
+			// input is a comma separated list of domains
+			if( domain.indexOf( "," ) >= 0)
+			{ 
+				const domains = domain.split(',');
+				domains.forEach(
+					loopDomain =>
+					{
+						let runObject = {
+							"domain": loopDomain.trim(),
+							"file": loopDomain.trim() + ".json"
+						};
+						returnValue.push( runObject );
+					}
+				);
+			}
+			else // input is a simple string - assumed one domain
+			{
+				let runObject = {
+					"domain": domain.trim(),
+					"file": domain.trim() + ".json"
+				};
+				returnValue.push( runObject );
+			}
+			return returnValue;
+		}
+		else // request all domains
+		{
+			// TODO: needs to be called async
+
+			// let fs = require( "fs" );
+			// let path = "../input/";
+
+			// fs.readdir( path,
+			// 	( error, items ) =>
+			// 	{
+			// 		// TODO: Handle errors
+
+			// 		items.forEach(
+			// 			item =>
+			// 			{
+			// 				if( item.endsWith( ".json" ) )
+			// 				{
+			// 					let runObject = {
+			// 						"domain": item.substring( 0, (item.length - 5) ),
+			// 						"file": item
+			// 					};
+			// 					returnValue.push( runObject );
+			// 				}
+			// 			}
+			// 		);
+			// 		return returnValue;
+			// 	});
+		}
+	}
 	
 }
 
