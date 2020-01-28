@@ -234,13 +234,17 @@ class CW_Runner
 	} // command_localNetwork()
 
 	/**
+	  * Validate details of the user's domain name and registration
 	  * 
-	  * TODO: Refactor all the string slices into a utility function
-	  * @param {*} param0 
+	  * TODO: Refactor the completion blocks for maintainabiolity
+	  * @author costmo
+	  * @param {*} configObject				A parsed config object from JSON input
+	  * @param {*} responseObject			A default response object
 	  */
 	 command_Domain( { configObject = null, responseObject =  null } )
 	 {
 		let async = require( "async" );
+		let StringUtil = require( "./CW_StringUtil.js" );
 
 		responseObject.test = "domain";
 		responseObject.description = "Technical domain tests";
@@ -271,12 +275,9 @@ class CW_Runner
 							result.forEach( 
 								resultItem =>
 								{
-									if (resultItem.value[ (resultItem.value.length - 1) ] === ".")
-									{
-										resultItem.value = resultItem.value.slice( 0, -1 );
-									}
-
-									responseObject.servers.ns.push( resultItem.value );
+									responseObject.servers.ns.push( 
+										StringUtil.stripTrailingDot( resultItem.value ) 
+										);
 								});
 								completion( null, responseObject );
 						}
@@ -300,13 +301,9 @@ class CW_Runner
 							result.forEach( 
 								resultItem =>
 								{
-									if (resultItem.value[ (resultItem.value.length - 1) ] === ".")
-									{
-										resultItem.value = resultItem.value.slice( 0, -1 );
-									}
-
-									responseObject.servers.mx.push( resultItem.value );
-									
+									responseObject.servers.mx.push( 
+										StringUtil.stripTrailingDot( resultItem.value ) 
+										);
 								});
 								completion( null, responseObject );
 						}
@@ -325,13 +322,7 @@ class CW_Runner
 								result.forEach( 
 									resultItem =>
 									{
-										// get rid of the trailing dot in the record value
-										if (resultItem.value[ (resultItem.value.length - 1) ] === ".")
-										{
-											resultItem.value = resultItem.value.slice( 0, -1 );
-										}
-
-										responseObject.servers.tld_a.push( resultItem.value );
+										responseObject.servers.tld_a.push( StringUtil.stripTrailingDot( resultItem.value ) );
 									});
 									completion( null, responseObject );
 							}
@@ -348,14 +339,8 @@ class CW_Runner
 								// We should get a CNAME as the first response result and an A record as the second
 								if( result.length > 1 )
 								{
-									if (result[0].value[ (result[0].value.length - 1) ] === ".")
-									{
-										result[0].value = result[0].value.slice( 0, -1 );
-									}
-									if (result[1].value[ (result[1].value.length - 1) ] === ".")
-									{
-										result[1].value = result[1].value.slice( 0, -1 );
-									}
+									result[0].value = StringUtil.stripTrailingDot( result[0].value )
+									result[1].value = StringUtil.stripTrailingDot( result[1].value )
 
 									
 									if( (result[0].type == "CNAME" && result[1].type == "A") )
@@ -388,11 +373,7 @@ class CW_Runner
 								result.forEach( 
 									resultItem =>
 									{
-										if (resultItem.value[ (resultItem.value.length - 1) ] === ".")
-										{
-											resultItem.value = resultItem.value.slice( 0, -1 );
-										}
-										responseObject.servers.www_cname.push( resultItem.value );
+										responseObject.servers.www_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
 									});
 									completion( null, responseObject );
 							}
@@ -414,11 +395,7 @@ class CW_Runner
 								result.forEach( 
 									resultItem =>
 									{
-										if (resultItem.value[ (resultItem.value.length - 1) ] === ".")
-										{
-											resultItem.value = resultItem.value.slice( 0, -1 );
-										}
-										responseObject.servers.tld_cname.push( resultItem.value );
+										responseObject.servers.tld_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
 									});
 									completion( null, responseObject );
 							}

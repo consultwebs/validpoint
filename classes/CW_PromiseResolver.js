@@ -3,6 +3,7 @@
  * A convenience wrapper to abstract code from Promise input parameters
  * 
  * @author costmo
+ * TODO: The PromiseResolver needs to be divided into subclasses for maintainability
  */
 
  // TODO: Add an array of hosts to ping, iterate and check them until we find one that responds or there are none left to check
