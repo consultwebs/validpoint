@@ -7,6 +7,7 @@
  * Invocation without "command" or "domain" is synonymous with "all" as the command or domain
  * 
  * TODO: handle unhandled Promise rejections
+ * TODO: global constants throughout the code need to be consolidated before there are too many of them or too much code
  */
 
 require( "strict-mode" )(
@@ -31,6 +32,7 @@ require( "strict-mode" )(
 			{
 				if( runObjects && runObjects.length > 0 )
 				{
+					// The things that run in the forEach are synchronous, so checks for all domains run at once and return in no particular order
 					runObjects.forEach(
 						runObject =>
 						{
@@ -41,21 +43,22 @@ require( "strict-mode" )(
 								{
 									try
 									{
-					
 										// `this` is an instance of the InputParser
 										config = this.parseJsonString();
 					
 										if( config == null )
 										{
 											throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
-											process.exit( 1 );
 										}
 
-										runner.runCommand( { command: cmd, configObject: config } );
+										let CW_Advice = require( "../../classes/CW_Advice.js" );
+										let advice = new CW_Advice();
+										runner.runCommand( { command: cmd, configObject: config, adviceObject: advice } );
 									}
 									catch( exception )
 									{
-										console.log( `Process exception:\n${exception}` );
+										console.log( "Process exception:" );
+										console.log( exception );
 										process.exit( 1 );
 									}
 								}

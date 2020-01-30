@@ -2,9 +2,26 @@
     "name": "Consultwebs",
 	"domain": "consultwebs.com",
 	"url": "www.consultwebs.com",
-	"alerts": 
+	"exclude_tests": 
 	{
-		"dns": "warn",
-		"foo": "bar"
+
+	},
+	"alert_levels": 
+	{
+		"ONSCREEN": "MINOR",
+		"EMAIL": "MAJOR",
+		"SMS": "CRITICAL"
+	},
+	"severity_thresholds": 
+	{
+		"local": 
+		{
+			"local-network": "CRITICAL",
+			"local-dns": "CRITICAL"
+		},
+		"website":
+		{
+
+		}
 	}
 }

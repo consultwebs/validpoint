@@ -6,6 +6,9 @@
 const CW_Network = require( "./CW_Network.js" );
 const network = new CW_Network();
 
+let CW_Constants = require( "./CW_Constants.js" );
+let CW_Advice = require( "./CW_Advice.js" );
+
 class CW_Runner
 {
 	/**
@@ -49,13 +52,24 @@ class CW_Runner
 	 * @author costmo
 	 * @param {*} command 			The command to run
 	 * @param {*} configObject		An object holding the ingested configuration values
+	 * @param {*} adviceObject			An instance of CW_Advice to pass down from the caller
 	 */
-	async runCommand( { command = "", configObject = null } )
+	async runCommand( { command = "", configObject = null, adviceObject = null } )
     {
         // sanity check the requested command
-        command = this.sanitizeCommand( command );
+		command = this.sanitizeCommand( command );
 
-		// TODO: populate the reponse object with values from a helper class instead of individual lines in each 'case'
+		if( !adviceObject )
+		{
+			adviceObject = new CW_Advice();
+		}
+		if( configObject )
+		{
+			adviceObject.configObject = configObject;
+			adviceObject.domain = configObject.domain;
+		}
+
+		// TODO: remove this as soon as all commands are using adviceObject instead
 		let responseObject = 
 		{
 			test: "",
@@ -77,7 +91,7 @@ class CW_Runner
 				this.command_Website( { configObject: configObject, responseObject: responseObject, port: 443 } );
 				break;
 			case "local":
-				this.command_localNetwork( { configObject: configObject, responseObject: responseObject } );
+				this.command_localNetwork( { configObject: configObject, adviceObject: adviceObject } );
 				break;
 			case "dns":
 				this.command_Dns( { configObject: configObject, responseObject: responseObject } );
@@ -213,23 +227,29 @@ class CW_Runner
 	 * 
 	 * @author costmo
 	 * @param {*} configObject			A populated config object
-	 * @param {*} responseObject	A default response object
+	 * @param {*} adviceObject			A constructed CW_Advice instance
 	 */
-	command_localNetwork( { configObject = null, responseObject =  null } )
+	command_localNetwork( { configObject = null, adviceObject =  null } )
 	{
-		responseObject.test = "local-network";
-		responseObject.description = "Local network connectivity check";
+		adviceObject.itemResult.command = "local-network";
+		adviceObject.itemResult.category = "local"; // TODO: Lookup the category of the command
 
 		CW_Runner.network.checkLocalNetwork()
 			.then( 
 				( result ) => 
 				{
-					responseObject.result = result;
-					if( result != "up" )
-					{
-						responseObject.result_advice = "Your local network is currently offline. Check your Internet connection and try again."
-					}
-					console.log( JSON.stringify( responseObject ) );
+					// `result` will either be PASS or FAIL. Nothing more meaningfiul is received
+					adviceObject.itemResult.result = result;
+					adviceObject.itemResult.result_tags.push( result );
+					adviceObject.itemResult.raw_response = result;
+
+					adviceObject.testResult.results.push( adviceObject.itemResult );
+					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+					// console.log( JSON.stringify( adviceObject ) );
+					console.log( adviceObject );
+					console.log( "\n" );
+					
 				});
 	} // command_localNetwork()
 
@@ -262,7 +282,6 @@ class CW_Runner
  
 		// Using ANY as the argument to dig is remarkably unreliable in retrieving complete records. 
 		// The only way to get complete records reliably is to perform individual TYPE queries against an authoritative name server.
-		// TODO: Refactor each of these completion blocks into individual methods so the code is easier to read/follow
 		async.waterfall(
 			[
 				( completion ) =>
@@ -440,7 +459,7 @@ class CW_Runner
 					// Look over the results and offer some advice if necessary
 					result.raw_response = result.servers;
 
-					// TODO: Advice needs to be refactored into its own class
+					// TODO: Refactor Advice into its own class
 					if( result.servers.ns.length < 1 )
 					{
 						result.result_advice += " Your domain does not have any name servers defined, so people will not be able to reach your website. Contact your website hosting provider.";

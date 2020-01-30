@@ -6,6 +6,8 @@
  * TODO: The PromiseResolver needs to be divided into subclasses for maintainability
  */
 
+let CW_Constants = require( "./CW_Constants.js" );
+
  // TODO: Add an array of hosts to ping, iterate and check them until we find one that responds or there are none left to check
 const PING_HOST = "8.8.4.4"; // Google public DNS server
 const DNS_HOST = "www.google.com";
@@ -34,7 +36,7 @@ class CW_PromiseResolver
 	{
 		// Set the default status to "down"
 		let ping = require( "ping" );
-		let msg = "down";
+		let msg = CW_Constants.RESULT_FAIL;
 
 		// Perform a ping to prove the default status
 		ping.sys.probe( PING_HOST,
@@ -42,7 +44,7 @@ class CW_PromiseResolver
 			{
 				if( isAlive )
 				{
-					msg = "up";
+					msg = CW_Constants.RESULT_PASS;
 				}
 				
 				resolve( msg );
@@ -355,6 +357,7 @@ class CW_PromiseResolver
 			let fs = require( "fs" );
 			let path = "../input/";
 
+			// Iterate all files in the input directory
 			fs.readdir( path,
 				( error, items ) =>
 				{

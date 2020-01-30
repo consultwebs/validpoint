@@ -27,7 +27,7 @@ class CW_Network
 		let resolver = new CW_PromiseResolver();
 	
 		return new Promise(
-			(resolve, reject ) =>
+			async (resolve, reject ) =>
 			{
 				resolver.resolve_localNetwork( resolve, reject );
 			}
