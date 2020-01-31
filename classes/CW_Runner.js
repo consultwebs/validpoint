@@ -244,10 +244,10 @@ class CW_Runner
 					adviceObject.itemResult.raw_response = result;
 
 					adviceObject.testResult.results.push( adviceObject.itemResult );
-					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+					adviceObject.finalizeOutput( { stripConfigObject: false, stripItemResult: true } );
 
-					// console.log( JSON.stringify( adviceObject ) );
-					console.log( adviceObject );
+					console.log( JSON.stringify( adviceObject ) );
+					// console.log( adviceObject );
 					console.log( "\n" );
 					
 				});

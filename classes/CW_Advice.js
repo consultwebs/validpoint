@@ -59,6 +59,26 @@ class CW_Advice
 	}
 
 	/**
+	 * Get yer clean Action object here. Constrain the members of an action object
+	 * 
+	 * @author costmo
+	 */
+	getEmptyActionObject()
+	{
+		let returnValue = 
+		{
+			"category": "",
+			"command": "",
+			"result": "",
+			"severity": "",
+			"tag": "",
+			"content": ""
+		};
+
+		return returnValue;
+	}
+
+	/**
 	 * After running the final test, parse the results to offer final advice
 	 * 
 	 * @author costmo
@@ -66,20 +86,22 @@ class CW_Advice
 	 */
 	finalizeOutput( { stripConfigObject = true, stripItemResult = true } )
 	{
-		// Make sure we're all cleaned up - constructive phase
-		this.clearItemResult();
-
 		// Iterate the test results and send them to a helper to get specific advice
 		this.testResult.results.forEach(
 			result =>
 			{
 				// console.log( "Parsing result:" );
 				// console.log( result );
-				this.parseResult( { result: result } );
+				this.testResult.actions.push( 
+					this.parseResult( { result: result } )
+				 );
 			}
 		);
 
-		// Make sure we're all cleaned up - destructive phase
+		// Make sure we're all cleaned up - constructive action
+		this.clearItemResult();
+
+		// destructive action
 		if( (this.configObject) && (stripConfigObject == true) )
 		{
 			delete this.configObject;
@@ -94,15 +116,30 @@ class CW_Advice
 	/**
 	 * Farm out the work of parsing a resultItem and pushing actionable items to the `actions` array
 	 * 
-	 * // TODO: Farm out logic for parsing conditions here
-	 * 
 	 * @author costmo
 	 * @param {*} result		The resultItem to parse 
 	 */
-	parseResult( { result: result } )
+	parseResult()
 	{
-		// console.log( "Parsing: " );
-		// console.log( result );
+		let returnValue = this.getEmptyActionObject();
+		returnValue = 
+		{	...returnValue,
+			category: this.itemResult.category,
+			command: this.itemResult.command,
+			result: this.itemResult.result
+		}
+
+		if( returnValue.result == CW_Constants.RESULT_PASS )
+		{
+			returnValue.severity = CW_Constants.SEVERITY_OK;
+			returnValue.tag = CW_Constants.NAME_SEVERITY_OK;
+		}
+		else
+		{
+			// TODO: Farm out logic for parsing FAIL and PUNT conditions here
+		}
+
+		return returnValue;
 	}
 }
 
