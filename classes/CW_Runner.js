@@ -231,24 +231,27 @@ class CW_Runner
 	 */
 	command_localNetwork( { configObject = null, adviceObject =  null } )
 	{
-		adviceObject.itemResult.command = "local-network";
-		adviceObject.itemResult.category = "local"; // TODO: Lookup the category of the command
+		adviceObject.item_result.command = "local-network";
+		adviceObject.item_result.category = "local"; // TODO: Lookup the category of the command
 
 		CW_Runner.network.checkLocalNetwork()
 			.then( 
 				( result ) => 
 				{
-					// `result` will either be PASS or FAIL. Nothing more meaningfiul is received
-					adviceObject.itemResult.result = result;
-					adviceObject.itemResult.result_tags.push( result );
-					adviceObject.itemResult.raw_response = result;
+					// result = "FAIL"; // Simulate a failure without shutting off your local network
 
-					adviceObject.testResult.results.push( adviceObject.itemResult );
-					adviceObject.finalizeOutput( { stripConfigObject: false, stripItemResult: true } );
+					// `result` will either be PASS or FAIL. Nothing more meaningfiul is needed for this test
+					adviceObject.item_result.result = result;
+					adviceObject.item_result.result_tags.push( result );
+					adviceObject.item_result.raw_response = result;
 
+					adviceObject.test_result.results.push( adviceObject.item_result );
+					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+					// console.log( "\n" );
 					console.log( JSON.stringify( adviceObject ) );
 					// console.log( adviceObject );
-					console.log( "\n" );
+					// console.log( "\n" );
 					
 				});
 	} // command_localNetwork()

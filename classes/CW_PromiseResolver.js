@@ -45,7 +45,6 @@ class CW_PromiseResolver
 				if( isAlive )
 				{
 					msg = CW_Constants.RESULT_PASS;
-					// msg = CW_Constants.RESULT_FAIL;
 				}
 				
 				resolve( msg );

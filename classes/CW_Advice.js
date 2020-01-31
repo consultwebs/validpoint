@@ -5,6 +5,8 @@
  *    allow a caller to take possession and make decisions on non-binary 
  *    results (something other than PAS|FAIL)
  * 
+ * NOTE: Member variables that are intended to be used directly in JSON output are not camelCased.
+ * 
  * @author costmo
  */
 
@@ -28,9 +30,10 @@ class CW_Advice
 		 * The domain name for the instance
 		 */
 		this.domain = "";
+		this.greatest_severity = CW_Constants.SEVERITY_IGNORE; // not camelCase because this member is used in JSON output
 
 		// An empty "full results" array of result and action objects for callers to populate for later parsing
-		this.testResult = {
+		this.test_result = {
 			"results": [],		// Results of individual tests to iterate and parse when all tests are complete for a given domain.
 			"actions": []		// Things to do in response to the results. To be populated during a finalization process.
 		}; 
@@ -40,7 +43,7 @@ class CW_Advice
 	}
 
 	/**
-	 * Replace the constructed member's itemResult with one that's empty.
+	 * Replace the constructed member's item_result with one that's empty.
 	 * 
 	 * Useful for using a single instance for multiple/chained tests
 	 * 
@@ -48,7 +51,7 @@ class CW_Advice
 	 */
 	clearItemResult()
 	{
-		this.itemResult = {
+		this.item_result = {
 			"command": "",
 			"category": "",
 			"result": CW_Constants.RESULT_UNTESTED,
@@ -71,7 +74,6 @@ class CW_Advice
 			"command": "",
 			"result": "",
 			"severity": "",
-			"tag": "",
 			"content": ""
 		};
 
@@ -87,28 +89,32 @@ class CW_Advice
 	finalizeOutput( { stripConfigObject = true, stripItemResult = true } )
 	{
 		// Iterate the test results and send them to a helper to get specific advice
-		this.testResult.results.forEach(
+		this.test_result.results.forEach(
 			result =>
 			{
-				// console.log( "Parsing result:" );
-				// console.log( result );
-				this.testResult.actions.push( 
-					this.parseResult( { result: result } )
-				 );
+				// Push the parsed result to the 'actions' 
+				let parsedResult = this.parseResult( { result: result } );
+				
+				// Do not push "OK" and "IGNORE" results into the "actions" array since we'll never "act" on them
+				if( parsedResult.severity > CW_Constants.SEVERITY_OK )
+				{
+					this.test_result.actions.push( parsedResult );
+				}
+				
 			}
 		);
 
 		// Make sure we're all cleaned up - constructive action
 		this.clearItemResult();
 
-		// destructive action
+		// Cleanup - destructive actions
 		if( (this.configObject) && (stripConfigObject == true) )
 		{
 			delete this.configObject;
 		}
 		if( (stripItemResult == true) )
 		{
-			delete this.itemResult;
+			delete this.item_result;
 		}
 
 	}
@@ -121,22 +127,49 @@ class CW_Advice
 	 */
 	parseResult()
 	{
-		let returnValue = this.getEmptyActionObject();
-		returnValue = 
-		{	...returnValue,
-			category: this.itemResult.category,
-			command: this.itemResult.command,
-			result: this.itemResult.result
+		let returnValue = 
+		{	...this.getEmptyActionObject(),
+			category: this.item_result.category,
+			command: this.item_result.command,
+			result: this.item_result.result
 		}
 
+		// We got a PASS or, so there's nothing else to do
 		if( returnValue.result == CW_Constants.RESULT_PASS )
 		{
 			returnValue.severity = CW_Constants.SEVERITY_OK;
 			returnValue.tag = CW_Constants.NAME_SEVERITY_OK;
+
+			// Set "OK" at the top-level if we've only seen "IGNORE" 
+			this.greatest_severity = ( CW_Constants.SEVERITY_OK > this.greatest_severity ) 
+					? CW_Constants.SEVERITY_OK : this.greatest_severity;
 		}
-		else
+		else if( returnValue.result == CW_Constants.IGNORE ) // simple population of IGNORE items - something that presumably did not actually run
 		{
-			// TODO: Farm out logic for parsing FAIL and PUNT conditions here
+			returnValue.severity = CW_Constants.SEVERITY_IGNORE;
+			returnValue.tag = CW_Constants.NAME_SEVERITY_IGNORE;
+		}
+		else // Farm out logic for parsing FAIL and PUNT conditions
+		{
+			// Use separate handlers for each command category
+			
+			if( returnValue.category == "local" )
+			{
+				let CW_AdviceContent_Local = require( "./CW_AdviceContent_Local.js" );
+
+				let adviceContent = new CW_AdviceContent_Local({
+					command:  returnValue.command,
+					testResult: this.item_result
+				});
+				adviceContent.advise();
+
+				// If this is the greatest severity we've seen, set the new top-level
+				this.greatest_severity = ( adviceContent.severity > this.greatest_severity ) 
+					? adviceContent.severity : this.greatest_severity;
+
+				returnValue.severity = adviceContent.severity;
+				returnValue.content = adviceContent.content;
+			}
 		}
 
 		return returnValue;
