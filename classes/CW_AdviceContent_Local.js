@@ -54,20 +54,15 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	 * @author costmo
 	 * @param {*} severity		The severity for which content is needed 
 	 */
-	contentForSeverity( {severity = null } )
+	contentForSeverity( { severity = null } )
 	{
+		let strings = require( "../Validpoint/strings/category.local.js" );
+		
 		switch( severity )
 		{
 			case CW_Constants.SEVERITY_ESSENTIAL:
 			case CW_Constants.SEVERITY_URGENT:
-				if( this.command == "local-network" )
-				{
-					return "You are not currently connected to the Internet, and none of these tests are likely to work. Contact your Internet Service Provider.";
-				}
-				else if( this.command == "local-dns" )
-				{
-					return "You are currently unable to resolve domain names, which means that your Internet connection is probably not working. Contact your Internet Service Provider.";
-				}
+				return strings[ this.command ][ CW_Constants.NAME_SEVERITY_URGENT ];
 			default:
 				return "";
 		}

@@ -32,9 +32,15 @@ class CW_Runner
 	{
 		let returnValue = "all";
 
+		// local: local-netowrk, local-dns
+		// website-admin: http, https, domain
+		// website: http-response, https-response, website, secure-website
+
 		let validCommands = [ 
-			"all", "local-network", "local-dns", "http", "https", "http-response", "https-response", 
-			"website", "secure-website" , "domain"
+			"all", 
+			"local-network", "local-dns", 
+			"http", "https", "domain",
+			"http-response", "https-response", "website", "secure-website" , 
 		];
 
 		if( validCommands.indexOf( input ) >= 0 )
@@ -211,7 +217,7 @@ class CW_Runner
 		CW_Runner.network.checkLocalDns()
 			.then( 
 				( result ) => 
-				{ 
+				{
 					// Handled in the same way as local-network
 					adviceObject.item_result.result = result;
 					adviceObject.item_result.result_tags.push( result );
@@ -219,7 +225,7 @@ class CW_Runner
 
 					adviceObject.test_result.results.push( adviceObject.item_result );
 					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-					
+
 					console.log( JSON.stringify( adviceObject ) );
 				});
 	} // command_Dns
