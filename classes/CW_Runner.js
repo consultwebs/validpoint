@@ -33,7 +33,7 @@ class CW_Runner
 		let returnValue = "all";
 
 		let validCommands = [ 
-			"all", "local", "dns", "http", "https", "http-response", "https-response", 
+			"all", "local-network", "local-dns", "http", "https", "http-response", "https-response", 
 			"website", "secure-website" , "domain"
 		];
 
@@ -90,11 +90,11 @@ class CW_Runner
 			case "secure-website":
 				this.command_Website( { configObject: configObject, responseObject: responseObject, port: 443 } );
 				break;
-			case "local":
-				this.command_localNetwork( { configObject: configObject, adviceObject: adviceObject } );
+			case "local-network":
+				this.command_LocalNetwork( { configObject: configObject, adviceObject: adviceObject } );
 				break;
-			case "dns":
-				this.command_Dns( { configObject: configObject, responseObject: responseObject } );
+			case "local-dns":
+				this.command_LocalDns( { configObject: configObject, adviceObject: adviceObject } );
 				break;
 			case "http":
 				this.command_WebsiteAvailability( { configObject: configObject, responseObject: responseObject, port: 80 } );
@@ -201,23 +201,26 @@ class CW_Runner
 	 * 
 	 * @author costmo
 	 * @param {*} configObject			A populated config object
-	 * @param {*} responseObject	A default response object
+	 * @param {*} adviceObject		A constructed CW_Advice instance
 	 */
-	command_Dns( { configObject = null, responseObject =  null } )
+	command_LocalDns( { configObject = null, adviceObject =  null } )
 	{
-		responseObject.test = "local-dns";
-		responseObject.description = "Local DNS connectivity check";
+		adviceObject.item_result.command = "local-dns";
+		adviceObject.item_result.category = "local";
 
-		CW_Runner.network.checkDns()
+		CW_Runner.network.checkLocalDns()
 			.then( 
 				( result ) => 
 				{ 
-					responseObject.result = result;
-					if( result != "up" )
-					{
-						responseObject.result_advice = "Your local Domain Name Service (DNS) is not working. Contact your Internet Service Provider and try again.";
-					}
-					console.log( JSON.stringify( responseObject ) );
+					// Handled in the same way as local-network
+					adviceObject.item_result.result = result;
+					adviceObject.item_result.result_tags.push( result );
+					adviceObject.item_result.raw_response = result;
+
+					adviceObject.test_result.results.push( adviceObject.item_result );
+					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+					
+					console.log( JSON.stringify( adviceObject ) );
 				});
 	} // command_Dns
 
@@ -229,10 +232,10 @@ class CW_Runner
 	 * @param {*} configObject			A populated config object
 	 * @param {*} adviceObject			A constructed CW_Advice instance
 	 */
-	command_localNetwork( { configObject = null, adviceObject =  null } )
+	command_LocalNetwork( { configObject = null, adviceObject =  null } )
 	{
 		adviceObject.item_result.command = "local-network";
-		adviceObject.item_result.category = "local"; // TODO: Lookup the category of the command
+		adviceObject.item_result.category = "local";
 
 		CW_Runner.network.checkLocalNetwork()
 			.then( 

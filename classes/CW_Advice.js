@@ -169,7 +169,7 @@ class CW_Advice
 
 				returnValue.severity = adviceContent.severity;
 				returnValue.content = adviceContent.content;
-			}
+			} // category: "local"
 		}
 
 		return returnValue;

@@ -2,7 +2,8 @@
 /**
  * Offering advice for "local" tests
  * 
- * These are going to be simpler than most other tests since any failure is a show-stopper
+ * These are going to be simpler than most other tests since any failure is a show-stopper,
+ *    and each test has a binary respnonse
  * 
  * @author costmo
  */
@@ -12,6 +13,12 @@ let CW_Constants = require( "./CW_Constants.js" );
 let CW_AdviceContent = require( "./CW_AdviceContent.js" );
 class CW_AdviceContent_Local extends CW_AdviceContent
 {
+	/**
+	 * Create an instance for a finished command and testResult
+	 * 
+	 * @param {*} command		The command that has finished
+	 * @param {*} testResult	A test_result object to parse 
+	 */
 	constructor( { command = null, testResult = null } )
 	{
 		super({ 
@@ -28,6 +35,7 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	 * Once an Advice object has its test results, the parser runs this category-specific method to 
 	 *   produce an action object
 	 * 
+	 * @author costmo
 	 * 
 	 */
 	advise()
@@ -36,7 +44,16 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 		this.content = this.contentForSeverity( { severity: this.severity } );
 	}
 
-	// TODO: Use localization to feed content
+	/**
+	 * Provide the content for the discovered severity on the current instance's command.
+	 * 
+	 * Commands in the "local" category only need content for ESSENTIAL and URGENT
+	 * 
+	 * // TODO: Use localization to feed content
+	 * 
+	 * @author costmo
+	 * @param {*} severity		The severity for which content is needed 
+	 */
 	contentForSeverity( {severity = null } )
 	{
 		switch( severity )
@@ -46,6 +63,10 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 				if( this.command == "local-network" )
 				{
 					return "You are not currently connected to the Internet, and none of these tests are likely to work. Contact your Internet Service Provider.";
+				}
+				else if( this.command == "local-dns" )
+				{
+					return "You are currently unable to resolve domain names, which means that your Internet connection is probably not working. Contact your Internet Service Provider.";
 				}
 			default:
 				return "";

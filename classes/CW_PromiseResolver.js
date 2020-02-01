@@ -59,10 +59,10 @@ class CW_PromiseResolver
 	 * @param	{*}		resolve		Resolve function	
 	 * @param	{*}		reject		Reject function
 	 */
-	resolve_checkDns( resolve, reject )
+	resolve_checkLocalDns( resolve, reject )
 	{
 		let dns = require( "dns" );
-		let msg = "down";
+		let msg = CW_Constants.RESULT_FAIL;
 
 		dns.resolve4( DNS_HOST,
 			( error, addresses ) =>
@@ -70,7 +70,7 @@ class CW_PromiseResolver
 				// We don't care about the content of the response, just whether or not there was an error
 				if( !error ) // Default is "down" so there's nothing to change for an error response
 				{
-					msg = "up";
+					msg = CW_Constants.RESULT_PASS;
 				}
 				resolve( msg );
 			}

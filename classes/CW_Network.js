@@ -40,7 +40,7 @@ class CW_Network
 	 * @author costmo
 	 * @returns Promise
 	 */
-	async checkDns()
+	async checkLocalDns()
 	{
 		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
 		let resolver = new CW_PromiseResolver();
@@ -48,7 +48,7 @@ class CW_Network
 		return new Promise( 
 			(resolve, reject ) => 
 			{
-				resolver.resolve_checkDns( resolve, reject );
+				resolver.resolve_checkLocalDns( resolve, reject );
 			});
 	} // checkDns()
 
