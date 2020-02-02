@@ -33,7 +33,7 @@ class CW_Runner
 		let returnValue = "all";
 
 		// local: local-netowrk, local-dns
-		// website-admin: http, https, domain
+		// website-admin: http-port, https-port, domain
 		// website: http-response, https-response, website, secure-website
 
 		let validCommands = [ 
@@ -103,10 +103,10 @@ class CW_Runner
 				this.command_LocalDns( { configObject: configObject, adviceObject: adviceObject } );
 				break;
 			case "http-port":
-				this.command_WebsiteAvailability( { configObject: configObject, responseObject: responseObject, port: 80 } );
+				this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 80 } );
 				break;
 			case "https-port":
-				this.command_WebsiteAvailability( { configObject: configObject, responseObject: responseObject, port: 443 } );
+				this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 443 } );
 				break;
 			case "http-response":
 				this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: 80 } );
@@ -148,7 +148,6 @@ class CW_Runner
 		if( port == 443 )
 		{
 			adviceObject.item_result.command = "https-response";
-			adviceObject.item_result.category = "website";
 		}
 
 		CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
@@ -175,29 +174,32 @@ class CW_Runner
 	 * 
 	 * @author costmo
 	 * @param {*} configObject			A populated config object
-	 * @param {*} responseObject	A default response object
+	 * @param {*} adviceObject		A constructed CW_Advice instance
 	 * @param {*} port				The port number we're checking
 	 */
-	command_WebsiteAvailability( { configObject = null, responseObject =  null, port = 80 } )
+	command_WebsiteAvailability( { configObject = null, adviceObject =  null, port = 80 } )
 	{
-		responseObject.test = "http";
-		responseObject.description = "Non-secure website availability test";
+		adviceObject.item_result.command = "http-port";
+		adviceObject.item_result.category = "website-admin";
 
 		if( port == 443 )
 		{
-			responseObject.test = "https";
-			responseObject.description = "Secure website availability test";
+			adviceObject.item_result.command = "https-port";
 		}
 
 		CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } )
 				.then(
 					( result ) =>
 					{
-						responseObject.result = result.result;
-						responseObject.result_advice = result.result_advice;
-						responseObject.response_time = result.response_time;
-						responseObject.raw_response = result.raw_response;
-						console.log( JSON.stringify( responseObject ) );
+						adviceObject.item_result.result = result.result;
+						adviceObject.item_result.result_tags.push( result.result );
+						adviceObject.item_result.raw_response = result;
+						adviceObject.item_result.response_time = result.response_time;
+
+						adviceObject.test_result.results.push( adviceObject.item_result );
+						adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+						console.log( JSON.stringify( adviceObject ) );
 					}
 				);
 	}

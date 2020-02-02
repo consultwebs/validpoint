@@ -192,9 +192,8 @@ class CW_PromiseResolver
 					// We're sending back more than a simple string. Construct the return object
 					returnValue = 
 					{
-						result: "",
-						result_advice: "",
-						response_time: 0,
+						result:CW_Constants.RESULT_PASS,
+						response_time: -1,
 						raw_response: ""
 					};
 
@@ -202,13 +201,14 @@ class CW_PromiseResolver
 					if( parseFloat( response.avg ) + "" !== "NaN" ) // Node has no isNan()?
 					{
 						// Site is up
-						returnValue.result = "up";
+						returnValue.result = CW_Constants.RESULT_PASS;
 						returnValue.response_time = response.avg;
 						returnValue.raw_response = response;
 
+						// Request took too long. Punt to see if a response is needed
 						if( response.avg > MAX_HTTTP_RESPONSE_TIME )
 						{
-							returnValue.result_advice = "Your website is taking much longer than it should to respond, and it may be entirely down. Contact your hosting provider for immediate assistance.";
+							returnValue.result = CW_Constants.RESULT_PUNT;
 						}
 					}
 					else
@@ -216,7 +216,7 @@ class CW_PromiseResolver
 						// Site is down
 						returnValue = 
 						{
-							result: "down",
+							result: CW_Constants.RESULT_FAIL,
 							response_time: 0,
 							raw_response: response
 						}
@@ -228,7 +228,7 @@ class CW_PromiseResolver
 				// Return "Down" if there's an error
 				returnValue = 
 				{
-					result: "down",
+					result: CW_Constants.RESULT_FAIL,
 					response_time: 0,
 					raw_response: response
 				}

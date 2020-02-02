@@ -148,10 +148,9 @@ class CW_Advice
 		}
 		else // Farm out logic for parsing FAIL and PUNT conditions
 		{
-			// Use separate handlers for each command category
-
 			let adviceContent;
-			
+
+			// Use separate handlers for each command category	
 			if( returnValue.category == "local" )
 			{
 				let CW_AdviceContent_Local = require( "./CW_AdviceContent_Local.js" );
@@ -173,7 +172,18 @@ class CW_Advice
 					configObject: this.configObject
 				});
 			} // category: "website"
+			else if( returnValue.category == "website-admin" )
+			{
+				let CW_AdviceContent_WebsiteAdmin = require( "./CW_AdviceContent_WebsiteAdmin.js" );
 
+				adviceContent = new CW_AdviceContent_WebsiteAdmin({
+					command:  returnValue.command,
+					testResult: this.item_result,
+					configObject: this.configObject
+				});
+			} // category: "website-admin"
+
+			// We've got a category-specific object, now advise
 			adviceContent.advise();
 
 			// If this is the greatest severity we've seen, set the new top-level
