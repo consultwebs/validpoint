@@ -100,7 +100,6 @@ class CW_Advice
 				{
 					this.test_result.actions.push( parsedResult );
 				}
-				
 			}
 		);
 
@@ -138,7 +137,6 @@ class CW_Advice
 		if( returnValue.result == CW_Constants.RESULT_PASS )
 		{
 			returnValue.severity = CW_Constants.SEVERITY_OK;
-			returnValue.tag = CW_Constants.NAME_SEVERITY_OK;
 
 			// Set "OK" at the top-level if we've only seen "IGNORE" 
 			this.greatest_severity = ( CW_Constants.SEVERITY_OK > this.greatest_severity ) 
@@ -147,29 +145,44 @@ class CW_Advice
 		else if( returnValue.result == CW_Constants.IGNORE ) // simple population of IGNORE items - something that presumably did not actually run
 		{
 			returnValue.severity = CW_Constants.SEVERITY_IGNORE;
-			returnValue.tag = CW_Constants.NAME_SEVERITY_IGNORE;
 		}
 		else // Farm out logic for parsing FAIL and PUNT conditions
 		{
 			// Use separate handlers for each command category
+
+			let adviceContent;
 			
 			if( returnValue.category == "local" )
 			{
 				let CW_AdviceContent_Local = require( "./CW_AdviceContent_Local.js" );
 
-				let adviceContent = new CW_AdviceContent_Local({
+				adviceContent = new CW_AdviceContent_Local({
 					command:  returnValue.command,
-					testResult: this.item_result
+					testResult: this.item_result,
+					configObject: this.configObject
 				});
-				adviceContent.advise();
-
-				// If this is the greatest severity we've seen, set the new top-level
-				this.greatest_severity = ( adviceContent.severity > this.greatest_severity ) 
-					? adviceContent.severity : this.greatest_severity;
-
-				returnValue.severity = adviceContent.severity;
-				returnValue.content = adviceContent.content;
+				
 			} // category: "local"
+			else if( returnValue.category == "website" )
+			{
+				let CW_AdviceContent_Website = require( "./CW_AdviceContent_Website.js" );
+
+				adviceContent = new CW_AdviceContent_Website({
+					command:  returnValue.command,
+					testResult: this.item_result,
+					configObject: this.configObject
+				});
+			} // category: "website"
+
+			adviceContent.advise();
+
+			// If this is the greatest severity we've seen, set the new top-level
+			this.greatest_severity = ( adviceContent.severity > this.greatest_severity ) 
+				? adviceContent.severity : this.greatest_severity;
+
+			returnValue.severity = adviceContent.severity;
+			returnValue.content = adviceContent.content;
+			
 		}
 
 		return returnValue;

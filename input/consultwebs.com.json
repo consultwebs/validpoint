@@ -8,20 +8,29 @@
 	},
 	"alert_levels": 
 	{
-		"ONSCREEN": "MINOR",
-		"EMAIL": "MAJOR",
-		"SMS": "CRITICAL"
+		"ONSCREEN": "NOTICE",
+		"EMAIL": "ESSENTIAL",
+		"SMS": "URGENT"
 	},
 	"severity_thresholds": 
 	{
 		"local": 
 		{
-			"local-network": "CRITICAL",
-			"local-dns": "CRITICAL"
+			"local-network": "ESSENTIAL",
+			"local-dns": "ESSENTIAL"
 		},
 		"website":
 		{
-
+			"http-response": "ESSENTIAL",
+			"https-response": "NOTICE",
+			"website": "ESSENTIAL",
+			"secure-website": "NOTICE"
+		},
+		"website-admin":
+		{
+			"http-port": "ESSENTIAL",
+			"https-port": "NOTICE",
+			"domain": "NOTICE"
 		}
 	}
 }

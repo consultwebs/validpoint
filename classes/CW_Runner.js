@@ -39,7 +39,7 @@ class CW_Runner
 		let validCommands = [ 
 			"all", 
 			"local-network", "local-dns", 
-			"http", "https", "domain",
+			"http-port", "https-port", "domain",
 			"http-response", "https-response", "website", "secure-website" , 
 		];
 
@@ -102,17 +102,17 @@ class CW_Runner
 			case "local-dns":
 				this.command_LocalDns( { configObject: configObject, adviceObject: adviceObject } );
 				break;
-			case "http":
+			case "http-port":
 				this.command_WebsiteAvailability( { configObject: configObject, responseObject: responseObject, port: 80 } );
 				break;
-			case "https":
+			case "https-port":
 				this.command_WebsiteAvailability( { configObject: configObject, responseObject: responseObject, port: 443 } );
 				break;
 			case "http-response":
-				this.command_WebsiteResponse( { configObject: configObject, responseObject: responseObject, port: 80 } );
+				this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: 80 } );
 				break;
 			case "https-response":
-				this.command_WebsiteResponse( { configObject: configObject, responseObject: responseObject, port: 443 } );
+				this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: 443 } );
 				break;
 			case "domain":
 				this.command_Domain( { configObject: configObject, responseObject: responseObject } );
@@ -137,32 +137,33 @@ class CW_Runner
 	 * 
 	 * @author costmo
 	 * @param {*} configObject			A populated config object
-	 * @param {*} responseObject	A default response object
+	 * @param {*} adviceObject		A constructed CW_Advice instance
 	 * @param {*} port				The port number we're checking
 	 */
-	command_WebsiteResponse( { configObject = null, responseObject =  null, port = 80 } )
+	command_WebsiteResponse( { configObject = null, adviceObject =  null, port = 80 } )
 	{
-		responseObject.test = "http-reponse";
-		responseObject.description = "Website response test";
+		adviceObject.item_result.command = "http-response";
+		adviceObject.item_result.category = "website";
 
 		if( port == 443 )
 		{
-			responseObject.test = "https-reponse";
-			responseObject.description = "Secure website response test";
+			adviceObject.item_result.command = "https-response";
+			adviceObject.item_result.category = "website";
 		}
 
 		CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
 				.then(
 					( result ) =>
 					{
-						responseObject.result = result.result;
-						responseObject.result_advice = result.result_advice;
-						responseObject.response_time = result.response_time;
-						// responseObject.raw_response = result.raw_response; // skip this until we want/need to deal with JSON "circular references"
-						responseObject.status_code = result.status_code;
-						responseObject.redirect_location = result.redirect_location;
+						adviceObject.item_result.result = result.result;
+						adviceObject.item_result.result_tags.push( result.result );
+						adviceObject.item_result.raw_response = result;
+						adviceObject.item_result.response_time = result.response_time;
 
-						console.log( JSON.stringify( responseObject ) );
+						adviceObject.test_result.results.push( adviceObject.item_result );
+						adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+						console.log( JSON.stringify( adviceObject ) );
 					}
 				);
 	}
@@ -257,10 +258,7 @@ class CW_Runner
 					adviceObject.test_result.results.push( adviceObject.item_result );
 					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 
-					// console.log( "\n" );
 					console.log( JSON.stringify( adviceObject ) );
-					// console.log( adviceObject );
-					// console.log( "\n" );
 					
 				});
 	} // command_localNetwork()

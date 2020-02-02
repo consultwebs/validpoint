@@ -5,8 +5,8 @@ module.exports = Object.freeze(
 	RESULT_PUNT: "PUNT",			// An advice result that means "test results are not binary and the caller will handle providing proper advice"
 	RESULT_UNTESTED: "UNTESTED",	// Not yet tested
 
-	NAME_SEVERITY_OK: "OK",
 	NAME_SEVERITY_IGNORE: "IGNORE",
+	NAME_SEVERITY_OK: "OK",
 	NAME_SEVERITY_NOTICE: "NOTICE",
 	NAME_SEVERITY_ESSENTIAL: "ESSENTIAL",
 	NAME_SEVERITY_URGENT: "URGENT",

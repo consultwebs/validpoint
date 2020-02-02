@@ -1,9 +1,8 @@
 
 /**
- * Offering advice for "local" tests
+ * Offering advice for "website" tests
  * 
- * These are going to be simpler than most other tests since any failure is a show-stopper,
- *    and each test has a binary respnonse
+ * These tests will be a little more complicated than "local"
  * 
  * @author costmo
  */
@@ -11,7 +10,7 @@
 let CW_Constants = require( "./CW_Constants.js" );
 
 let CW_AdviceContent = require( "./CW_AdviceContent.js" );
-class CW_AdviceContent_Local extends CW_AdviceContent
+class CW_AdviceContent_Website extends CW_AdviceContent
 {
 	/**
 	 * Create an instance for a finished command and testResult
@@ -23,15 +22,17 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	constructor( { command = null, testResult = null, configObject = null } )
 	{
 		super({ 
-			category: "local", 
+			category: "website", 
 			command: command,
 			testResult: testResult 
 		});
+
+		this.configObject = configObject;
 		
 	}
 
 	/**
-	 * Advice content hub for "local" requests.
+	 * Advice content hub for "website" requests.
 	 * 
 	 * Once an Advice object has its test results, the parser runs this category-specific method to 
 	 *   produce an action object
@@ -41,6 +42,17 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	 */
 	advise()
 	{
+		// The only PUNT condition is a redirect
+		if( this.test_result.result == CW_Constants.RESULT_PUNT )
+		{
+			// If the redirect points to something other than the user's domain, set the severity
+			if( this.test_result.raw_response.raw_response.indexOf( this.configObject.domain ) > -1 )
+			{
+				this.test_result.result = CW_Constants.RESULT_PASS;
+			}
+		}
+
+		// TODO: Parse this.test_result.raw_response.raw_response for 404 or 500 errors
 		this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
 		this.content = this.contentForSeverity( { severity: this.severity } );
 	}
@@ -54,16 +66,27 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	 * 
 	 * @author costmo
 	 * @param {*} severity		The severity for which content is needed 
+	 * @param {*} extraInput	Extra input needed to form a reasonable response. Typically a response code
 	 */
-	contentForSeverity( { severity = null } )
+	contentForSeverity( { severity = null, extraInput = null } )
 	{
-		let strings = require( "../Validpoint/strings/category.local.js" );
+		let strings = require( "../Validpoint/strings/category.website.js" );
 		
 		switch( severity )
 		{
+			case CW_Constants.SEVERITY_NOTICE:
+				return strings[ this.command ][ CW_Constants.NAME_SEVERITY_NOTICE ];
 			case CW_Constants.SEVERITY_ESSENTIAL:
 			case CW_Constants.SEVERITY_URGENT:
-				return strings[ this.command ][ CW_Constants.NAME_SEVERITY_URGENT ];
+				if( extraInput && 
+					undefined != (strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_URGENT ]) )
+				{
+					return strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_URGENT ];
+				}
+				else
+				{
+					return strings[ this.command ][ CW_Constants.NAME_SEVERITY_URGENT ];
+				}
 			default:
 				return "";
 		}
@@ -83,6 +106,9 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	{
 		switch( resultTag )
 		{
+			// PUNT will happen if there is a redirect and the redirect location domain does not match
+			case "PUNT":
+				return CW_Constants.SEVERITY_NOTICE;
 			case "FAIL":
 				return CW_Constants.SEVERITY_URGENT;
 			default:
@@ -93,4 +119,4 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 
 }
 
-module.exports =  CW_AdviceContent_Local;
+module.exports =  CW_AdviceContent_Website;

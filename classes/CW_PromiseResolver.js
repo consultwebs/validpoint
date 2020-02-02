@@ -117,34 +117,30 @@ class CW_PromiseResolver
 
 						returnValue = 
 						{
-							result: "up",
-							result_advice: "",
+							result: CW_Constants.RESULT_PASS,
 							response_time: -1,
-							raw_response: response,
-							status_code: response.statusCode,
+							raw_response: response.statusCode, // send the status code as the raw response
 							redirect_location: (undefined == headers.location) ? "" : headers.location
 						};
 
 						// 400-level errors
 						if( response.statusCode.toString().startsWith( "4" ) )
 						{
-							returnValue.result = "down";
-							returnValue.result_advice = "The home page of your website is not currently available. Contact your website hosting provider immediately.";
+							returnValue.result = CW_Constants.RESULT_FAIL;
 						}
 						else if( response.statusCode.toString().startsWith( "5" ) ) // 500-level errors
 						{
-							returnValue.result = "down";
-							returnValue.result_advice = "Your website is experiencing a technical issue that is preventing people from using it. Contact your website hosting provider immediately.";
+							returnValue.result =  CW_Constants.RESULT_FAIL;
 						}
 						else if( response.statusCode.toString().startsWith( "3" ) ) // Redirects
 						{
-							returnValue.result = "redirect";
-							returnValue.result_advice = "Your website is redirecting. This is not necessarily a problem, but it may cause an SEO penalty. Please contact your SEO specialist.";
+							// for redirects, report the redirect location as the raw response
+							returnValue.raw_response = returnValue.redirect_location;
+							returnValue.result = CW_Constants.RESULT_PUNT;
 						}
 						else if( response.statusCode != 200 ) // Everything else that's not '200'
 						{
-							returnValue.result = "down";
-							returnValue.result_advice = "Your website is not available to users for an unusual technical reason. Contact your website hosting provider.";
+							returnValue.result =  CW_Constants.RESULT_FAIL;
 						}
 						
 						resolve( returnValue );
