@@ -115,7 +115,7 @@ class CW_Runner
 				this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: 443 } );
 				break;
 			case "domain":
-				this.command_Domain( { configObject: configObject, responseObject: responseObject } );
+				this.command_Domain( { configObject: configObject, adviceObject: adviceObject } );
 				break;
 			case "all":
 				console.log( "ALL not yet implemented" );
@@ -271,26 +271,31 @@ class CW_Runner
 	  * TODO: Refactor the completion blocks for maintainabiolity
 	  * @author costmo
 	  * @param {*} configObject				A parsed config object from JSON input
-	  * @param {*} responseObject			A default response object
+	  * @param {*} adviceObject		A constructed CW_Advice instance
 	  */
-	 command_Domain( { configObject = null, responseObject =  null } )
+	 command_Domain( { configObject = null, adviceObject = null } )
 	 {
 		let async = require( "async" );
 		let StringUtil = require( "./CW_StringUtil.js" );
 
-		responseObject.test = "domain";
-		responseObject.description = "Technical domain tests";
+		adviceObject.item_result.command = "domain";
+		adviceObject.item_result.category = "website-admin";
 
-		responseObject.http_response_time = -1;
-		responseObject.https_response_time = -1;
-		responseObject.servers = new Object();
-		responseObject.servers.ns = new Array(); // list of name servers
-		responseObject.servers.tld_cname = new Array(); // list of cname records for @
-		responseObject.servers.www_cname = new Array(); // list of cname records for www
-		responseObject.servers.mx = new Array(); // list of Mail eXchange servers
-		responseObject.servers.tld_a = new Array(); // list of A records for the domain
-		responseObject.servers.www_a = new Array(); // list of A records for www.<domain>
-
+		// Add a custom structure to the adviceObject for domain responses since they hold a lot of info
+		adviceObject.domainResponses = 
+		{
+			http_response_time: -1,
+			https_response_time: -1,
+			servers: 
+			{
+				ns: [],				// list of name servers
+				tld_cname: [],		// list of cname records for @
+				www_cname: [],		// list of cname records for www
+				mx: [],				// list of Mail eXchange servers
+				tld_a: [],			// list of A records for the domain
+				www_a: []			// list of A records for www.<domain>
+			}
+		}
  
 		// Using ANY as the argument to dig is remarkably unreliable in retrieving complete records. 
 		// The only way to get complete records reliably is to perform individual TYPE queries against an authoritative name server.
@@ -306,44 +311,44 @@ class CW_Runner
 							result.forEach( 
 								resultItem =>
 								{
-									responseObject.servers.ns.push( 
+									adviceObject.domainResponses.servers.ns.push( 
 										StringUtil.stripTrailingDot( resultItem.value ) 
 										);
 								});
-								completion( null, responseObject );
+								completion( null, adviceObject );
 						}
 					);
 				},
 				( result, completion ) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
 				{
-					if( result.servers.ns.length > 0 && result.servers.ns[0].length > 0 )
+					if( result.domainResponses.servers.ns.length > 0 &&  result.domainResponses.servers.ns[0].length > 0 )
 					{
-						result.servers.ns[0] = result.servers.ns[0];
+						// result.domainResponses.servers.ns[0] = result.domainResponses.servers.ns[0]; // this line is nonsensical. It is what it is.
 					}
 					else
 					{
 						// TODO: Reject or throw because there were no records
 					}
 
-					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX", queryServer: result.servers.ns[0] } )
+					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX", queryServer: result.domainResponses.servers.ns[0] } )
 					.then(
 						( result ) =>
 						{
 							result.forEach( 
 								resultItem =>
 								{
-									responseObject.servers.mx.push( 
+									adviceObject.domainResponses.servers.mx.push( 
 										StringUtil.stripTrailingDot( resultItem.value ) 
 										);
 								});
-								completion( null, responseObject );
+								completion( null, adviceObject );
 						}
 					);
 
 				},
 				( result, completion ) => // Step 3. Perform a dig query against an authoritative name server to get an A record for the domain (should be the @ record)
 				{
-					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "A", queryServer: result.servers.ns[0] } )
+					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
 					.then(
 						( result ) =>
 						{
@@ -353,15 +358,15 @@ class CW_Runner
 								result.forEach( 
 									resultItem =>
 									{
-										responseObject.servers.tld_a.push( StringUtil.stripTrailingDot( resultItem.value ) );
+										adviceObject.domainResponses.servers.tld_a.push( StringUtil.stripTrailingDot( resultItem.value ) );
 									});
-									completion( null, responseObject );
+									completion( null, adviceObject );
 							}
 						});
 				},
 				( result, completion ) => // Step 4. Perform a dig query against an authoritative name server to get an A record for the www.<domain> 
 				{
-					CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "A", queryServer: result.servers.ns[0] } )
+					CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
 					.then(
 						( result ) =>
 						{
@@ -373,29 +378,28 @@ class CW_Runner
 									result[0].value = StringUtil.stripTrailingDot( result[0].value )
 									result[1].value = StringUtil.stripTrailingDot( result[1].value )
 
-									
 									if( (result[0].type == "CNAME" && result[1].type == "A") )
 									{
-										responseObject.servers.www_cname.push( result[0].value );
-										responseObject.servers.www_a.push( result[1].value );
+										adviceObject.domainResponses.servers.www_cname.push( result[0].value );
+										adviceObject.domainResponses.servers.www_a.push( result[1].value );
 									}
 									else if(result[0].type == "A" && result[1].type == "CNAME" ) // In theory, these can arrive in reverse order
 									{
-										responseObject.servers.www_cname.push( result[1].value );
-										responseObject.servers.www_a.push( result[0].value );
+										adviceObject.domainResponses.servers.www_cname.push( result[1].value );
+										adviceObject.domainResponses.servers.www_a.push( result[0].value );
 									}
 								}
-								completion( null, responseObject );
+								completion( null, adviceObject );
 							}
 							else
 							{
-								completion( null, responseObject );
+								completion( null, adviceObject );
 							}
 						});
 				},
 				( result, completion ) => // Step 5. Perform a dig query against an authoritative name server to get a CNAME record for the URL
 				{
-					CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "CNAME", queryServer: result.servers.ns[0] } )
+					CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
 					.then(
 						( result ) =>
 						{
@@ -404,19 +408,19 @@ class CW_Runner
 								result.forEach( 
 									resultItem =>
 									{
-										responseObject.servers.www_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
+										adviceObject.domainResponses.servers.www_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
 									});
-									completion( null, responseObject );
+									completion( null, adviceObject );
 							}
 							else
 							{
-								completion( null, responseObject );
+								completion( null, adviceObject );
 							}
 						});
 				},
 				( result, completion ) => // Step 6. Perform a dig query against an authoritative name server to get a CNAME record for the domain
 				{
-					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "CNAME", queryServer: result.servers.ns[0] } )
+					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
 					.then(
 						( result ) =>
 						{
@@ -426,13 +430,13 @@ class CW_Runner
 								result.forEach( 
 									resultItem =>
 									{
-										responseObject.servers.tld_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
+										adviceObject.domainResponses.servers.tld_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
 									});
-									completion( null, responseObject );
+									completion( null, adviceObject );
 							}
 							else
 							{
-								completion( null, responseObject );
+								completion( null, adviceObject );
 							}
 						});
 				},
@@ -442,123 +446,44 @@ class CW_Runner
 					.then(
 						( result ) =>
 						{
-							responseObject.expiration = result;
-
-							let parsedDate = Date.parse( responseObject.expiration );
+							let parsedDate = Date.parse( result );
 							let now = Date.now();
 							let timeDiff = Math.abs( now - parsedDate );
 							let daysTilExpiry = Math.floor( timeDiff/(86400 * 1000) ); // '* 1000' because timeDiff is in microseconds
 
-							responseObject.days_til_expiry = daysTilExpiry;
+							adviceObject.domainResponses.expiration = result;
+							adviceObject.domainResponses.days_til_expiry = daysTilExpiry;
 
-							completion( null, responseObject );
+							completion( null, adviceObject );
 						});
 				}
-				// ( result, completion ) =>
-				// {
-				// }
 			],
 			( error, result ) =>
 			{
 				// TODO: Handle errors
 				if( error )
 				{
+					// TODO: Finalize the adviceObject
+					// TODO: Handle errors
 					console.log( "E" );
 					console.log( error );
 				}
 				else
 				{
-					// Look over the results and offer some advice if necessary
-					result.raw_response = result.servers;
 
-					// TODO: Refactor Advice into its own class
-					if( result.servers.ns.length < 1 )
-					{
-						result.result_advice += " Your domain does not have any name servers defined, so people will not be able to reach your website. Contact your website hosting provider.";
-					}
-					if( result.servers.tld_cname.length > 0 )
-					{
-						// TODO: make sure the only record(s) point to an IP address and not a domain name. It's normal for a dig query to receive an IP address here when there is no CNAME actually defined
-						// result.result_advice += " Your domain name is currently configured as an alias (CNAME) to another address. This may not be a problem, but it isn't normal. You should contact your website hosting provider if you have a concern.";
-					}
+					adviceObject.item_result.raw_response = result.domainResponses;
+					// Generate an Advice.item_result since we've been gathering data into a custom structure until now
 
-					if( result.servers.www_cname.length < 1 )
-					{
-						result.result_advice += " You have not configured a \"www\" address for people to reach your website. People may still be able to reach your website by not typing the \"www,\" but many Internet users expect URLs to begin with those characters and type them, even when they don't need to do so. To make sure you are maximising your traffic, you should contact your website hosting provider and have them add a \"CNAME\" record for your domain.";
-					}
-					else
-					{
-						let foundDomain = false;
-						result.servers.www_cname.forEach(
-							cname =>
-							{
-								if( cname == configObject.domain )
-								{
-									foundDomain = true;
-								}
-							}
-						);
-						if( !foundDomain )
-						{
-							result.result_advice += " Your \"www\" alias is not currently pointing to your top-level domain. This may not be a problem, but it isn't normal. You should contact your website hosting provider if you have a concern.";
-						}
-					}
+					adviceObject.test_result.results.push( adviceObject.item_result );
+					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+					delete adviceObject.domainResponses;
+					console.log( JSON.stringify( adviceObject ) );
 
-					if( result.servers.mx.length < 1 )
-					{
-						result.result_advice += " You have not configured any Mail Exchange (MX) records. This means that people will not be able to send you email messages using your domain name. Contact your website or email hosting provider for more information.";
-					}
-					if( result.servers.tld_a.length < 1 )
-					{
-						result.result_advice += " Your domain name does not have its own \"A\" record in your domain's DNS records. This may not be a problem, but it isn't normal. You should contact your website hosting provider if you have a concern.";
-					}
-					if( result.servers.www_a.length > 0 ) // make sure the www "A" record matches the TLD record
-					{
-						let haveMatch = false;
-
-						if( result.servers.tld_a.length > 0 )
-						{
-							result.servers.tld_a.forEach(
-								server =>
-								{
-									// We're only trying to match against the first www A record. Having more than one would be weird.
-									if( result.servers.www_a[0] == result.servers.tld_a[0] )
-									{
-										haveMatch = true;
-									}
-								}
-							);
-						}
-
-						if( !haveMatch )
-						{
-							result.result_advice += " Your \"www\" DNS record does not match your domain's top-level IP address. This may not be a problem, but it isn't normal. You should contact your website hosting provider if you have a concern.";
-						}
-					}
-
-					if( result.days_til_expiry < 91 )
-					{
-						if( result.days_til_expiry < 1 )
-						{
-							result.result_advice += " Your domain name has expired and people will not be able to reach your website. If you do not renew your domain name soon, their may be a large \"redemption\" fee. Contact your hosting provider immediately for assistance.";
-						}
-						else
-						{
-							result.result_advice += " Your domain name is going to expire in " + result.days_til_expiry + " days. If you do not renew your domain name, people will not be able to reach your website. Contact your hosting provider immediately for assistance.";
-						}
-					}
-
-					if( result.result_advice.length < 1 )
-					{
-						result.result_advice = "none";
-						result.result = "pass";
-					}
-					else
-					{
-						result.result = "advice";
-					}
+					delete result.whois_info;
 				}
-				console.log( result );
+
+				// OUTPUT HERE
+				// console.log( result );
 			}
 		);
 		 

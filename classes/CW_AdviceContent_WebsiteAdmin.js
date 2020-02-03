@@ -42,14 +42,137 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 	 */
 	advise()
 	{
-		// The only PUNT condition is a response that takes too long
-		if( this.test_result.result == CW_Constants.RESULT_PUNT )
+		// Make a separate parser for the domain command since it has a lot of things to check
+		if( this.command == "domain" )
 		{
-			// TODO: Get config to see if we should notify
+			let tags = this.resultTagsForDomain( { inputObject: this.test_result.raw_response } );
+
+			if( tags.length < 1 )
+			{
+				this.severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PASS } );
+				this.content = this.contentForSeverity( { severity: this.severity } );
+			}
+			else
+			{
+				this.content = "";
+				tags.forEach(
+					tag =>
+					{
+						let severity = this.resultTagToSeverity( { resultTag: tag.result_value } );
+						if( severity > this.severity )
+						{
+							this.severity = severity;
+							this.test_result.result = tag.result_value;
+						}
+
+						this.content += this.contentForSeverity( { severity: severity, extraInput: tag.intermediate_key } ) + "\n";
+						this.result = tag.result_value;
+					}
+				);
+			}
+		}
+		else
+		{
+			// The only PUNT condition is a response that takes too long. Without logic below, that will generate a NOTICE
+			if( this.test_result.result == CW_Constants.RESULT_PUNT )
+			{
+				// TODO: Get config to see if we should notify
+			}
+
+			this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
+			this.content = this.contentForSeverity( { severity: this.severity } );
+		}
+	}
+
+	/**
+	 * A string of tests to riun gathered domain info through to look for problems.
+	 * 
+	 * @returns Array
+	 * @author costmo
+	 * @param {*} inputObject			The raw_response from the runner 
+	 */
+	resultTagsForDomain( { inputObject = null } )
+	{
+		let returnValue = [];
+
+		// No name servers present
+		if( inputObject.servers.ns.length < 1 )
+		{
+			returnValue.push(
+				{
+					intermediate_key: "NS_NONE",
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
 		}
 
-		this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
-		this.content = this.contentForSeverity( { severity: this.severity } );
+		// TLD is an alias
+		if( inputObject.servers.tld_cname.length > 0 )
+		{
+			returnValue.push(
+				{
+					intermediate_key: "TLD_IS_ALIAS",
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+
+		// No cname for WWW
+		if( inputObject.servers.www_cname.length < 1 )
+		{
+			returnValue.push(
+				{
+					intermediate_key: "WWW_CNAME_NONE",
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+
+		// No MX servers
+		if( inputObject.servers.mx.length < 1 )
+		{
+			returnValue.push(
+				{
+					intermediate_key: "MX_NONE",
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+
+		// No A record for TLF
+		if( inputObject.servers.tld_a.length < 1 )
+		{
+			returnValue.push(
+				{
+					intermediate_key: "TLD_A_NONE",
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+
+		// Domain name expired
+		if( inputObject.days_til_expiry < 1 )
+		{
+			returnValue.push(
+				{
+					intermediate_key: "DOMAIN_EXPIRED",
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+
+		// Domain name will expire
+		if( inputObject.days_til_expiry < 90 )
+		{
+			returnValue.push(
+				{
+					intermediate_key: "DOMAIN_WILL_EXPIRE",
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+
+		return returnValue;
 	}
 
 	/**
