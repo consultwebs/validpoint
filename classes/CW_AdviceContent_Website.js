@@ -52,9 +52,45 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 			}
 		}
 
-		// TODO: Parse this.test_result.raw_response.raw_response for 404 or 500 errors
-		this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
-		this.content = this.contentForSeverity( { severity: this.severity } );
+		if( this.command == "website-content" )
+		{
+			let tags = this.resultTagsForContent( { inputObject: this.test_result.raw_response } );
+			// adviceObject.item_result.result = result.result;
+			// adviceObject.item_result.result_tags.push( result.result );
+
+			// Nothing was wrong
+			if( tags.length < 1 )
+			{
+				this.severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PASS } );
+				this.content = this.contentForSeverity( { severity: this.severity } );
+			}
+			else
+			{
+				// handle more complicated severity determinations
+				this.content = "";
+				tags.forEach(
+					tag =>
+					{
+						let severity = this.resultTagToSeverity( { resultTag: tag.result_value, extraKey: tag.intermediate_key } );
+						if( severity > this.severity )
+						{
+							this.severity = severity;
+							this.test_result.result = tag.result_value;
+						}
+
+						this.content += this.contentForSeverity( { severity: severity, extraInput: tag.intermediate_key } ) + "\n";
+						this.result = tag.result_value;
+					}
+				);
+			}
+		}
+		else
+		{
+			// TODO: Parse this.test_result.raw_response.raw_response for 404 or 500 errors
+			this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
+			this.content = this.contentForSeverity( { severity: this.severity } );
+		}
+
 	}
 
 	/**
@@ -75,7 +111,15 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 		switch( severity )
 		{
 			case CW_Constants.SEVERITY_NOTICE:
-				return strings[ this.command ][ CW_Constants.NAME_SEVERITY_NOTICE ];
+				if( extraInput && 
+					undefined != (strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_NOTICE ]) )
+				{
+					return strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_NOTICE ];
+				}
+				else
+				{
+					return strings[ this.command ][ CW_Constants.NAME_SEVERITY_NOTICE ];
+				}
 			case CW_Constants.SEVERITY_ESSENTIAL:
 			case CW_Constants.SEVERITY_URGENT:
 				if( extraInput && 
@@ -101,8 +145,9 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 	 * TODO: Get this setting from client configuration and override the system config setting
 	 * 
 	 * @param {*} resultTag				The result tag to map  
+	 * @param {*} extraKey				An optional extra key to help refine the lookup
 	 */
-	resultTagToSeverity( { resultTag = null } )
+	resultTagToSeverity( { resultTag = null, extraKey = null } )
 	{
 		switch( resultTag )
 		{
@@ -110,10 +155,109 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 			case "PUNT":
 				return CW_Constants.SEVERITY_NOTICE;
 			case "FAIL":
-				return CW_Constants.SEVERITY_URGENT;
+				if( extraKey && extraKey.length > 0 )
+				{
+					switch( extraKey )
+					{
+						case "HEAD_NONE":
+						case "H1_NONE":
+						case "NOINDEX":
+							return CW_Constants.SEVERITY_NOTICE;
+						default:
+							return CW_Constants.SEVERITY_URGENT;
+					}
+				}
+				else // end if( extraKey && extraKey.length > 0 ) for case: FAIL
+				{
+					return CW_Constants.SEVERITY_URGENT;
+				}
 			default:
 				return super.resultTagToSeverity( { resultTag: resultTag } );
 		}
+	}
+
+	/**
+	 * A string of tests to riun gathered domain info through to look for problems.
+	 * 
+	 * @returns Array
+	 * @author costmo
+	 * @param {*} inputObject			The raw_response from the runner 
+	 */
+	resultTagsForContent( { inputObject = null } )
+	{
+		let returnValue = [];
+
+		// A series of things that should be present in the HTML
+		if( (!inputObject.headNode.childNodes) || 
+			(inputObject.headNode.childNodes.length < 1) )
+		{
+			returnValue.push(
+				{
+					intermediate_key: "HEAD_NONE",
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+
+		if( (!inputObject.titleNode.childNodes) || 
+			(inputObject.titleNode.childNodes.length < 1) ||
+			(inputObject.titleNode.rawText.length < 1) )
+		{
+			returnValue.push(
+				{
+					intermediate_key: "TITLE_NONE",
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+
+		if( (!inputObject.bodyNode.childNodes) || 
+			(inputObject.bodyNode.childNodes.length < 1) ||
+			(inputObject.bodyNode.rawText.length < 1) )
+		{
+			returnValue.push(
+				{
+					intermediate_key: "BODY_NONE",
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+
+		// We're only checking for 1
+		if( (!inputObject.h1Node.childNodes) || 
+			(inputObject.h1Node.childNodes.length < 1) /*|| // requires separate parsing if there's more than one
+			(inputObject.h1Node.rawText.length < 1)*/ )
+		{
+			returnValue.push(
+				{
+					intermediate_key: "H1_NONE",
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+
+		// walk through meta tags to find a "noindex"
+		if(  inputObject.metaNodes &&
+			inputObject.metaNodes.length > 0 )
+		{
+			inputObject.metaNodes.forEach(
+				node =>
+				{
+					if( node.rawAttrs.indexOf( "noindex" ) > -1 )
+					{
+						returnValue.push(
+							{
+								intermediate_key: "NOINDEX",
+								result_value: CW_Constants.RESULT_FAIL
+							}
+						);
+					}
+					
+				}
+			);
+		}
+		
+		return returnValue;
 	}
 
 

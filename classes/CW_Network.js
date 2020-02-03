@@ -53,6 +53,25 @@ class CW_Network
 	} // checkDns()
 
 	/**
+	 * Verify essential HTML tags on the user's site
+	 * 
+	 * @author costmo
+	 * @returns Promise
+	 * @param {*} url			The URL of the site to check
+	 */
+	async checkWebsiteContent( { url = null } )
+	{
+		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
+		let resolver = new CW_PromiseResolver();
+
+		return new Promise( 
+			( resolve, reject ) => 
+			{
+				resolver.resolve_checkWebsiteContent( resolve, reject, { url: url } );
+			});
+	} // checkWebsiteResponse()
+
+	/**
 	 * Verify that the user's website status and redirect URL
 	 * 
 	 * @author costmo

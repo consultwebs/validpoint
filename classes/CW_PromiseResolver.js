@@ -78,6 +78,36 @@ class CW_PromiseResolver
 	} // resolve_checkDns()
 
 	/**
+	 * Verify that essential HTML tags exist on the user's site
+	 * 
+	 * @author costmo
+	 * @param	{*}		resolve		Resolve function	
+	 * @param	{*}		reject		Reject function
+	 * @param {*} url			The URL of the site to check
+	 */
+	async resolve_checkWebsiteContent( resolve, reject, { url = null } )
+	{
+		// TODO: catch errors
+
+		let puppeteer = require( "puppeteer" );
+
+		let browser = await puppeteer.launch();
+		let page = await browser.newPage();
+		await page.goto( "https://" + url );
+
+		let outerHtml = await page.evaluate(
+			() =>
+			{
+				// TODO: Should reject/error if there's no HTML node
+				return document.querySelector("html").outerHTML;
+			}
+		);
+			
+		await browser.close();
+		resolve( outerHtml );
+	}
+
+	/**
 	 * Verify that the user's website status and redirect URL
 	 * 
 	 * @author costmo

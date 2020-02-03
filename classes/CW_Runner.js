@@ -34,13 +34,13 @@ class CW_Runner
 
 		// local: local-netowrk, local-dns
 		// website-admin: http-port, https-port, domain
-		// website: http-response, https-response, website, secure-website
+		// website: http-response, https-response, website, secure-website, website-content
 
 		let validCommands = [ 
 			"all", 
 			"local-network", "local-dns", 
 			"http-port", "https-port", "domain",
-			"http-response", "https-response", "website", "secure-website" , 
+			"http-response", "https-response", "website", "secure-website",  "website-content"
 		];
 
 		if( validCommands.indexOf( input ) >= 0 )
@@ -74,22 +74,12 @@ class CW_Runner
 			adviceObject.configObject = configObject;
 			adviceObject.domain = configObject.domain;
 		}
-
-		// TODO: remove this as soon as all commands are using adviceObject instead
-		let responseObject = 
-		{
-			test: "",
-			description: "",
-			result: "",
-			result_advice: "",
-			response_time: -1,
-			raw_response: "",
-			status_code: "",
-			redirect_location: ""
-		};
 		
 		switch( command )
 		{
+			case "website-content":
+				this.command_WebsiteContent( { configObject: configObject, adviceObject: adviceObject } );
+				break;
 			case "website":
 				this.command_Website( { configObject: configObject, adviceObject: adviceObject, port: 80 } );
 				break;
@@ -126,6 +116,51 @@ class CW_Runner
 		}
 
 	} // runCommand()
+
+	/**
+	 * Check website content for essential tags
+	 * 
+	 * @author costmo
+	 * @param {*} configObject			A populated config object
+	 * @param {*} adviceObject		A constructed CW_Advice instance
+	 */
+	command_WebsiteContent( { configObject = null, adviceObject =  null } )
+	{
+		adviceObject.item_result.command = "website-content";
+		adviceObject.item_result.category = "website";
+
+		CW_Runner.network.checkWebsiteContent( { url: configObject.url } )
+				.then(
+					( result ) =>
+					{
+						// Parse the incoming HTML to find important elements
+						let HtmlParser = require( "node-html-parser" );
+						let root = HtmlParser.parse( result );
+
+						// Stuff some nodes into an object for testing
+						adviceObject.item_result.raw_response = {
+							headNode: root.querySelector( "head" ),
+							titleNode:  root.querySelector( "head title" ),
+							bodyNode:  root.querySelector( "body" ),
+							h1Node:  root.querySelector( "h1" ),
+							metaNodes:  root.querySelectorAll( "meta" )
+						}
+
+						adviceObject.test_result.results.push( adviceObject.item_result );
+						adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+						// remove large result sets
+						adviceObject.test_result.results.forEach(
+							result =>
+							{
+								result.raw_response = "";
+							}
+						);
+
+						console.log( JSON.stringify( adviceObject ) );
+					}
+				);
+	}
 
 	/**
 	 * Below here should be convenience wrappers to get the content we want from working classes and coerce it for output

@@ -94,10 +94,11 @@ class CW_Advice
 			{
 				// Push the parsed result to the 'actions' 
 				let parsedResult = this.parseResult( { result: result } );
-				
+
 				// Do not push "OK" and "IGNORE" results into the "actions" array since we'll never "act" on them
 				if( parsedResult.severity > CW_Constants.SEVERITY_OK )
 				{
+					
 					this.test_result.actions.push( parsedResult );
 				}
 			}
@@ -181,15 +182,18 @@ class CW_Advice
 					testResult: this.item_result,
 					configObject: this.configObject
 				});
+
 			} // category: "website-admin"
 
 			// We've got a category-specific object, now advise
 			adviceContent.advise();
+			returnValue.result =  adviceContent.result;
 
 			// If this is the greatest severity we've seen, set the new top-level
 			this.greatest_severity = ( adviceContent.severity > this.greatest_severity ) 
 				? adviceContent.severity : this.greatest_severity;
 
+			
 			returnValue.severity = adviceContent.severity;
 			returnValue.content = adviceContent.content;
 			
