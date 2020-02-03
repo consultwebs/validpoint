@@ -66,7 +66,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 	 * 
 	 * @author costmo
 	 * @param {*} severity		The severity for which content is needed 
-	 * @param {*} extraInput	Extra input needed to form a reasonable response. Typically a response code
+	 * @param {*} extraInput	Extra input needed to form a more precise response
 	 */
 	contentForSeverity( { severity = null, extraInput = null } )
 	{

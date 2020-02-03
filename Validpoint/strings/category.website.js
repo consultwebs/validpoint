@@ -28,10 +28,10 @@ module.exports =
 	},
 	"website":
 	{
-		"URGENT": 		"Some string"
+		"URGENT": 		"Your web server is currently not accepting connections for your domain. People will not be able to reach your website using this address. Please contact your hosting provider for support"
 	},
 	"secure-website":
 	{
-		"URGENT": 		"Some secure string"
+		"URGENT": 		"Your secure web server is currently not accepting connections for your domain. People will not be able to reach your website using this address. Please contact your hosting provider for support"
 	}
 };

@@ -91,10 +91,10 @@ class CW_Runner
 		switch( command )
 		{
 			case "website":
-				this.command_Website( { configObject: configObject, responseObject: responseObject, port: 80 } );
+				this.command_Website( { configObject: configObject, adviceObject: adviceObject, port: 80 } );
 				break;
 			case "secure-website":
-				this.command_Website( { configObject: configObject, responseObject: responseObject, port: 443 } );
+				this.command_Website( { configObject: configObject, adviceObject: adviceObject, port: 443 } );
 				break;
 			case "local-network":
 				this.command_LocalNetwork( { configObject: configObject, adviceObject: adviceObject } );
@@ -573,24 +573,20 @@ class CW_Runner
 	 * 
 	 * @author costmo
 	 * @param {*} configObject			A populated config object
-	 * @param {*} responseObject	A default response object
+	 * @param {*} adviceObject		A constructed CW_Advice instance
 	 * @param {*} port				The port number we're checking
 	 */
-	command_Website( { configObject = null, responseObject =  null, port = 80 } )
+	command_Website( { configObject = null, adviceObject =  null, port = 80 } )
 	{
 		let async = require( "async" );
 
-		// http(s), then http(s)-response
-		responseObject.test = "website";
-		responseObject.description = "Non-secure website availability and response test";
+		adviceObject.item_result.command = "website";
+		adviceObject.item_result.category = "website";
 
 		if( port == 443 )
 		{
-			responseObject.test = "secure-website";
-			responseObject.description = "Secure website availability and response test";
+			adviceObject.item_result.command = "secure-website";
 		}
-
-		let outputObject = responseObject;
 
 		async.waterfall(
 			[
@@ -600,13 +596,31 @@ class CW_Runner
 							.then(
 								( result ) =>
 								{
-									responseObject.result = result.result;
-									responseObject.result_advice = result.result_advice;
-									responseObject.response_time = result.response_time;
-									responseObject.raw_response = result.raw_response;
+									adviceObject.item_result.result = result.result;
+									adviceObject.item_result.result_tags.push( result.result );
+									adviceObject.item_result.raw_response = result;
+									adviceObject.item_result.response_time = result.response_time;
+			
+									adviceObject.test_result.results.push( adviceObject.item_result );
+									adviceObject.finalizeOutput( { stripConfigObject: false, stripItemResult: false } );
 
-									outputObject = responseObject;
-									completion( null, responseObject );
+									// only run part 2 if we got a PASS or UNTESTED
+									if( adviceObject.item_result.result == CW_Constants.RESULT_PASS ||
+										adviceObject.item_result.result == CW_Constants.RESULT_UNTESTED )
+										{
+											completion( null, adviceObject );
+										}
+										else
+										{
+											// If there was a failure, we're not moving on to the next step, so sanitize the output
+											if( adviceObject.configObject )
+											{
+												delete adviceObject.configObject;
+											}
+											delete adviceObject.item_result;
+											
+											console.log( JSON.stringify( adviceObject ) );
+										}
 								}
 							);
 				},
@@ -616,12 +630,16 @@ class CW_Runner
 							.then(
 								( result ) =>
 								{
-									outputObject.result = result.result;
-									outputObject.result_advice += " " + result.result_advice;
-									responseObject.status_code = result.status_code;
-									responseObject.redirect_location = result.redirect_location;
+									adviceObject.item_result.result = result.result;
+									adviceObject.item_result.result_tags.push( result.result );
+									adviceObject.item_result.raw_response = result;
+									adviceObject.item_result.response_time = result.response_time;
+			
+									adviceObject.test_result.results.push( adviceObject.item_result );
+									adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+			
+									console.log( JSON.stringify( adviceObject ) );
 
-									console.log( JSON.stringify( responseObject ) );
 									completion( null );
 								}
 							);

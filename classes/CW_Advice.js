@@ -104,7 +104,7 @@ class CW_Advice
 		);
 
 		// Make sure we're all cleaned up - constructive action
-		this.clearItemResult();
+		// this.clearItemResult();
 
 		// Cleanup - destructive actions
 		if( (this.configObject) && (stripConfigObject == true) )
