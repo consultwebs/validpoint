@@ -99,7 +99,7 @@ class CW_PromiseResolver
 			() =>
 			{
 				// TODO: Should reject/error if there's no HTML node
-				return document.querySelector("html").outerHTML;
+				return document.querySelector( "html" ).outerHTML;
 			}
 		);
 			

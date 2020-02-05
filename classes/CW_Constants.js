@@ -10,12 +10,14 @@ module.exports = Object.freeze(
 	NAME_SEVERITY_NOTICE: "NOTICE",
 	NAME_SEVERITY_ESSENTIAL: "ESSENTIAL",
 	NAME_SEVERITY_URGENT: "URGENT",
+	NAME_SEVERITY_CLI: "CLI",
 
 	SEVERITY_IGNORE: -1,
 	SEVERITY_OK: 0,
 	SEVERITY_NOTICE: 1,
 	SEVERITY_ESSENTIAL: 2,
-	SEVERITY_URGENT: 3
+	SEVERITY_URGENT: 3,
+	SEVERITY_CLI: 99					// Errors on the CLI tests indicate system/network failure, leading to the inability to run further tests
 
 
 });

@@ -21,11 +21,9 @@ require( "strict-mode" )(
 		const CW_InputParser =  require( "../../classes/CW_InputParser.js" );
 		let config = null;
 
-		// parse the requested command from the command line arguments, then run the command
-		let argv = require( "yargs" ).argv;
-
-		let cmd = (argv.c) ? argv.c : "all";
-		let domain = (argv.d) ? argv.d : "all";
+		let inputOptions = CW_Runner.processinputArguments();
+		let cmd = inputOptions.command;
+		let domain = inputOptions.domain;
 
 		CW_InputParser.makeRunnerObjects( domain ).then(
 			( runObjects ) =>
@@ -72,9 +70,5 @@ require( "strict-mode" )(
 				}
 			}
 		);
-		
-		
-			
-
-    }
+	}
 );

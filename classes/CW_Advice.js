@@ -98,7 +98,6 @@ class CW_Advice
 				// Do not push "OK" and "IGNORE" results into the "actions" array since we'll never "act" on them
 				if( parsedResult.severity > CW_Constants.SEVERITY_OK )
 				{
-					
 					this.test_result.actions.push( parsedResult );
 				}
 			}

@@ -626,6 +626,77 @@ class CW_Runner
 	{
 		return network;
 	}
+
+	static processinputArguments()
+	{
+		let returnValue =
+		{
+			command: "",
+			domain: ""
+		};
+
+		// parse the requested command from the command line arguments, then run the command
+		let yargs = require( "yargs" );
+		yargs.scriptName( "./bin/Validpoint" )
+			.usage( "USAGE: $0 <command> -d [domain1,[domain2,...]] [-f file] [-c configFile] [-h]" )
+			.version( "0.0.1" )
+			.option( "d",
+			{
+				alias: "domain",
+				describe: "The domain name or a comma-delimited list of domain names",
+				demand: false,
+				type: "string",
+				nargs: 1
+			} )
+			.option( "f",
+			{
+				alias: "file",
+				describe: "A file or directory for test input",
+				demand: false,
+				type: "string",
+				conflicts: [ "d" ] // Don't allow users to specify a file or directory for input AND a domain to test
+			} )
+			.option( "c",
+			{
+				alias: "config",
+				describe: "A JSON file for test-run configuration",
+				demand: false,
+				type: "string"
+			} )
+			.option( "h",
+			{
+				alias: "help",
+				describe: "Show this help screen", // This doesn't have any effect
+				demand: false
+			})
+			.command( "$0", "Unknown command supplied", // If the user typed a command that we do not know how to handle, show the help screen and exit
+				() => {},
+				( argv ) =>
+				{
+					console.log( "Unknown command: " + argv._["0"] );
+					yargs.showHelp();
+					process.exit( 1 );
+				}
+			)
+			.command( "local-network", "Test local network connectivity" )
+			.command( "local-dns", "Test local DNS resolution" )
+			.command( "http-port", "Test response time of web server port 80" )
+			.command( "https-port", "Test response time of web server port 443" )
+			.command( "domain", "Test domain registrar configuration" )
+			.command( "http-response", "Test response code and redirection for http" )
+			.command( "https-response", "Test response code and redirection for https" )
+			.command( "website", "Combined test of http-port and http-response" )
+			.command( "secure-website", "Combined test of https-port and https-response" )
+			.command( "website-content", "Test website content for essential content" )
+			.demandCommand( 1, "You must specify a command to run" )
+			.help( "help",  "Show this help screen" )
+			.argv;
+
+		returnValue.command = yargs.argv._[0];
+		returnValue.domain = yargs.argv.domain;
+
+		return returnValue;
+	}
 }
 
 module.exports = CW_Runner;
