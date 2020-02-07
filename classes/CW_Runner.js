@@ -100,28 +100,22 @@ class CW_Runner
 						.then(
 							(result) =>
 							{
-								// console.log( "WSA THEN" );
-								// console.log( result );
 								resolve( result );
 							}
 						);
 					}
 				);
-
-				// break;
-				// return new Promise(
-				// 	( resolve, reject ) =>
-				// 	{
-				// 		resolve( this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 80 }  ) );
-				// 	}
-				// );
 			case "https-port":
-				// return this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 443 } );
-				// break;
 				return new Promise(
-					( resolve, reject ) =>
+					(resolve, reject) =>
 					{
-						resolve( this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 443 } ) );
+						this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 443 } )
+						.then(
+							(result) =>
+							{
+								resolve( result );
+							}
+						);
 					}
 				);
 			case "http-response":
@@ -265,38 +259,6 @@ class CW_Runner
 				resolve( JSON.stringify( adviceObject ) );
 
 			});
-
-
-		// 	resolve(
-		// 		() =>
-		// 		{
-		// 			CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } )
-		// 					.then(
-		// 						async ( result ) =>
-		// 						{
-		// 							console.log( "running" );
-		// 							return new Promise(
-		// 								(resolve, reject) =>
-		// 								{
-		// 									adviceObject.item_result.result = result.result;
-		// 									adviceObject.item_result.result_tags.push( result.result );
-		// 									adviceObject.item_result.raw_response = result;
-		// 									adviceObject.item_result.response_time = result.response_time;
-
-		// 									adviceObject.test_result.results.push( adviceObject.item_result );
-		// 									adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-
-		// 									resolve( JSON.stringify( adviceObject ) );
-		// 								}
-		// 							);
-									
-		// 						}
-		// 					);
-		// 		}
-		// 	);
-		// } );
-
-
 	}
 
 	/**
@@ -573,9 +535,6 @@ class CW_Runner
 
 					delete result.whois_info;
 				}
-
-				// OUTPUT HERE
-				// console.log( result );
 			}
 		);
 		 
