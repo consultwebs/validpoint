@@ -87,8 +87,18 @@ class CW_Runner
 				this.command_Website( { configObject: configObject, adviceObject: adviceObject, port: 443 } );
 				break;
 			case "local-network":
-				this.command_LocalNetwork( { configObject: configObject, adviceObject: adviceObject } );
-				break;
+				return new Promise(
+					(resolve, reject) =>
+					{
+						this.command_LocalNetwork( { configObject: configObject, adviceObject: adviceObject } )
+						.then(
+							(result) =>
+							{
+								resolve( result );
+							}
+						);
+					}
+				);
 			case "local-dns":
 				this.command_LocalDns( { configObject: configObject, adviceObject: adviceObject } );
 				break;
@@ -303,23 +313,24 @@ class CW_Runner
 		adviceObject.item_result.command = "local-network";
 		adviceObject.item_result.category = "local";
 
-		CW_Runner.network.checkLocalNetwork()
-			.then( 
-				( result ) => 
-				{
-					// result = "FAIL"; // Simulate a failure without shutting off your local network
+		return new Promise(
+			async (resolve, reject) =>
+			{
 
-					// `result` will either be PASS or FAIL. Nothing more meaningfiul is needed for this test
-					adviceObject.item_result.result = result;
-					adviceObject.item_result.result_tags.push( result );
-					adviceObject.item_result.raw_response = result;
+				let result = await CW_Runner.network.checkLocalNetwork();
 
-					adviceObject.test_result.results.push( adviceObject.item_result );
-					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+				// `result` will either be PASS or FAIL. Nothing more meaningfiul is needed for this test
+				adviceObject.item_result.result = result;
+				adviceObject.item_result.result_tags.push( result );
+				adviceObject.item_result.raw_response = result;
 
-					console.log( JSON.stringify( adviceObject ) );
-					
-				});
+				adviceObject.test_result.results.push( adviceObject.item_result );
+				adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+				resolve( JSON.stringify( adviceObject ) );
+
+			});
+
 	} // command_localNetwork()
 
 	/**

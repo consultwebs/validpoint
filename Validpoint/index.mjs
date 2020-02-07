@@ -11,6 +11,12 @@ const runner = new CW_Runner();
 const CW_InputParser =  require( "../classes/CW_InputParser.js" );
 let config = null;
 
+exports.testLocalNetwork = 
+( domain, callback ) =>
+{
+	commandRunner( { domain: domain, command: "local-network", callback: callback } );
+};
+
 exports.testHTTPPort = 
 ( domain, callback ) =>
 {
