@@ -61,3 +61,4 @@ typings/
 .next
 /util/
 /input/
+.vscode

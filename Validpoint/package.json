@@ -1,8 +1,10 @@
 {
   "name": "Validpoint",
-  "version": "1.0.0",
-  "description": "CLI service validator",
+  "version": "0.0.1",
+  "description": "Consultwebs service validator",
   "license": "MIT",
+  "type": "module",
+  "main": "index.mjs",
   "bin": {
     "Validpoint": "bin/Validpoint"
   },

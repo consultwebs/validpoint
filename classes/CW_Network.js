@@ -99,7 +99,7 @@ class CW_Network
 	 * @param {*} domain		The domain name of the site to check
 	 * @param {*} port			The port to check (80 or 443)
 	 */
-	async checkWebsiteAvailability( { domain = null, port = 80 } )
+	checkWebsiteAvailability( { domain = null, port = 80 } )
 	{
 		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
 		let resolver = new CW_PromiseResolver();

@@ -30,7 +30,7 @@ class CW_Runner
 	 */
 	sanitizeCommand( input )
 	{
-		let returnValue = "all";
+		let returnValue = "all"; // "all" isn't (yet) implemented, actually
 
 		// local: local-netowrk, local-dns
 		// website-admin: http-port, https-port, domain
@@ -93,11 +93,30 @@ class CW_Runner
 				this.command_LocalDns( { configObject: configObject, adviceObject: adviceObject } );
 				break;
 			case "http-port":
-				this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 80 } );
-				break;
+				console.log("command");
+				this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 80 } )
+					.then(
+						(result) =>
+						{
+							// resolve( result );
+						}
+					);
+				// break;
+				// return new Promise(
+				// 	( resolve, reject ) =>
+				// 	{
+				// 		resolve( this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 80 }  ) );
+				// 	}
+				// );
 			case "https-port":
-				this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 443 } );
-				break;
+				// return this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 443 } );
+				// break;
+				return new Promise(
+					( resolve, reject ) =>
+					{
+						resolve( this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 443 } ) );
+					}
+				);
 			case "http-response":
 				this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: 80 } );
 				break;
@@ -222,21 +241,55 @@ class CW_Runner
 			adviceObject.item_result.command = "https-port";
 		}
 
-		CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } )
-				.then(
-					( result ) =>
-					{
-						adviceObject.item_result.result = result.result;
-						adviceObject.item_result.result_tags.push( result.result );
-						adviceObject.item_result.raw_response = result;
-						adviceObject.item_result.response_time = result.response_time;
+		return new Promise(
+			async (resolve, reject) =>
+			{
 
-						adviceObject.test_result.results.push( adviceObject.item_result );
-						adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+				let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } );
 
-						console.log( JSON.stringify( adviceObject ) );
-					}
-				);
+				adviceObject.item_result.result = result.result;
+				adviceObject.item_result.result_tags.push( result.result );
+				adviceObject.item_result.raw_response = result;
+				adviceObject.item_result.response_time = result.response_time;
+
+				adviceObject.test_result.results.push( adviceObject.item_result );
+				adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+				resolve( JSON.stringify( adviceObject ) );
+
+			});
+
+
+		// 	resolve(
+		// 		() =>
+		// 		{
+		// 			CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } )
+		// 					.then(
+		// 						async ( result ) =>
+		// 						{
+		// 							console.log( "running" );
+		// 							return new Promise(
+		// 								(resolve, reject) =>
+		// 								{
+		// 									adviceObject.item_result.result = result.result;
+		// 									adviceObject.item_result.result_tags.push( result.result );
+		// 									adviceObject.item_result.raw_response = result;
+		// 									adviceObject.item_result.response_time = result.response_time;
+
+		// 									adviceObject.test_result.results.push( adviceObject.item_result );
+		// 									adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+		// 									resolve( JSON.stringify( adviceObject ) );
+		// 								}
+		// 							);
+									
+		// 						}
+		// 					);
+		// 		}
+		// 	);
+		// } );
+
+
 	}
 
 	/**
@@ -498,8 +551,6 @@ class CW_Runner
 				// TODO: Handle errors
 				if( error )
 				{
-					// TODO: Finalize the adviceObject
-					// TODO: Handle errors
 					console.log( "E" );
 					console.log( error );
 				}
@@ -507,7 +558,6 @@ class CW_Runner
 				{
 
 					adviceObject.item_result.raw_response = result.domainResponses;
-					// Generate an Advice.item_result since we've been gathering data into a custom structure until now
 
 					adviceObject.test_result.results.push( adviceObject.item_result );
 					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
@@ -635,6 +685,11 @@ class CW_Runner
 			domain: ""
 		};
 
+		// TODO: If there's a command and no domain, run the command for all domains
+		// TODO: If there's a domain and no command, run all commands for the domain
+		// TODO: If there is not a domain or a command, show the help screen
+		// TODO: Request help from a module call
+
 		// parse the requested command from the command line arguments, then run the command
 		let yargs = require( "yargs" );
 		yargs.scriptName( "./bin/Validpoint" )
@@ -673,6 +728,7 @@ class CW_Runner
 				() => {},
 				( argv ) =>
 				{
+					// TODO: run help
 					console.log( "Unknown command: " + argv._["0"] );
 					yargs.showHelp();
 					process.exit( 1 );

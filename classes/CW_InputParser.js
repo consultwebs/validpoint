@@ -13,10 +13,17 @@ class CW_InputParser
      * @author costmo
      * @param {*} fileName Name of the file from the 'input' directory
      */
-    constructor( fileName )
+    constructor( fileName, path = null )
     {
-        this.mFileName = fileName;
-        this.mPath = "../input/";
+		this.mFileName = fileName;
+		if( !path )
+		{
+			this.mPath = "../input/";
+		}
+		else
+		{
+			this.mPath = path;
+		}
         this.mInputString = "";
     }
 
@@ -28,7 +35,7 @@ class CW_InputParser
 	init( callback )
 	{
         let fileSystem = require( "fs" );
-
+		
         try
         {
             // Make a copy of 'this' that the readFile callback can access
@@ -41,7 +48,7 @@ class CW_InputParser
                         throw new Error( error.message );
                     }
                     passedThis.mInputString = data;
-                    callback.bind( passedThis )();
+					callback.bind( passedThis )();
                 });
         }
         catch( exception )
