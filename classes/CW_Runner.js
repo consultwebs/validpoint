@@ -93,14 +93,21 @@ class CW_Runner
 				this.command_LocalDns( { configObject: configObject, adviceObject: adviceObject } );
 				break;
 			case "http-port":
-				console.log("command");
-				this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 80 } )
-					.then(
-						(result) =>
-						{
-							// resolve( result );
-						}
-					);
+				return new Promise(
+					(resolve, reject) =>
+					{
+						this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 80 } )
+						.then(
+							(result) =>
+							{
+								// console.log( "WSA THEN" );
+								// console.log( result );
+								resolve( result );
+							}
+						);
+					}
+				);
+
 				// break;
 				// return new Promise(
 				// 	( resolve, reject ) =>
