@@ -78,14 +78,44 @@ class CW_Runner
 		switch( command )
 		{
 			case "website-content":
-				this.command_WebsiteContent( { configObject: configObject, adviceObject: adviceObject } );
-				break;
+				return new Promise(
+					(resolve, reject) =>
+					{
+						this.command_WebsiteContent( { configObject: configObject, adviceObject: adviceObject } )
+						.then(
+							(result) =>
+							{
+								resolve( result );
+							}
+						);
+					}
+				);
 			case "website":
-				this.command_Website( { configObject: configObject, adviceObject: adviceObject, port: 80 } );
-				break;
+				return new Promise(
+					(resolve, reject) =>
+					{
+						this.command_Website( { configObject: configObject, adviceObject: adviceObject, port: 80 } ) 
+						.then(
+							(result) =>
+							{
+								resolve( result );
+							}
+						);
+					}
+				);
 			case "secure-website":
-				this.command_Website( { configObject: configObject, adviceObject: adviceObject, port: 443 } );
-				break;
+				return new Promise(
+					(resolve, reject) =>
+					{
+						this.command_Website( { configObject: configObject, adviceObject: adviceObject, port: 443 } ) 
+						.then(
+							(result) =>
+							{
+								resolve( result );
+							}
+						);
+					}
+				);
 			case "local-network":
 				return new Promise(
 					(resolve, reject) =>
@@ -100,8 +130,18 @@ class CW_Runner
 					}
 				);
 			case "local-dns":
-				this.command_LocalDns( { configObject: configObject, adviceObject: adviceObject } );
-				break;
+				return new Promise(
+					(resolve, reject) =>
+					{
+						this.command_LocalDns( { configObject: configObject, adviceObject: adviceObject } )
+						.then(
+							(result) =>
+							{
+								resolve( result );
+							}
+						);
+					}
+				);
 			case "http-port":
 				return new Promise(
 					(resolve, reject) =>
@@ -129,14 +169,45 @@ class CW_Runner
 					}
 				);
 			case "http-response":
-				this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: 80 } );
-				break;
+				return new Promise(
+					(resolve, reject) =>
+					{
+						this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: 80 } )
+						.then(
+							(result) =>
+							{
+								resolve( result );
+							}
+						);
+					}
+				);
 			case "https-response":
-				this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: 443 } );
-				break;
+				return new Promise(
+					(resolve, reject) =>
+					{
+						this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: 443 } )
+						.then(
+							(result) =>
+							{
+								resolve( result );
+							}
+						);
+					}
+				);
 			case "domain":
-				this.command_Domain( { configObject: configObject, adviceObject: adviceObject } );
-				break;
+				// this.command_Domain( { configObject: configObject, adviceObject: adviceObject } );
+				return new Promise(
+					(resolve, reject) =>
+					{
+						this.command_Domain( { configObject: configObject, adviceObject: adviceObject } )
+						.then(
+							(result) =>
+							{
+								resolve( result );
+							}
+						);
+					}
+				);
 			case "all":
 				console.log( "ALL not yet implemented" );
 				break;
@@ -159,37 +230,40 @@ class CW_Runner
 		adviceObject.item_result.command = "website-content";
 		adviceObject.item_result.category = "website";
 
-		CW_Runner.network.checkWebsiteContent( { url: configObject.url } )
-				.then(
-					( result ) =>
+		return new Promise(
+			async (resolve, reject) =>
+			{
+
+				let result = await CW_Runner.network.checkWebsiteContent( { url: configObject.url } );
+
+				// Parse the incoming HTML to find important elements
+				let HtmlParser = require( "node-html-parser" );
+				let root = HtmlParser.parse( result );
+
+				// Stuff some nodes into an object for testing
+				adviceObject.item_result.raw_response = {
+					headNode: root.querySelector( "head" ),
+					titleNode:  root.querySelector( "head title" ),
+					bodyNode:  root.querySelector( "body" ),
+					h1Node:  root.querySelector( "h1" ),
+					metaNodes:  root.querySelectorAll( "meta" )
+				}
+
+				adviceObject.test_result.results.push( adviceObject.item_result );
+				adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+				// TODO: This is properly returning the correct final response, but "PASS" results leave an empty Advice object
+
+				// remove large result sets
+				adviceObject.test_result.results.forEach(
+					result =>
 					{
-						// Parse the incoming HTML to find important elements
-						let HtmlParser = require( "node-html-parser" );
-						let root = HtmlParser.parse( result );
-
-						// Stuff some nodes into an object for testing
-						adviceObject.item_result.raw_response = {
-							headNode: root.querySelector( "head" ),
-							titleNode:  root.querySelector( "head title" ),
-							bodyNode:  root.querySelector( "body" ),
-							h1Node:  root.querySelector( "h1" ),
-							metaNodes:  root.querySelectorAll( "meta" )
-						}
-
-						adviceObject.test_result.results.push( adviceObject.item_result );
-						adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-
-						// remove large result sets
-						adviceObject.test_result.results.forEach(
-							result =>
-							{
-								result.raw_response = "";
-							}
-						);
-
-						console.log( JSON.stringify( adviceObject ) );
+						result.raw_response = "";
 					}
 				);
+
+				resolve( JSON.stringify( adviceObject ) );
+
+			});
 	}
 
 	/**
@@ -215,21 +289,23 @@ class CW_Runner
 			adviceObject.item_result.command = "https-response";
 		}
 
-		CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
-				.then(
-					( result ) =>
-					{
-						adviceObject.item_result.result = result.result;
-						adviceObject.item_result.result_tags.push( result.result );
-						adviceObject.item_result.raw_response = result;
-						adviceObject.item_result.response_time = result.response_time;
+		return new Promise(
+			async (resolve, reject) =>
+			{
 
-						adviceObject.test_result.results.push( adviceObject.item_result );
-						adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+				let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } );
 
-						console.log( JSON.stringify( adviceObject ) );
-					}
-				);
+				adviceObject.item_result.result = result.result;
+				adviceObject.item_result.result_tags.push( result.result );
+				adviceObject.item_result.raw_response = result;
+				adviceObject.item_result.response_time = result.response_time;
+
+				adviceObject.test_result.results.push( adviceObject.item_result );
+				adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+				resolve( JSON.stringify( adviceObject ) );
+
+			});
 	}
 	
 
@@ -284,20 +360,23 @@ class CW_Runner
 		adviceObject.item_result.command = "local-dns";
 		adviceObject.item_result.category = "local";
 
-		CW_Runner.network.checkLocalDns()
-			.then( 
-				( result ) => 
-				{
-					// Handled in the same way as local-network
-					adviceObject.item_result.result = result;
-					adviceObject.item_result.result_tags.push( result );
-					adviceObject.item_result.raw_response = result;
+		return new Promise(
+			async (resolve, reject) =>
+			{
 
-					adviceObject.test_result.results.push( adviceObject.item_result );
-					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+				let result = await CW_Runner.network.checkLocalDns();
 
-					console.log( JSON.stringify( adviceObject ) );
-				});
+				// Handled in the same way as local-network
+				adviceObject.item_result.result = result;
+				adviceObject.item_result.result_tags.push( result );
+				adviceObject.item_result.raw_response = result;
+
+				adviceObject.test_result.results.push( adviceObject.item_result );
+				adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+				resolve( JSON.stringify( adviceObject ) );
+
+			});
 	} // command_Dns
 
 	/**
@@ -364,190 +443,196 @@ class CW_Runner
 				www_a: []			// list of A records for www.<domain>
 			}
 		}
- 
-		// Using ANY as the argument to dig is remarkably unreliable in retrieving complete records. 
-		// The only way to get complete records reliably is to perform individual TYPE queries against an authoritative name server.
-		async.waterfall(
-			[
-				( completion ) =>
-				{
-					// get nameserver records first so that we can get all the other data from an authority because non-authorities don't always answer completely
-					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "NS", queryServer: null } )
-					.then(
-						( result ) =>
-						{
-							result.forEach( 
-								resultItem =>
-								{
-									adviceObject.domainResponses.servers.ns.push( 
-										StringUtil.stripTrailingDot( resultItem.value ) 
-										);
-								});
-								completion( null, adviceObject );
-						}
-					);
-				},
-				( result, completion ) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
-				{
-					if( result.domainResponses.servers.ns.length > 0 &&  result.domainResponses.servers.ns[0].length > 0 )
-					{
-						// result.domainResponses.servers.ns[0] = result.domainResponses.servers.ns[0]; // this line is nonsensical. It is what it is.
-					}
-					else
-					{
-						// TODO: Reject or throw because there were no records
-					}
 
-					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX", queryServer: result.domainResponses.servers.ns[0] } )
-					.then(
-						( result ) =>
-						{
-							result.forEach( 
-								resultItem =>
-								{
-									adviceObject.domainResponses.servers.mx.push( 
-										StringUtil.stripTrailingDot( resultItem.value ) 
-										);
-								});
-								completion( null, adviceObject );
-						}
-					);
-
-				},
-				( result, completion ) => // Step 3. Perform a dig query against an authoritative name server to get an A record for the domain (should be the @ record)
-				{
-					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
-					.then(
-						( result ) =>
-						{
-							// This happens if there is no CNAME record, which is OK if there is an A record
-							if( undefined !== result )
-							{
-								result.forEach( 
-									resultItem =>
-									{
-										adviceObject.domainResponses.servers.tld_a.push( StringUtil.stripTrailingDot( resultItem.value ) );
-									});
-									completion( null, adviceObject );
-							}
-						});
-				},
-				( result, completion ) => // Step 4. Perform a dig query against an authoritative name server to get an A record for the www.<domain> 
-				{
-					CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
-					.then(
-						( result ) =>
-						{
-							if( undefined !== result )
-							{
-								// We should get a CNAME as the first response result and an A record as the second
-								if( result.length > 1 )
-								{
-									result[0].value = StringUtil.stripTrailingDot( result[0].value )
-									result[1].value = StringUtil.stripTrailingDot( result[1].value )
-
-									if( (result[0].type == "CNAME" && result[1].type == "A") )
-									{
-										adviceObject.domainResponses.servers.www_cname.push( result[0].value );
-										adviceObject.domainResponses.servers.www_a.push( result[1].value );
-									}
-									else if(result[0].type == "A" && result[1].type == "CNAME" ) // In theory, these can arrive in reverse order
-									{
-										adviceObject.domainResponses.servers.www_cname.push( result[1].value );
-										adviceObject.domainResponses.servers.www_a.push( result[0].value );
-									}
-								}
-								completion( null, adviceObject );
-							}
-							else
-							{
-								completion( null, adviceObject );
-							}
-						});
-				},
-				( result, completion ) => // Step 5. Perform a dig query against an authoritative name server to get a CNAME record for the URL
-				{
-					CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
-					.then(
-						( result ) =>
-						{
-							if( undefined !== result )
-							{
-								result.forEach( 
-									resultItem =>
-									{
-										adviceObject.domainResponses.servers.www_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
-									});
-									completion( null, adviceObject );
-							}
-							else
-							{
-								completion( null, adviceObject );
-							}
-						});
-				},
-				( result, completion ) => // Step 6. Perform a dig query against an authoritative name server to get a CNAME record for the domain
-				{
-					CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
-					.then(
-						( result ) =>
-						{
-							// This should be undefined
-							if( undefined !== result )
-							{
-								result.forEach( 
-									resultItem =>
-									{
-										adviceObject.domainResponses.servers.tld_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
-									});
-									completion( null, adviceObject );
-							}
-							else
-							{
-								completion( null, adviceObject );
-							}
-						});
-				},
-				( result, completion ) => // Step 7. Perform a whois lookup to get the domain expiration
-				{
-					CW_Runner.network.getWhoisInfo( { domain: configObject.domain } )
-					.then(
-						( result ) =>
-						{
-							let parsedDate = Date.parse( result );
-							let now = Date.now();
-							let timeDiff = Math.abs( now - parsedDate );
-							let daysTilExpiry = Math.floor( timeDiff/(86400 * 1000) ); // '* 1000' because timeDiff is in microseconds
-
-							adviceObject.domainResponses.expiration = result;
-							adviceObject.domainResponses.days_til_expiry = daysTilExpiry;
-
-							completion( null, adviceObject );
-						});
-				}
-			],
-			( error, result ) =>
+		return new Promise(
+			(resolve, reject) =>
 			{
-				// TODO: Handle errors
-				if( error )
-				{
-					console.log( "E" );
-					console.log( error );
-				}
-				else
-				{
+				// Using ANY as the argument to dig is remarkably unreliable in retrieving complete records. 
+				// The only way to get complete records reliably is to perform individual TYPE queries against an authoritative name server.
+				async.waterfall(
+					[
+						( completion ) =>
+						{
+							// get nameserver records first so that we can get all the other data from an authority because non-authorities don't always answer completely
+							CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "NS", queryServer: null } )
+							.then(
+								( result ) =>
+								{
+									result.forEach( 
+										resultItem =>
+										{
+											adviceObject.domainResponses.servers.ns.push( 
+												StringUtil.stripTrailingDot( resultItem.value ) 
+												);
+										});
+										completion( null, adviceObject );
+								}
+							);
+						},
+						( result, completion ) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
+						{
+							if( result.domainResponses.servers.ns.length > 0 &&  result.domainResponses.servers.ns[0].length > 0 )
+							{
+								// result.domainResponses.servers.ns[0] = result.domainResponses.servers.ns[0]; // this line is nonsensical. It is what it is.
+							}
+							else
+							{
+								// TODO: Reject or throw because there were no records
+							}
 
-					adviceObject.item_result.raw_response = result.domainResponses;
+							CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX", queryServer: result.domainResponses.servers.ns[0] } )
+							.then(
+								( result ) =>
+								{
+									result.forEach( 
+										resultItem =>
+										{
+											adviceObject.domainResponses.servers.mx.push( 
+												StringUtil.stripTrailingDot( resultItem.value ) 
+												);
+										});
+										completion( null, adviceObject );
+								}
+							);
 
-					adviceObject.test_result.results.push( adviceObject.item_result );
-					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-					delete adviceObject.domainResponses;
-					console.log( JSON.stringify( adviceObject ) );
+						},
+						( result, completion ) => // Step 3. Perform a dig query against an authoritative name server to get an A record for the domain (should be the @ record)
+						{
+							CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
+							.then(
+								( result ) =>
+								{
+									// This happens if there is no CNAME record, which is OK if there is an A record
+									if( undefined !== result )
+									{
+										result.forEach( 
+											resultItem =>
+											{
+												adviceObject.domainResponses.servers.tld_a.push( StringUtil.stripTrailingDot( resultItem.value ) );
+											});
+											completion( null, adviceObject );
+									}
+								});
+						},
+						( result, completion ) => // Step 4. Perform a dig query against an authoritative name server to get an A record for the www.<domain> 
+						{
+							CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
+							.then(
+								( result ) =>
+								{
+									if( undefined !== result )
+									{
+										// We should get a CNAME as the first response result and an A record as the second
+										if( result.length > 1 )
+										{
+											result[0].value = StringUtil.stripTrailingDot( result[0].value )
+											result[1].value = StringUtil.stripTrailingDot( result[1].value )
 
-					delete result.whois_info;
-				}
-			}
-		);
+											if( (result[0].type == "CNAME" && result[1].type == "A") )
+											{
+												adviceObject.domainResponses.servers.www_cname.push( result[0].value );
+												adviceObject.domainResponses.servers.www_a.push( result[1].value );
+											}
+											else if(result[0].type == "A" && result[1].type == "CNAME" ) // In theory, these can arrive in reverse order
+											{
+												adviceObject.domainResponses.servers.www_cname.push( result[1].value );
+												adviceObject.domainResponses.servers.www_a.push( result[0].value );
+											}
+										}
+										completion( null, adviceObject );
+									}
+									else
+									{
+										completion( null, adviceObject );
+									}
+								});
+						},
+						( result, completion ) => // Step 5. Perform a dig query against an authoritative name server to get a CNAME record for the URL
+						{
+							CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
+							.then(
+								( result ) =>
+								{
+									if( undefined !== result )
+									{
+										result.forEach( 
+											resultItem =>
+											{
+												adviceObject.domainResponses.servers.www_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
+											});
+											completion( null, adviceObject );
+									}
+									else
+									{
+										completion( null, adviceObject );
+									}
+								});
+						},
+						( result, completion ) => // Step 6. Perform a dig query against an authoritative name server to get a CNAME record for the domain
+						{
+							CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
+							.then(
+								( result ) =>
+								{
+									// This should be undefined
+									if( undefined !== result )
+									{
+										result.forEach( 
+											resultItem =>
+											{
+												adviceObject.domainResponses.servers.tld_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
+											});
+											completion( null, adviceObject );
+									}
+									else
+									{
+										completion( null, adviceObject );
+									}
+								});
+						},
+						( result, completion ) => // Step 7. Perform a whois lookup to get the domain expiration
+						{
+							CW_Runner.network.getWhoisInfo( { domain: configObject.domain } )
+							.then(
+								( result ) =>
+								{
+									let parsedDate = Date.parse( result );
+									let now = Date.now();
+									let timeDiff = Math.abs( now - parsedDate );
+									let daysTilExpiry = Math.floor( timeDiff/(86400 * 1000) ); // '* 1000' because timeDiff is in microseconds
+
+									adviceObject.domainResponses.expiration = result;
+									adviceObject.domainResponses.days_til_expiry = daysTilExpiry;
+
+									completion( null, adviceObject );
+								});
+						}
+					],
+					( error, result ) =>
+					{
+						// TODO: Handle errors
+						if( error )
+						{
+							console.log( "E" );
+							console.log( error );
+						}
+						else
+						{
+
+							adviceObject.item_result.raw_response = result.domainResponses;
+
+							adviceObject.test_result.results.push( adviceObject.item_result );
+							adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+							delete adviceObject.domainResponses;
+							resolve( JSON.stringify( adviceObject ) );
+
+							delete result.whois_info;
+						}
+					}
+				);
+			}); // new Promise()
+ 
+
 		 
  
 
@@ -575,72 +660,83 @@ class CW_Runner
 			adviceObject.item_result.command = "secure-website";
 		}
 
-		async.waterfall(
-			[
-				( completion ) =>
-				{
-					CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } )
-							.then(
-								( result ) =>
-								{
-									adviceObject.item_result.result = result.result;
-									adviceObject.item_result.result_tags.push( result.result );
-									adviceObject.item_result.raw_response = result;
-									adviceObject.item_result.response_time = result.response_time;
-			
-									adviceObject.test_result.results.push( adviceObject.item_result );
-									adviceObject.finalizeOutput( { stripConfigObject: false, stripItemResult: false } );
-
-									// only run part 2 if we got a PASS or UNTESTED
-									if( adviceObject.item_result.result == CW_Constants.RESULT_PASS ||
-										adviceObject.item_result.result == CW_Constants.RESULT_UNTESTED )
-										{
-											completion( null, adviceObject );
-										}
-										else
-										{
-											// If there was a failure, we're not moving on to the next step, so sanitize the output
-											if( adviceObject.configObject )
-											{
-												delete adviceObject.configObject;
-											}
-											delete adviceObject.item_result;
-											
-											console.log( JSON.stringify( adviceObject ) );
-										}
-								}
-							);
-				},
-				( result, completion ) =>
-				{
-					CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
-							.then(
-								( result ) =>
-								{
-									adviceObject.item_result.result = result.result;
-									adviceObject.item_result.result_tags.push( result.result );
-									adviceObject.item_result.raw_response = result;
-									adviceObject.item_result.response_time = result.response_time;
-			
-									adviceObject.test_result.results.push( adviceObject.item_result );
-									adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-			
-									console.log( JSON.stringify( adviceObject ) );
-
-									completion( null );
-								}
-							);
-				}
-			],
-			( error ) =>
+		// wrap the entire waterfall in a promise
+		return new Promise(
+			(resolve, reject) =>
 			{
-				// TODO: Handle errors
-				if( error )
-				{
-					console.log( error );
-				}
-			}
-		);
+				// TODO: This needs to be abstracted from the input of Promise(). That there's way too much code to be an input
+				async.waterfall(
+					[
+						( completion ) =>
+						{
+							CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } )
+									.then(
+										( result ) =>
+										{
+											adviceObject.item_result.result = result.result;
+											adviceObject.item_result.result_tags.push( result.result );
+											adviceObject.item_result.raw_response = result;
+											adviceObject.item_result.response_time = result.response_time;
+					
+											adviceObject.test_result.results.push( adviceObject.item_result );
+											adviceObject.finalizeOutput( { stripConfigObject: false, stripItemResult: false } );
+		
+											// only run part 2 if we got a PASS or UNTESTED
+											if( adviceObject.item_result.result == CW_Constants.RESULT_PASS ||
+												adviceObject.item_result.result == CW_Constants.RESULT_UNTESTED )
+												{
+													completion( null, adviceObject );
+												}
+												else
+												{
+													// If there was a failure, we're not moving on to the next step, so sanitize the output
+													if( adviceObject.configObject )
+													{
+														delete adviceObject.configObject;
+													}
+													delete adviceObject.item_result;
+													
+													// console.log( JSON.stringify( adviceObject ) );
+												}
+										}
+									);
+						},
+						( result, completion ) =>
+						{
+							CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
+									.then(
+										( result ) =>
+										{
+											adviceObject.item_result.result = result.result;
+											adviceObject.item_result.result_tags.push( result.result );
+											adviceObject.item_result.raw_response = result;
+											adviceObject.item_result.response_time = result.response_time;
+					
+											adviceObject.test_result.results.push( adviceObject.item_result );
+											adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+					
+											// console.log( JSON.stringify( adviceObject ) );
+		
+											completion( null, JSON.stringify( adviceObject ) );
+										}
+									);
+						}
+					],
+					( error, result ) =>
+					{
+						// TODO: Handle errors
+						if( error )
+						{
+							console.log( "E: " + error );
+						}
+						else
+						{
+							resolve( result );
+						}
+					}
+				); // async.waterfall
+			}); // new Promise()
+
 	} // command_Website()
 
 	/**

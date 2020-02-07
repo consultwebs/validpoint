@@ -11,6 +11,48 @@ const runner = new CW_Runner();
 const CW_InputParser =  require( "../classes/CW_InputParser.js" );
 let config = null;
 
+exports.testDomain = 
+( domain, callback ) =>
+{
+	commandRunner( { domain: domain, command: "domain", callback: callback } );
+};
+
+exports.testSecureWebsite = 
+( domain, callback ) =>
+{
+	commandRunner( { domain: domain, command: "secure-website", callback: callback } );
+};
+
+exports.testWebsiteContent = 
+( domain, callback ) =>
+{
+	commandRunner( { domain: domain, command: "website-content", callback: callback } );
+};
+
+exports.testWebsite = 
+( domain, callback ) =>
+{
+	commandRunner( { domain: domain, command: "website", callback: callback } );
+};
+
+exports.testHTTPSResponse = 
+( domain, callback ) =>
+{
+	commandRunner( { domain: domain, command: "https-response", callback: callback } );
+};
+
+exports.testHTTPResponse = 
+( domain, callback ) =>
+{
+	commandRunner( { domain: domain, command: "http-response", callback: callback } );
+};
+
+exports.testLocalDNS = 
+( domain, callback ) =>
+{
+	commandRunner( { domain: domain, command: "local-dns", callback: callback } );
+};
+
 exports.testLocalNetwork = 
 ( domain, callback ) =>
 {
