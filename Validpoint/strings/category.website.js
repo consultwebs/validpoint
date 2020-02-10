@@ -36,6 +36,10 @@ module.exports =
 	},
 	"website-content":
 	{
+		"NO_HTML":
+		{
+			"URGENT": "No HTML tag was detected in the content of your website. This means that your website will not work well, if at all. Contact your website developer immediately for assistance."
+		},
 		"HEAD_NONE":
 		{
 			"NOTICE": "Your website does not have a HEAD tag. This has a serious impact on SEO ranking. Contact your website developer for help."

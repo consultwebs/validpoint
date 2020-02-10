@@ -187,6 +187,19 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 	{
 		let returnValue = [];
 
+		// We get a DOM tree if there are real results to examine. Otherwise, there was an error getting the DOM
+		if( typeof inputObject !== "object" )
+		{
+			returnValue.push(
+				{
+					intermediate_key: inputObject,
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+
+			return returnValue;
+		}
+
 		// A series of things that should be present in the HTML
 		if( (!inputObject.headNode.childNodes) || 
 			(inputObject.headNode.childNodes.length < 1) )

@@ -87,24 +87,36 @@ class CW_PromiseResolver
 	 */
 	async resolve_checkWebsiteContent( resolve, reject, { url = null } )
 	{
-		// TODO: catch errors
-
 		let puppeteer = require( "puppeteer" );
 
-		let browser = await puppeteer.launch();
+		let browser = await puppeteer.launch( { ignoreHTTPSErrors: true } );
 		let page = await browser.newPage();
 		await page.goto( "https://" + url );
 
 		let outerHtml = await page.evaluate(
 			() =>
 			{
+				let html = document.querySelector( "html" ).outerHTML;
+
+				if( !html || html.length < 1 )
+				{
+					return "ERROR";
+				}
 				// TODO: Should reject/error if there's no HTML node
 				return document.querySelector( "html" ).outerHTML;
 			}
 		);
 			
 		await browser.close();
-		resolve( outerHtml );
+		
+		if( outerHtml == "ERROR" )
+		{
+			reject( "NO_HTML" );
+		}
+		else
+		{
+			resolve( outerHtml );
+		}
 	}
 
 	/**

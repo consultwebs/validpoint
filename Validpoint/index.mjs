@@ -113,10 +113,11 @@ let commandRunner =
 										}
 									);
 							}
-							catch( exception )
+							catch( error )
 							{
 								// TODO: Handle exceptions
-								// console.log( exception );
+								console.log( "UNCAUGHT ERROR" );
+								console.log( error );
 							}
 						}
 					);

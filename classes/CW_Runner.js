@@ -233,35 +233,47 @@ class CW_Runner
 		return new Promise(
 			async (resolve, reject) =>
 			{
+				try
+				{
+					let result = await CW_Runner.network.checkWebsiteContent( { url: configObject.url } );
 
-				let result = await CW_Runner.network.checkWebsiteContent( { url: configObject.url } );
+					// Parse the incoming HTML to find important elements
+					let HtmlParser = require( "node-html-parser" );
+					let root = HtmlParser.parse( result );
 
-				// Parse the incoming HTML to find important elements
-				let HtmlParser = require( "node-html-parser" );
-				let root = HtmlParser.parse( result );
-
-				// Stuff some nodes into an object for testing
-				adviceObject.item_result.raw_response = {
-					headNode: root.querySelector( "head" ),
-					titleNode:  root.querySelector( "head title" ),
-					bodyNode:  root.querySelector( "body" ),
-					h1Node:  root.querySelector( "h1" ),
-					metaNodes:  root.querySelectorAll( "meta" )
-				}
-
-				adviceObject.test_result.results.push( adviceObject.item_result );
-				adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-				// TODO: This is properly returning the correct final response, but "PASS" results leave an empty Advice object
-
-				// remove large result sets
-				adviceObject.test_result.results.forEach(
-					result =>
-					{
-						result.raw_response = "";
+					// Stuff some nodes into an object for testing
+					adviceObject.item_result.raw_response = {
+						headNode: root.querySelector( "head" ),
+						titleNode:  root.querySelector( "head title" ),
+						bodyNode:  root.querySelector( "body" ),
+						h1Node:  root.querySelector( "h1" ),
+						metaNodes:  root.querySelectorAll( "meta" )
 					}
-				);
 
-				resolve( JSON.stringify( adviceObject ) );
+					adviceObject.test_result.results.push( adviceObject.item_result );
+					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+					// remove large result sets
+					adviceObject.test_result.results.forEach(
+						result =>
+						{
+							result.raw_response = "";
+						}
+					);
+
+					resolve( JSON.stringify( adviceObject ) );
+				}
+				catch( error ) // There was an error getting the HTML of the page. Resolve the checker's rejection with a sane response
+				{
+					adviceObject.item_result.result = CW_Constants.RESULT_FAIL;
+					adviceObject.item_result.result_tags.push( error );
+					adviceObject.item_result.raw_response = error;
+
+					adviceObject.test_result.results.push( adviceObject.item_result );
+					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+					resolve( JSON.stringify( adviceObject ) );
+				}
 
 			});
 	}
@@ -472,9 +484,9 @@ class CW_Runner
 						},
 						( result, completion ) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
 						{
-							if( result.domainResponses.servers.ns.length > 0 &&  result.domainResponses.servers.ns[0].length > 0 )
+							if( result.domainResponses.servers.ns.length > 0 && result.domainResponses.servers.ns[0].length > 0 )
 							{
-								// result.domainResponses.servers.ns[0] = result.domainResponses.servers.ns[0]; // this line is nonsensical. It is what it is.
+								// result.domainResponses.servers.ns[0] = result.domainResponses.servers.ns[0]; // this line is nonsensical. "It is what it is."
 							}
 							else
 							{
