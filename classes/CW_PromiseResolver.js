@@ -2,6 +2,8 @@
 /**
  * A convenience wrapper to abstract code from Promise input parameters
  * 
+ * The PromiseResolver handles all rejections and allows callers to to turn rejections into resolvable messages
+ * 
  * @author costmo
  * TODO: The PromiseResolver needs to be divided into subclasses for maintainability
  */
@@ -48,6 +50,7 @@ class CW_PromiseResolver
 				}
 				
 				resolve( msg );
+				// No need to reject() since all errors put us in a resolvable failure state
 			}
 		);
 	} // resolve_localNetwork
@@ -67,12 +70,13 @@ class CW_PromiseResolver
 		dns.resolve4( DNS_HOST,
 			( error, addresses ) =>
 			{
-				// We don't care about the content of the response, just whether or not there was an error
+				// If there was no error, it's a pass
 				if( !error ) // Default is "down" so there's nothing to change for an error response
 				{
 					msg = CW_Constants.RESULT_PASS;
 				}
 				resolve( msg );
+				// No need to reject() since all errors put us in a resolvable failure state
 			}
 		);
 	} // resolve_checkDns()
@@ -196,7 +200,7 @@ class CW_PromiseResolver
 		request.on( "error",
 			( error ) =>
 			{
-				// TODO: Reject, don't resolve
+				// TODO: reject call for "website" command when domain and/or port are bad
 				console.log( error );
 				resolve( returnValue );
 			}
@@ -247,24 +251,26 @@ class CW_PromiseResolver
 						returnValue.response_time = response.avg;
 						returnValue.raw_response = response;
 
-						// Request took too long. Punt to see if a response is needed
-						if( response.avg > MAX_HTTTP_RESPONSE_TIME )
+						if( response.avg > MAX_HTTTP_RESPONSE_TIME ) // Request took too long. Punt to see if a response is needed
 						{
 							returnValue.result = CW_Constants.RESULT_PUNT;
 						}
 					}
-					else
+					else // There was no response from the website
 					{
-						// Site is down
 						returnValue = 
 						{
 							result: CW_Constants.RESULT_FAIL,
 							response_time: 0,
-							raw_response: response
+							raw_response: "NO_RESPONSE"
 						}
 					}
-
+					
 					resolve( returnValue );
+				}
+				else // Not sure this can be triggered since providing bad URLs results in resolvable errors above
+				{
+					reject( error );
 				}
 
 				// Return "Down" if there's an error

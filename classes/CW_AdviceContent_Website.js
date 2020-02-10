@@ -55,8 +55,6 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 		if( this.command == "website-content" )
 		{
 			let tags = this.resultTagsForContent( { inputObject: this.test_result.raw_response } );
-			// adviceObject.item_result.result = result.result;
-			// adviceObject.item_result.result_tags.push( result.result );
 
 			// Nothing was wrong
 			if( tags.length < 1 )
@@ -84,9 +82,14 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 				);
 			}
 		}
+		else if(	(this.command == "http-response" || this.command == "https-response") &&  
+					this.test_result.raw_response.raw_response == "NO_RESPONSE" )
+		{
+			this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
+			this.content = this.contentForSeverity( { severity: this.severity, extraInput: this.test_result.raw_response.raw_response } );
+		}
 		else
 		{
-			// TODO: Parse this.test_result.raw_response.raw_response for 404 or 500 errors
 			this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
 			this.content = this.contentForSeverity( { severity: this.severity } );
 		}
@@ -107,7 +110,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 	contentForSeverity( { severity = null, extraInput = null } )
 	{
 		let strings = require( "../Validpoint/strings/category.website.js" );
-		
+
 		switch( severity )
 		{
 			case CW_Constants.SEVERITY_NOTICE:

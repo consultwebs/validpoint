@@ -305,7 +305,7 @@ class CW_Runner
 			async (resolve, reject) =>
 			{
 
-				let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } );
+				let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } );
 
 				adviceObject.item_result.result = result.result;
 				adviceObject.item_result.result_tags.push( result.result );
