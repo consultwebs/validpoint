@@ -314,35 +314,19 @@ class CW_PromiseResolver
 	 * @param	{*}		reject		Reject function
 	 * @param {*} domain		The domain/URL to query
 	 * @param {*} recordType	The type of record to find ("A", "CNAME", "MX" etc.)
-	 * @param {*} queryServer	The server to query. If null, will use the current user's configured DNS server
+	 * @param {*} queryServer	The server to query. If null, will use the current user's configured DNS server. This feature was obsoleted because servers don't always answer properly for remote requests.
 	 */
 	resolve_checkDomain( resolve, reject, { domain = null, recordType = null, queryServer = null } )
 	{
 		let dig = require( "node-dig-dns" );
 
-		// Doing a query from local dig does not provide every result so we will get the domain's NS 
-		//   records first, then we can dig for everything except using an SOA
-
-		if( queryServer == null )
-		{
-			dig( [ domain, recordType ] )
-				.then(
-					( result ) =>
-					{
-						resolve( result.answer );
-					}
-				);
-		}
-		else
-		{
-			dig( [ queryServer, domain, recordType ] )
-				.then(
-					( result ) =>
-					{
-						resolve( result.answer );
-					}
-				);
-		}
+		dig( [ domain, recordType ] )
+			.then(
+				( result ) =>
+				{
+					resolve( result.answer );
+				}
+			);
 	} // resolve_checkDomain()
 
 	resolve_makeRunnerObjects( resolve, reject, { domain = null } )

@@ -465,6 +465,7 @@ class CW_Runner
 												StringUtil.stripTrailingDot( resultItem.value ) 
 												);
 										});
+
 										completion( null, adviceObject );
 								}
 							);
@@ -480,7 +481,7 @@ class CW_Runner
 								// TODO: Reject or throw because there were no records
 							}
 
-							CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX", queryServer: result.domainResponses.servers.ns[0] } )
+							CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX" } )
 							.then(
 								( result ) =>
 								{
@@ -695,8 +696,6 @@ class CW_Runner
 														delete adviceObject.configObject;
 													}
 													delete adviceObject.item_result;
-													
-													// console.log( JSON.stringify( adviceObject ) );
 												}
 										}
 									);
@@ -714,8 +713,6 @@ class CW_Runner
 					
 											adviceObject.test_result.results.push( adviceObject.item_result );
 											adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-					
-											// console.log( JSON.stringify( adviceObject ) );
 		
 											completion( null, JSON.stringify( adviceObject ) );
 										}
