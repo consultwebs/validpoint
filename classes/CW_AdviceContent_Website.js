@@ -113,9 +113,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 	/**
 	 * Provide the content for the discovered severity on the current instance's command.
 	 * 
-	 * Commands in the "local" category only need content for ESSENTIAL and URGENT
-	 * 
-	 * // TODO: Use localization to feed content
+	 * Commands in the "local" category only need content for ESSENTIAL and URGENTt
 	 * 
 	 * @author costmo
 	 * @param {*} severity		The severity for which content is needed 

@@ -75,6 +75,8 @@ class CW_Runner
 			adviceObject.domain = configObject.domain;
 		}
 		
+		let connectionPort = 80;
+		
 		// Rejections have been resolved before getting back to here, so we only return resolved Promises
 		switch( command )
 		{
@@ -92,23 +94,12 @@ class CW_Runner
 					}
 				);
 			case "website":
-				return new Promise(
-					(resolve, reject) =>
-					{
-						this.command_Website( { configObject: configObject, adviceObject: adviceObject, port: 80 } ) 
-						.then(
-							(result) =>
-							{
-								resolve( result );
-							}
-						);
-					}
-				);
 			case "secure-website":
+				connectionPort = (command == "website") ? 80 : 443;
 				return new Promise(
 					(resolve, reject) =>
 					{
-						this.command_Website( { configObject: configObject, adviceObject: adviceObject, port: 443 } ) 
+						this.command_Website( { configObject: configObject, adviceObject: adviceObject, port: connectionPort } ) 
 						.then(
 							(result) =>
 							{
@@ -144,23 +135,12 @@ class CW_Runner
 					}
 				);
 			case "http-port":
-				return new Promise(
-					(resolve, reject) =>
-					{
-						this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 80 } )
-						.then(
-							(result) =>
-							{
-								resolve( result );
-							}
-						);
-					}
-				);
 			case "https-port":
+				connectionPort = (command == "http-port") ? 80 : 443;
 				return new Promise(
 					(resolve, reject) =>
 					{
-						this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: 443 } )
+						this.command_WebsiteAvailability( { configObject: configObject, adviceObject: adviceObject, port: connectionPort } )
 						.then(
 							(result) =>
 							{
@@ -170,23 +150,12 @@ class CW_Runner
 					}
 				);
 			case "http-response":
-				return new Promise(
-					(resolve, reject) =>
-					{
-						this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: 80 } )
-						.then(
-							(result) =>
-							{
-								resolve( result );
-							}
-						);
-					}
-				);
 			case "https-response":
+				connectionPort = (command == "http-response") ? 80 : 443;
 				return new Promise(
 					(resolve, reject) =>
 					{
-						this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: 443 } )
+						this.command_WebsiteResponse( { configObject: configObject, adviceObject: adviceObject, port: connectionPort } )
 						.then(
 							(result) =>
 							{
@@ -511,7 +480,7 @@ class CW_Runner
 							}
 							else
 							{
-								// TODO: Reject or throw because there were no records
+								// TODO: Resolve a FAIL because there were no records
 							}
 
 							CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX" } )
@@ -860,7 +829,6 @@ class CW_Runner
 				() => {},
 				( argv ) =>
 				{
-					// TODO: run help
 					console.log( "Unknown command: " + argv._["0"] );
 					yargs.showHelp();
 					process.exit( 1 );

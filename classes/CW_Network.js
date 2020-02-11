@@ -116,8 +116,6 @@ class CW_Network
 	 * 
 	 * IMPORTANT NOTE: The keys and values that are returned by the query are strings that have no rules from registrar from registrar or OS to OS (the implementation of the local whois executable makes a difference). This parser is likely to fail for some registrars.
 	 * 
-	 * TODO: Update this so a caller can tell the parser which bit of data it wants returned.
-	 * 
 	 * @author costmo
 	 * @returns Promise
 	 * @param {*} domain		The domain name to lookup 

@@ -50,8 +50,6 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	 * 
 	 * Commands in the "local" category only need content for ESSENTIAL and URGENT
 	 * 
-	 * // TODO: Use localization to feed content
-	 * 
 	 * @author costmo
 	 * @param {*} severity		The severity for which content is needed 
 	 */

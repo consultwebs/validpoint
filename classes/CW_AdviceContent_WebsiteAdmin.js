@@ -79,8 +79,15 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 				// TODO: Get config to see if we should notify
 			}
 
+			let extraKey = null;
+			if( (this.command == "http-port" || this.command == "https-port") &&
+				this.test_result.raw_response.raw_response == "NO_RESPONSE" )
+			{
+				extraKey = this.test_result.raw_response.raw_response;
+			}
+
 			this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
-			this.content = this.contentForSeverity( { severity: this.severity } );
+			this.content = this.contentForSeverity( { severity: this.severity, extraInput: extraKey } );
 		}
 	}
 

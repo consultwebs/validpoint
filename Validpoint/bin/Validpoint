@@ -6,8 +6,6 @@
  * Invoking: ./bin/Validpoint -c [command] (-d [domain1,[domain2,[domain3...]]])
  * Invocation without "command" or "domain" is synonymous with "all" as the command or domain
  * 
- * TODO: handle unhandled Promise rejections
- * TODO: global constants throughout the code need to be consolidated before there are too many of them or too much code
  */
 
 require( "strict-mode" )(
