@@ -290,7 +290,12 @@ class CW_Runner
 				}
 				catch( error )
 				{
+					// This is here as a formality. There is no condition that can cause the PromiseResolver to reject 
+					//    other than a code or system error that would have prevented us reaching here in the first 
+					//    place. e.g. "module 'tcp-ping' is not installed"
 
+					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } ); // Strip unwanted output objects from the return value. This will never add Advice since there will be nothing in the test_result array.
+					resolve( JSON.stringify( adviceObject ) );
 				}
 
 

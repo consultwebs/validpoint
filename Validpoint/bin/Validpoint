@@ -3,9 +3,10 @@
 /**
  * CW website validator access hub.
  * 
- * Invoking: ./bin/Validpoint -c [command] (-d [domain1,[domain2,[domain3...]]])
- * Invocation without "command" or "domain" is synonymous with "all" as the command or domain
- * 
+ * Invoking: 
+ * ./bin/Validpoint command (-d [domain1,[domain2,[domain3...]]])
+ * See all commands and options:
+ * ./bin/Validpoint help
  */
 
 require( "strict-mode" )(
@@ -44,6 +45,7 @@ require( "strict-mode" )(
 					
 										if( config == null )
 										{
+											// TODO: Warn more usefully and process.exit. There's no "up" from here, so throwing doesn't make sense unless we love javascript error output. Also, there will be no useful input, so we can't continue anyway
 											throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
 										}
 
@@ -57,10 +59,11 @@ require( "strict-mode" )(
 												}
 											);
 									}
-									catch( exception )
+									catch( exception ) // runCommand never receives rejections, so this will only be code or system errors - never test failures
 									{
-										console.log( "Process exception:" );
+										console.log( "There was a problem running your command. The error reported was:" );
 										console.log( exception );
+										console.log( "Exiting now." );
 										process.exit( 1 );
 									}
 								}
@@ -70,6 +73,7 @@ require( "strict-mode" )(
 				}
 				else // We didn't get any JSON files for input
 				{
+					// TODO: Warn more usefully and process.exit. There's no "up" from here, so throwing doesn't make sense unless we love javascript error output. Also, there will be no useful input, so we can't continue anyway
 					throw new Error( "COULD NOT FIND ANY CONFIGURATION FILES TO RUN." );
 				}
 			}
