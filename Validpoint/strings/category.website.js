@@ -36,11 +36,39 @@ module.exports =
 	},
 	"website":
 	{
-		"URGENT": 		"Your web server is currently not accepting connections for your domain. People will not be able to reach your website using this address. Please contact your hosting provider for support"
+		"URGENT": 		"Your web server is currently not accepting connections for your domain. People will not be able to reach your website using this address. Please contact your hosting provider for support",
+		"NO_RESPONSE":
+		{
+			"URGENT": 	"Your website is currently not responding. People will not be able to reach your website using this address. Please contact your hosting provider for support"
+		},
+		"NOT_FOUND":
+		{
+			"URGENT": 	"Your website could not be reached. Please contact your hosting provider for support"
+		},
+		"TIMED_OUT":
+		{
+			"URGENT": 	"Your website never responded. People will not be able to reach your website using this address. Please contact your hosting provider for support"
+		},
+		"REPLACEMENT":
+		{
+			"NOTICE": 	"Your website is currently responding with an invalid: %response% People may not be able to reach your website using this address, and there may be a significant SEO impact. Please contact your hosting provider for support"
+		}
 	},
 	"secure-website":
 	{
-		"URGENT": 		"Your secure web server is currently not accepting connections for your domain. People will not be able to reach your website using this address. Please contact your hosting provider for support"
+		"URGENT": 		"Your secure web server is currently not accepting connections for your domain. People will not be able to reach your website using this address. Please contact your hosting provider for support",
+		"NO_RESPONSE":
+		{
+			"URGENT": 	"Your secure website is currently not responding. People will not be able to reach your website using this address. Please contact your hosting provider for support"
+		},
+		"TIMED_OUT":
+		{
+			"URGENT": 	"Your secure website never responded. People will not be able to reach your website using this address. Please contact your hosting provider for support"
+		},
+		"REPLACEMENT":
+		{
+			"NOTICE": 	"Your secure website is currently responding with an invalid response: %response% People may not be able to reach your website using this address, and there may be a significant SEO impact. Please contact your hosting provider for support"
+		}
 	},
 	"website-content":
 	{

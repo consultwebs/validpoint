@@ -75,6 +75,7 @@ class CW_Runner
 			adviceObject.domain = configObject.domain;
 		}
 		
+		// Rejections have been resolved before getting back to here, so we only return resolved Promises
 		switch( command )
 		{
 			case "website-content":
@@ -304,18 +305,25 @@ class CW_Runner
 		return new Promise(
 			async (resolve, reject) =>
 			{
+				try
+				{
+					let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } );
 
-				let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } );
+					adviceObject.item_result.result = result.result;
+					adviceObject.item_result.result_tags.push( result.result );
+					adviceObject.item_result.raw_response = result;
+					adviceObject.item_result.response_time = result.response_time;
 
-				adviceObject.item_result.result = result.result;
-				adviceObject.item_result.result_tags.push( result.result );
-				adviceObject.item_result.raw_response = result;
-				adviceObject.item_result.response_time = result.response_time;
+					adviceObject.test_result.results.push( adviceObject.item_result );
+					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 
-				adviceObject.test_result.results.push( adviceObject.item_result );
-				adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+					resolve( JSON.stringify( adviceObject ) );
+				}
+				catch( error )
+				{
 
-				resolve( JSON.stringify( adviceObject ) );
+				}
+
 
 			});
 	}
@@ -343,18 +351,31 @@ class CW_Runner
 		return new Promise(
 			async (resolve, reject) =>
 			{
+				try
+				{
+					let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } );
 
-				let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } );
+					adviceObject.item_result.result = result.result;
+					adviceObject.item_result.result_tags.push( result.result );
+					adviceObject.item_result.raw_response = result;
+					adviceObject.item_result.response_time = result.response_time;
+	
+					adviceObject.test_result.results.push( adviceObject.item_result );
+					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+	
+					resolve( JSON.stringify( adviceObject ) );
+				}
+				catch( error ) // I don't think we'll be able to reach this catch naturally
+				{
+					adviceObject.item_result.result = CW_Constants.RESULT_FAIL;
+					adviceObject.item_result.result_tags.push( error );
+					adviceObject.item_result.raw_response = error;
 
-				adviceObject.item_result.result = result.result;
-				adviceObject.item_result.result_tags.push( result.result );
-				adviceObject.item_result.raw_response = result;
-				adviceObject.item_result.response_time = result.response_time;
+					adviceObject.test_result.results.push( adviceObject.item_result );
+					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 
-				adviceObject.test_result.results.push( adviceObject.item_result );
-				adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-
-				resolve( JSON.stringify( adviceObject ) );
+					resolve( JSON.stringify( adviceObject ) );
+				}
 
 			});
 	}
@@ -677,14 +698,17 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
+
 				// TODO: This needs to be abstracted from the input of Promise(). That there's way too much code to be an input
 				async.waterfall(
 					[
 						( completion ) =>
 						{
 							CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } )
-									.then(
-										( result ) =>
+								.then(
+									( result ) =>
+									{
+										try
 										{
 											adviceObject.item_result.result = result.result;
 											adviceObject.item_result.result_tags.push( result.result );
@@ -700,23 +724,17 @@ class CW_Runner
 												{
 													completion( null, adviceObject );
 												}
-												else
+												else // If there was a failure, we're not moving on to the next step, so sanitize the output and resolve early with a FAIL
 												{
-													// If there was a failure, we're not moving on to the next step, so sanitize the output
 													if( adviceObject.configObject )
 													{
 														delete adviceObject.configObject;
 													}
 													delete adviceObject.item_result;
+													resolve( JSON.stringify( adviceObject ) );
 												}
 										}
-									);
-						},
-						( result, completion ) =>
-						{
-							CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
-									.then(
-										( result ) =>
+										catch( error ) // Not sure this can ever be reached
 										{
 											adviceObject.item_result.result = result.result;
 											adviceObject.item_result.result_tags.push( result.result );
@@ -724,26 +742,58 @@ class CW_Runner
 											adviceObject.item_result.response_time = result.response_time;
 					
 											adviceObject.test_result.results.push( adviceObject.item_result );
-											adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-		
-											completion( null, JSON.stringify( adviceObject ) );
+											adviceObject.finalizeOutput( { stripConfigObject: false, stripItemResult: false } );
+
+											if( adviceObject.configObject )
+											{
+												delete adviceObject.configObject;
+											}
+											delete adviceObject.item_result;
+											resolve( JSON.stringify( adviceObject ) );
 										}
-									);
+
+									}
+								);
+						},
+						( result, completion ) =>
+						{
+							CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
+								.then(
+									( result ) =>
+									{
+										adviceObject.item_result.result = result.result;
+										adviceObject.item_result.result_tags.push( result.result );
+										adviceObject.item_result.raw_response = result;
+										adviceObject.item_result.response_time = result.response_time;
+				
+										adviceObject.test_result.results.push( adviceObject.item_result );
+										adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+	
+										completion( null, JSON.stringify( adviceObject ) );
+									}
+								).catch(
+									error =>
+									{
+										adviceObject.item_result.result = error.result;
+										adviceObject.item_result.result_tags.push( error.result );
+										adviceObject.item_result.raw_response = error.raw_response;
+										adviceObject.item_result.response_time = error.response_time;
+				
+										adviceObject.test_result.results.push( adviceObject.item_result );
+										adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+										resolve( JSON.stringify( adviceObject ) );
+									}
+								);
 						}
 					],
 					( error, result ) =>
 					{
-						// TODO: Handle errors
-						if( error )
-						{
-							console.log( "E: " + error );
-						}
-						else
-						{
-							resolve( result );
-						}
+						// Errors have all been caught and handled prior to here
+						resolve( result ); // resolve the final answer
 					}
 				); // async.waterfall
+
 			}); // new Promise()
 
 	} // command_Website()

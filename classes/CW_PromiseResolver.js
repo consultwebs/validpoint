@@ -102,18 +102,19 @@ class CW_PromiseResolver
 			{
 				let html = document.querySelector( "html" ).outerHTML;
 
+				// There's no HTML node
 				if( !html || html.length < 1 )
 				{
 					return "ERROR";
 				}
-				// TODO: Should reject/error if there's no HTML node
+				
 				return document.querySelector( "html" ).outerHTML;
 			}
 		);
 			
 		await browser.close();
 		
-		if( outerHtml == "ERROR" )
+		if( !outerHtml || outerHtml == "ERROR" )
 		{
 			reject( "NO_HTML" );
 		}
@@ -200,9 +201,28 @@ class CW_PromiseResolver
 		request.on( "error",
 			( error ) =>
 			{
-				// TODO: reject call for "website" command when domain and/or port are bad
-				console.log( error );
-				resolve( returnValue );
+				returnValue = 
+				{
+					result: CW_Constants.RESULT_FAIL,
+					response_time: -1,
+					raw_response: ""
+				};
+
+				if( error.code == "ENOTFOUND" )
+				{
+					returnValue.raw_response = "NOT_FOUND";
+				}
+				else if( error.code == "ETIMEDOUT" )
+				{
+					returnValue.raw_response = "TIMED_OUT";
+				}
+				else if( error.reason ) // If there's a failure reason that isn't contained in a predictable tag
+				{
+					returnValue.raw_response = error.reason;
+				}
+
+				// Reject calls for "website" command when domain and/or port are bad or an http(s) request completely fails (e.g. certificate handshake failure)
+				reject( returnValue );
 			}
 		);
 	} // resolve_checkWebsiteResponse()
@@ -268,19 +288,18 @@ class CW_PromiseResolver
 					
 					resolve( returnValue );
 				}
-				else // Not sure this can be triggered since providing bad URLs results in resolvable errors above
+				else // Not sure this can be triggered since providing bad URLs and ports results in resolvable errors above
 				{
-					reject( error );
-				}
+					returnValue = 
+					{
+						result:CW_Constants.RESULT_FAIL,
+						response_time: -1,
+						raw_response: "NO_RESPONSE"
+					};
 
-				// Return "Down" if there's an error
-				returnValue = 
-				{
-					result: CW_Constants.RESULT_FAIL,
-					response_time: 0,
-					raw_response: response
+					reject( returnValue );
 				}
-				resolve( returnValue );
+				// I am unreachable
 			}
 		);
 	} // resolve_checkWebsiteAvailability()
