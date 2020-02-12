@@ -102,6 +102,22 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 	{
 		let returnValue = [];
 
+		if( inputObject && inputObject == "NO_ANSWER" )
+		{
+			returnValue.push(
+				{
+					intermediate_key: inputObject,
+					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+
+		// Early errors may leave us without a fully-built data structure
+		if( !inputObject.servers || !inputObject.servers.ns )
+		{
+			return returnValue;
+		}
+
 		// No name servers present
 		if( inputObject.servers.ns.length < 1 )
 		{

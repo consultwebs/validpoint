@@ -419,6 +419,20 @@ class CW_Runner
 
 	} // command_localNetwork()
 
+	// minimalAdviceObject( { adviceObject = null, rawResponse = null } )
+	// {
+	// 	adviceObject.item_result = 
+	// 	{
+	// 		raw_response: rawResponse
+	// 	}
+		
+	// 	adviceObject.test_result.results.push( adviceObject.item_result );
+	// 	adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+	// 	console.log( adviceObject.test_result );
+	// 	return adviceObject;
+	// }
+
 	/**
 	  * Validate details of the user's domain name and registration
 	  * 
@@ -454,179 +468,201 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
-				// Using ANY as the argument to dig is remarkably unreliable in retrieving complete records. 
-				// The only way to get complete records reliably is to perform individual TYPE queries against an authoritative name server.
-				async.waterfall(
-					[
-						( completion ) =>
-						{
-							// get nameserver records first so that we can get all the other data from an authority because non-authorities don't always answer completely
-							CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "NS", queryServer: null } )
-							.then(
-								( result ) =>
-								{
-									result.forEach( 
-										resultItem =>
-										{
-											adviceObject.domainResponses.servers.ns.push( 
-												StringUtil.stripTrailingDot( resultItem.value ) 
-												);
-										});
-
-										completion( null, adviceObject );
-								}
-							);
-						},
-						( result, completion ) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
-						{
-							if( result.domainResponses.servers.ns.length > 0 && result.domainResponses.servers.ns[0].length > 0 )
+				try
+				{
+					// Using ANY as the argument to dig is remarkably unreliable in retrieving complete records. 
+					// The only way to get complete records reliably is to perform individual TYPE queries against an authoritative name server.
+					async.waterfall(
+						[
+							( completion ) =>
 							{
-								// result.domainResponses.servers.ns[0] = result.domainResponses.servers.ns[0]; // this line is nonsensical. "It is what it is."
-							}
-							else
-							{
-								// TODO: Resolve a FAIL because there were no records
-							}
-
-							CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX" } )
-							.then(
-								( result ) =>
-								{
-									result.forEach( 
-										resultItem =>
-										{
-											adviceObject.domainResponses.servers.mx.push( 
-												StringUtil.stripTrailingDot( resultItem.value ) 
-												);
-										});
-										completion( null, adviceObject );
-								}
-							);
-
-						},
-						( result, completion ) => // Step 3. Perform a dig query against an authoritative name server to get an A record for the domain (should be the @ record)
-						{
-							CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
-							.then(
-								( result ) =>
-								{
-									// This happens if there is no CNAME record, which is OK if there is an A record
-									if( undefined !== result )
+								// get nameserver records first so that we can get all the other data from an authority because non-authorities don't always answer completely
+								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "NS", queryServer: null } )
+								.then(
+									( result ) =>
 									{
 										result.forEach( 
 											resultItem =>
 											{
-												adviceObject.domainResponses.servers.tld_a.push( StringUtil.stripTrailingDot( resultItem.value ) );
+												adviceObject.domainResponses.servers.ns.push( 
+													StringUtil.stripTrailingDot( resultItem.value ) 
+													);
+											});
+
+											completion( null, adviceObject );
+									}
+								)
+								.catch( 
+									( error ) =>
+									{
+										adviceObject.item_result.result = error;
+										adviceObject.item_result.raw_response = error;
+				
+										adviceObject.test_result.results.push( adviceObject.item_result );
+										adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+										delete adviceObject.domainResponses;
+										
+										resolve( JSON.stringify( adviceObject ) );
+									}
+								)
+								// {  }; // pass to the parent try/catch
+							},
+							( result, completion ) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
+							{
+								if( result.domainResponses.servers.ns.length > 0 && result.domainResponses.servers.ns[0].length > 0 )
+								{
+									// result.domainResponses.servers.ns[0] = result.domainResponses.servers.ns[0]; // this line is nonsensical. "It is what it is."
+								}
+								else
+								{
+									// TODO: Resolve a FAIL because there were no records
+								}
+
+								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX" } )
+								.then(
+									( result ) =>
+									{
+										result.forEach( 
+											resultItem =>
+											{
+												adviceObject.domainResponses.servers.mx.push( 
+													StringUtil.stripTrailingDot( resultItem.value ) 
+													);
 											});
 											completion( null, adviceObject );
 									}
-								});
-						},
-						( result, completion ) => // Step 4. Perform a dig query against an authoritative name server to get an A record for the www.<domain> 
-						{
-							CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
-							.then(
-								( result ) =>
-								{
-									if( undefined !== result )
-									{
-										// We should get a CNAME as the first response result and an A record as the second
-										if( result.length > 1 )
-										{
-											result[0].value = StringUtil.stripTrailingDot( result[0].value )
-											result[1].value = StringUtil.stripTrailingDot( result[1].value )
+								)
+								.catch( error )
+								{  console.log( "CATCH 1" );  }; // pass to the parent try/catch
 
-											if( (result[0].type == "CNAME" && result[1].type == "A") )
-											{
-												adviceObject.domainResponses.servers.www_cname.push( result[0].value );
-												adviceObject.domainResponses.servers.www_a.push( result[1].value );
-											}
-											else if(result[0].type == "A" && result[1].type == "CNAME" ) // In theory, these can arrive in reverse order
-											{
-												adviceObject.domainResponses.servers.www_cname.push( result[1].value );
-												adviceObject.domainResponses.servers.www_a.push( result[0].value );
-											}
+							},
+							( result, completion ) => // Step 3. Perform a dig query against an authoritative name server to get an A record for the domain (should be the @ record)
+							{
+								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
+								.then(
+									( result ) =>
+									{
+										// This happens if there is no CNAME record, which is OK if there is an A record
+										if( undefined !== result )
+										{
+											result.forEach( 
+												resultItem =>
+												{
+													adviceObject.domainResponses.servers.tld_a.push( StringUtil.stripTrailingDot( resultItem.value ) );
+												});
+												completion( null, adviceObject );
 										}
-										completion( null, adviceObject );
-									}
-									else
+									})
+									.catch( error )
+									{ console.log( "CATCH 2" ); }; // pass to the parent try/catch
+							},
+							( result, completion ) => // Step 4. Perform a dig query against an authoritative name server to get an A record for the www.<domain> 
+							{
+								CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
+								.then(
+									( result ) =>
 									{
-										completion( null, adviceObject );
-									}
-								});
-						},
-						( result, completion ) => // Step 5. Perform a dig query against an authoritative name server to get a CNAME record for the URL
-						{
-							CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
-							.then(
-								( result ) =>
-								{
-									if( undefined !== result )
-									{
-										result.forEach( 
-											resultItem =>
+										if( undefined !== result )
+										{
+											// We should get a CNAME as the first response result and an A record as the second
+											if( result.length > 1 )
 											{
-												adviceObject.domainResponses.servers.www_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
-											});
+												result[0].value = StringUtil.stripTrailingDot( result[0].value )
+												result[1].value = StringUtil.stripTrailingDot( result[1].value )
+
+												if( (result[0].type == "CNAME" && result[1].type == "A") )
+												{
+													adviceObject.domainResponses.servers.www_cname.push( result[0].value );
+													adviceObject.domainResponses.servers.www_a.push( result[1].value );
+												}
+												else if(result[0].type == "A" && result[1].type == "CNAME" ) // In theory, these can arrive in reverse order
+												{
+													adviceObject.domainResponses.servers.www_cname.push( result[1].value );
+													adviceObject.domainResponses.servers.www_a.push( result[0].value );
+												}
+											}
 											completion( null, adviceObject );
-									}
-									else
-									{
-										completion( null, adviceObject );
-									}
-								});
-						},
-						( result, completion ) => // Step 6. Perform a dig query against an authoritative name server to get a CNAME record for the domain
-						{
-							CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
-							.then(
-								( result ) =>
-								{
-									// This should be undefined
-									if( undefined !== result )
-									{
-										result.forEach( 
-											resultItem =>
-											{
-												adviceObject.domainResponses.servers.tld_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
-											});
+										}
+										else
+										{
 											completion( null, adviceObject );
-									}
-									else
+										}
+									})
+									.catch( error )
+									{ console.log( "CATCH 3" ); }; // pass to the parent try/catch
+							},
+							( result, completion ) => // Step 5. Perform a dig query against an authoritative name server to get a CNAME record for the URL
+							{
+								CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
+								.then(
+									( result ) =>
 									{
+										if( undefined !== result )
+										{
+											result.forEach( 
+												resultItem =>
+												{
+													adviceObject.domainResponses.servers.www_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
+												});
+												completion( null, adviceObject );
+										}
+										else
+										{
+											completion( null, adviceObject );
+										}
+									})
+									.catch( error )
+									{ console.log( "CATCH 4" ); };  // pass to the parent try/catch
+							},
+							( result, completion ) => // Step 6. Perform a dig query against an authoritative name server to get a CNAME record for the domain
+							{
+								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
+								.then(
+									( result ) =>
+									{
+										// This should be undefined
+										if( undefined !== result )
+										{
+											result.forEach( 
+												resultItem =>
+												{
+													adviceObject.domainResponses.servers.tld_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
+												});
+												completion( null, adviceObject );
+										}
+										else
+										{
+											completion( null, adviceObject );
+										}
+									})
+									.catch( error )
+									{ console.log( "CATCH 5" ); }; // pass to the parent try/catch
+							},
+							( result, completion ) => // Step 7. Perform a whois lookup to get the domain expiration
+							{
+								CW_Runner.network.getWhoisInfo( { domain: configObject.domain } )
+								.then(
+									( result ) =>
+									{
+										let parsedDate = Date.parse( result );
+										let now = Date.now();
+										let timeDiff = Math.abs( now - parsedDate );
+										let daysTilExpiry = Math.floor( timeDiff/(86400 * 1000) ); // '* 1000' because timeDiff is in microseconds
+
+										adviceObject.domainResponses.expiration = result;
+										adviceObject.domainResponses.days_til_expiry = daysTilExpiry;
+
 										completion( null, adviceObject );
-									}
-								});
-						},
-						( result, completion ) => // Step 7. Perform a whois lookup to get the domain expiration
+									})
+									.catch( error )
+									{ console.log( "CATCH 6" ); }; // pass to the parent try/catch;
+							}
+						],
+						( error, result ) =>
 						{
-							CW_Runner.network.getWhoisInfo( { domain: configObject.domain } )
-							.then(
-								( result ) =>
-								{
-									let parsedDate = Date.parse( result );
-									let now = Date.now();
-									let timeDiff = Math.abs( now - parsedDate );
-									let daysTilExpiry = Math.floor( timeDiff/(86400 * 1000) ); // '* 1000' because timeDiff is in microseconds
-
-									adviceObject.domainResponses.expiration = result;
-									adviceObject.domainResponses.days_til_expiry = daysTilExpiry;
-
-									completion( null, adviceObject );
-								});
-						}
-					],
-					( error, result ) =>
-					{
-						// TODO: Handle errors
-						if( error )
-						{
-							console.log( "E" );
-							console.log( error );
-						}
-						else
-						{
-
+							// Errors have been handled before here
+							console.log( "HERE 1" );
 							adviceObject.item_result.raw_response = result.domainResponses;
 
 							adviceObject.test_result.results.push( adviceObject.item_result );
@@ -636,8 +672,18 @@ class CW_Runner
 
 							delete result.whois_info;
 						}
-					}
-				);
+					);
+				}
+				catch( error )
+				{
+					console.log( "HERE 2" );
+					adviceObject.item_result.raw_response = error.message;
+					adviceObject.test_result.results.push( adviceObject.item_result );
+					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+					
+					resolve( JSON.stringify( adviceObject ) );
+				}
+
 			}); // new Promise()
  
 

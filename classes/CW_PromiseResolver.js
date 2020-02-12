@@ -356,12 +356,21 @@ class CW_PromiseResolver
 	resolve_checkDomain( resolve, reject, { domain = null, recordType = null, queryServer = null } )
 	{
 		let dig = require( "node-dig-dns" );
-
+domain = "lsdlisdlw.erosdlwe";
 		dig( [ domain, recordType ] )
 			.then(
 				( result ) =>
 				{
-					resolve( result.answer );
+					if( !result.answer || result.answer.length < 1 )
+					{
+						reject( "NO_ANSWER" );
+					}
+					else
+					{
+						resolve( result.answer );
+					}
+					
+
 				}
 			);
 	} // resolve_checkDomain()

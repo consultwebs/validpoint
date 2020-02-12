@@ -21,6 +21,10 @@ module.exports =
 	"domain":
 	{
 		"URGENT": 		"There was a problem with your domainm name. Please contact your hosting provider",
+		"NO_ANSWER":
+		{
+			"URGENT": 	"There was no response about your domain when we asked a whois server. People will not be able to reach your website until this is resolved. Please contact your web hosting provider for support."
+		},
 		"NS_NONE":
 		{
 			"URGENT": "There are not any name servers defined for your domain and people will not be able to reach your website. Please contact your web hosting provider for support."
