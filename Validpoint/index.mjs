@@ -115,7 +115,9 @@ let commandRunner =
 							}
 							catch( error )
 							{
-								// TODO: Handle exceptions
+								// TODO: Handle exceptions - update to match error handling in bin/ValidPoint
+								// The only thing that could happen here is handling config inpt errors. All other errors have been caught and handled before reaching here.
+
 								console.log( "UNCAUGHT ERROR" );
 								console.log( error );
 							}

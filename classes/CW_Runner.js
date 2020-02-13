@@ -419,19 +419,28 @@ class CW_Runner
 
 	} // command_localNetwork()
 
-	// minimalAdviceObject( { adviceObject = null, rawResponse = null } )
-	// {
-	// 	adviceObject.item_result = 
-	// 	{
-	// 		raw_response: rawResponse
-	// 	}
-		
-	// 	adviceObject.test_result.results.push( adviceObject.item_result );
-	// 	adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+	/**
+	 * Completed the details of an Advice object for an error state
+	 * 
+	 * Abstracts repeated code from catch blocks
+	 * 
+	 * @author costmo
+	 * @returns CW_Advice
+	 * @param {*} adviceObject				An already constructed Advice instance
+	 * @param {*} input						The input or error to add to the Advice object 
+	 */
+	constructErroredAdviceObject( { adviceObject = null, input = null } )
+	{
+		adviceObject.item_result.result = CW_Constants.RESULT_FAIL;
+		adviceObject.item_result.raw_response = input;
 
-	// 	console.log( adviceObject.test_result );
-	// 	return adviceObject;
-	// }
+		adviceObject.test_result.results.push( adviceObject.item_result );
+		adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: false } );
+
+		// delete adviceObject.domainResponses;
+
+		return adviceObject;
+	}
 
 	/**
 	  * Validate details of the user's domain name and registration
@@ -492,33 +501,15 @@ class CW_Runner
 											completion( null, adviceObject );
 									}
 								)
-								.catch( 
+								.catch( // resolve received rejections
 									( error ) =>
 									{
-										adviceObject.item_result.result = error;
-										adviceObject.item_result.raw_response = error;
-				
-										adviceObject.test_result.results.push( adviceObject.item_result );
-										adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-
-										delete adviceObject.domainResponses;
-										
-										resolve( JSON.stringify( adviceObject ) );
+										resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
 									}
-								)
-								// {  }; // pass to the parent try/catch
+								); 
 							},
 							( result, completion ) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
 							{
-								if( result.domainResponses.servers.ns.length > 0 && result.domainResponses.servers.ns[0].length > 0 )
-								{
-									// result.domainResponses.servers.ns[0] = result.domainResponses.servers.ns[0]; // this line is nonsensical. "It is what it is."
-								}
-								else
-								{
-									// TODO: Resolve a FAIL because there were no records
-								}
-
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX" } )
 								.then(
 									( result ) =>
@@ -533,9 +524,12 @@ class CW_Runner
 											completion( null, adviceObject );
 									}
 								)
-								.catch( error )
-								{  console.log( "CATCH 1" );  }; // pass to the parent try/catch
-
+								.catch( // resolve received rejections
+									( error ) =>
+									{
+										resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+									}
+								);
 							},
 							( result, completion ) => // Step 3. Perform a dig query against an authoritative name server to get an A record for the domain (should be the @ record)
 							{
@@ -554,8 +548,12 @@ class CW_Runner
 												completion( null, adviceObject );
 										}
 									})
-									.catch( error )
-									{ console.log( "CATCH 2" ); }; // pass to the parent try/catch
+									.catch( // resolve received rejections
+										( error ) =>
+										{
+											resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+										}
+									);
 							},
 							( result, completion ) => // Step 4. Perform a dig query against an authoritative name server to get an A record for the www.<domain> 
 							{
@@ -589,8 +587,12 @@ class CW_Runner
 											completion( null, adviceObject );
 										}
 									})
-									.catch( error )
-									{ console.log( "CATCH 3" ); }; // pass to the parent try/catch
+									.catch( // resolve received rejections
+										( error ) =>
+										{
+											resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+										}
+									);
 							},
 							( result, completion ) => // Step 5. Perform a dig query against an authoritative name server to get a CNAME record for the URL
 							{
@@ -612,8 +614,12 @@ class CW_Runner
 											completion( null, adviceObject );
 										}
 									})
-									.catch( error )
-									{ console.log( "CATCH 4" ); };  // pass to the parent try/catch
+									.catch( // resolve received rejections
+										( error ) =>
+										{
+											resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+										}
+									);
 							},
 							( result, completion ) => // Step 6. Perform a dig query against an authoritative name server to get a CNAME record for the domain
 							{
@@ -636,8 +642,12 @@ class CW_Runner
 											completion( null, adviceObject );
 										}
 									})
-									.catch( error )
-									{ console.log( "CATCH 5" ); }; // pass to the parent try/catch
+									.catch( // resolve received rejections
+										( error ) =>
+										{
+											resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+										}
+									);
 							},
 							( result, completion ) => // Step 7. Perform a whois lookup to get the domain expiration
 							{
@@ -655,41 +665,44 @@ class CW_Runner
 
 										completion( null, adviceObject );
 									})
-									.catch( error )
-									{ console.log( "CATCH 6" ); }; // pass to the parent try/catch;
+									.catch( // resolve received rejections
+										( error ) =>
+										{
+											resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+										}
+									);
 							}
 						],
 						( error, result ) =>
 						{
 							// Errors have been handled before here
-							console.log( "HERE 1" );
+
+							// Resolve the response
 							adviceObject.item_result.raw_response = result.domainResponses;
 
 							adviceObject.test_result.results.push( adviceObject.item_result );
 							adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 							delete adviceObject.domainResponses;
-							resolve( JSON.stringify( adviceObject ) );
+							delete adviceObject.whois_info;
 
-							delete result.whois_info;
+							resolve( JSON.stringify( adviceObject ) );
 						}
 					);
 				}
 				catch( error )
 				{
-					console.log( "HERE 2" );
-					adviceObject.item_result.raw_response = error.message;
-					adviceObject.test_result.results.push( adviceObject.item_result );
-					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+					// Each of the blocks above have their own catch, so this would only kick in if 
+					//   we specifically add a throw (don't do that) or reject to a contained catch()
+					//   (don't do that without good reason for breaking convention)
+
+					// adviceObject.item_result.raw_response = error.message;
+					// adviceObject.test_result.results.push( adviceObject.item_result );
+					// adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 					
-					resolve( JSON.stringify( adviceObject ) );
+					// resolve( JSON.stringify( adviceObject ) );
 				}
 
 			}); // new Promise()
- 
-
-		 
- 
-
 	 }
 
 	/**
@@ -718,7 +731,6 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
-
 				// TODO: This needs to be abstracted from the input of Promise(). That there's way too much code to be an input
 				async.waterfall(
 					[

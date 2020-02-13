@@ -23,7 +23,11 @@ module.exports =
 		"URGENT": 		"There was a problem with your domainm name. Please contact your hosting provider",
 		"NO_ANSWER":
 		{
-			"URGENT": 	"There was no response about your domain when we asked a whois server. People will not be able to reach your website until this is resolved. Please contact your web hosting provider for support."
+			"URGENT": 	"There was no response about your domain when we performed a 'dig' for information. People will not be able to reach your website until this is resolved. Please contact your web hosting provider for support."
+		},
+		"NO_WHOIS":
+		{
+			"URGENT": 	"A whois server was unable to find your domain. People will not be able to reach your website until this is resolved. Please contact your web hosting provider for support."
 		},
 		"NS_NONE":
 		{

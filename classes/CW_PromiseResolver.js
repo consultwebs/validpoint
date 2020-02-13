@@ -5,7 +5,7 @@
  * The PromiseResolver handles all rejections and allows callers to to turn rejections into resolvable messages
  * 
  * @author costmo
- * TODO: The PromiseResolver needs to be divided into subclasses for maintainability
+ * TODO: The PromiseResolver will need to be divided into subclasses for maintainability
  */
 
 let CW_Constants = require( "./CW_Constants.js" );
@@ -324,7 +324,6 @@ class CW_PromiseResolver
 			domain,
 			( error, response ) =>
 			{
-
 				let lineItems = whoisParser.parseWhoIsData( response )
 				lineItems.forEach(
 						item => 
@@ -334,13 +333,14 @@ class CW_PromiseResolver
 							{
 								resolve( item.value );
 							}
+							else if( lowerCaseAttribute.includes( "error:" ) )
+							{
+								reject( "NO_WHOIS" );
+							}
 						}
 					);
-
-
-				// TODO: Handle errors
 			}
-		);
+		); // There's no way to get into a .catch from this .then apart from a code/system error
 	} // resolve_getWhoisInfo()
 
 	/**
@@ -356,12 +356,13 @@ class CW_PromiseResolver
 	resolve_checkDomain( resolve, reject, { domain = null, recordType = null, queryServer = null } )
 	{
 		let dig = require( "node-dig-dns" );
-domain = "lsdlisdlw.erosdlwe";
 		dig( [ domain, recordType ] )
 			.then(
 				( result ) =>
 				{
-					if( !result.answer || result.answer.length < 1 )
+					// Require CNAME and A records. Failure to find one of those means the whois server couldn't find the domain or failed to respond
+					if( (recordType == "NS" || recordType == "A") && 
+						(!result.answer || result.answer.length < 1)  )
 					{
 						reject( "NO_ANSWER" );
 					}
@@ -369,10 +370,8 @@ domain = "lsdlisdlw.erosdlwe";
 					{
 						resolve( result.answer );
 					}
-					
-
 				}
-			);
+			); // There's no way to get into a .catch from this .then apart from a code/system error
 	} // resolve_checkDomain()
 
 	resolve_makeRunnerObjects( resolve, reject, { domain = null } )
@@ -417,8 +416,6 @@ domain = "lsdlisdlw.erosdlwe";
 			fs.readdir( path,
 				( error, items ) =>
 				{
-					// TODO: Handle errors
-
 					items.forEach(
 						item =>
 						{
