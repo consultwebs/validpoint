@@ -944,6 +944,12 @@ class CW_Runner
 					describe: "Include raw test results",
 					demand: false
 				} )
+				.option( "q",
+				{
+					alias: "quiet",
+					describe: "Suppress in-progress output and only show the result",
+					demand: false
+				} )
 				.command( "local-network", "Test local network connectivity" )
 				.command( "local-dns", "Test local DNS resolution" )
 				.command( "http-port", "Test response time of web server port 80" )
@@ -969,6 +975,7 @@ class CW_Runner
 						returnValue.domain = config.domains;
 						returnValue.directory = config.directory;
 						returnValue.show_raw = (yargs.argv.raw) ? true : false;
+						returnValue.quiet = (yargs.argv.quiet) ? true : false;
 
 						resolve( returnValue );
 					});
@@ -980,6 +987,8 @@ class CW_Runner
 				returnValue.domain = [ yargs.argv.domain ];
 				returnValue.directory = null;
 				returnValue.show_raw = (yargs.argv.raw) ? true : false;
+				returnValue.quiet = (yargs.argv.quiet) ? true : false;
+				
 				resolve( returnValue );
 			}
 		});
