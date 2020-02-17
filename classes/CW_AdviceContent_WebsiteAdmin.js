@@ -42,60 +42,61 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 	 */
 	advise()
 	{
-		// Make a separate parser for the domain command since it has a lot of things to check
-		if( this.command == "domain" )
-		{
-			let tags = this.resultTagsForDomain( { inputObject: this.test_result.raw_response } );
+		let tags = this.resultTagsForDomain( { inputObject: this.test_result.raw_response } );
 
-			if( tags.length < 1 )
+		if( tags.length < 1 )
+		{
+			if( this.command == "domain" )
 			{
 				this.severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PASS } );
 				this.content = this.contentForSeverity( { severity: this.severity } );
 			}
-			else
+			else // http(s)-port commands
 			{
-				this.content = "";
-				tags.forEach(
-					tag =>
-					{
-						let severity = this.resultTagToSeverity( { resultTag: tag.result_value, extraInput: tags } );
-						if( severity > this.severity )
-						{
-							this.severity = severity;
-							this.test_result.result = tag.result_value;
-						}
+				// The only PUNT condition is a response that takes too long. Without logic below, that will generate a NOTICE
+				if( this.test_result.result == CW_Constants.RESULT_PUNT )
+				{
+					// TODO: Get config to see if we should notify
+				}
 
-						if( severity == CW_Constants.SEVERITY_DIRECT_MESSAGE && tags[0].message != undefined && tags[0].message.length > 0 )
-						{
-							this.content += tags[0].message;
-						}
-						else
-						{
-							this.content += this.contentForSeverity( { severity: severity, extraInput: tag.intermediate_key } ) + "\n";
-						}
-
-						this.result = tag.result_value;
-					}
-				);
+				let extraKey = null;
+				if( (this.command == "http-port" || this.command == "https-port") &&
+					this.test_result.raw_response.raw_response == "NO_RESPONSE" )
+				{
+					extraKey = this.test_result.raw_response.raw_response;
+				}
+	
+				this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
+				this.content = this.contentForSeverity( { severity: this.severity, extraInput: extraKey } );
 			}
+
 		}
-		else
+		else // handle more complex responses and direct messages
 		{
-			// The only PUNT condition is a response that takes too long. Without logic below, that will generate a NOTICE
-			if( this.test_result.result == CW_Constants.RESULT_PUNT )
-			{
-				// TODO: Get config to see if we should notify
-			}
+			this.content = "";
+			tags.forEach(
+				tag =>
+				{
+					let severity = this.resultTagToSeverity( { resultTag: tag.result_value, extraInput: tags } );
 
-			let extraKey = null;
-			if( (this.command == "http-port" || this.command == "https-port") &&
-				this.test_result.raw_response.raw_response == "NO_RESPONSE" )
-			{
-				extraKey = this.test_result.raw_response.raw_response;
-			}
+					if( severity > this.severity )
+					{
+						this.severity = severity;
+						this.test_result.result = tag.result_value;
+					}
 
-			this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
-			this.content = this.contentForSeverity( { severity: this.severity, extraInput: extraKey } );
+					if( severity == CW_Constants.SEVERITY_DIRECT_MESSAGE && tags[0].message != undefined && tags[0].message.length > 0 )
+					{
+						this.content += tags[0].message;
+					}
+					else
+					{
+						this.content += this.contentForSeverity( { severity: severity, extraInput: tag.intermediate_key } ) + "\n";
+					}
+
+					this.result = tag.result_value;
+				}
+			);
 		}
 	}
 

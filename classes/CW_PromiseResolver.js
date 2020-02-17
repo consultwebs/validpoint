@@ -239,69 +239,82 @@ class CW_PromiseResolver
 	 */
 	async resolve_checkWebsiteAvailability( resolve, reject, { domain = null, port = 80 } )
 	{
-		let tcpPing = require( "tcp-ping" );
-		let returnValue;
-
-		// Ping configuration parameters
-		let tcpConfig = 
+		try
 		{
-			address: domain,
-			port: port,
-			attempts: 3
-		}
+			let tcpPing = require( "tcp-ping" );
+			let returnValue;
 
-		tcpPing.ping( tcpConfig,
-			( error, response ) =>
+			// Ping configuration parameters
+			let tcpConfig = 
 			{
-				if( !error ) // Default is "down" so there's nothing to change for an error response
+				address: domain,
+				port: port,
+				attempts: 3
+			}
+
+			tcpPing.ping( tcpConfig,
+				( error, response ) =>
 				{
-					// We're sending back more than a simple string. Construct the return object
-					returnValue = 
+					if( !error ) // Default is "down" so there's nothing to change for an error response
 					{
-						result:CW_Constants.RESULT_PASS,
-						response_time: -1,
-						raw_response: ""
-					};
-
-					// Failed ping results in valid result with "NaN" for the timing values
-					if( parseFloat( response.avg ) + "" !== "NaN" ) // Node has no isNan()?
-					{
-						// Site is up
-						returnValue.result = CW_Constants.RESULT_PASS;
-						returnValue.response_time = response.avg;
-						returnValue.raw_response = response;
-
-						if( response.avg > MAX_HTTTP_RESPONSE_TIME ) // Request took too long. Punt to see if a response is needed
+						// We're sending back more than a simple string. Construct the return object
+						returnValue = 
 						{
-							returnValue.result = CW_Constants.RESULT_PUNT;
+							result:CW_Constants.RESULT_PASS,
+							response_time: -1,
+							raw_response: ""
+						};
+
+						// Failed ping results in valid result with "NaN" for the timing values
+						if( parseFloat( response.avg ) + "" !== "NaN" ) // Node has no isNan()?
+						{
+							// Site is up
+							returnValue.result = CW_Constants.RESULT_PASS;
+							returnValue.response_time = response.avg;
+							returnValue.raw_response = response;
+
+							if( response.avg > MAX_HTTTP_RESPONSE_TIME ) // Request took too long. Punt to see if a response is needed
+							{
+								returnValue.result = CW_Constants.RESULT_PUNT;
+							}
 						}
+						else // There was no response from the website
+						{
+							returnValue = 
+							{
+								result: CW_Constants.RESULT_FAIL,
+								response_time: 0,
+								raw_response: "NO_RESPONSE"
+							}
+						}
+						
+						resolve( returnValue );
 					}
-					else // There was no response from the website
+					else // Not sure this can be triggered since providing bad URLs and ports results in resolvable errors above
 					{
 						returnValue = 
 						{
-							result: CW_Constants.RESULT_FAIL,
-							response_time: 0,
+							result:CW_Constants.RESULT_FAIL,
+							response_time: -1,
 							raw_response: "NO_RESPONSE"
-						}
-					}
-					
-					resolve( returnValue );
-				}
-				else // Not sure this can be triggered since providing bad URLs and ports results in resolvable errors above
-				{
-					returnValue = 
-					{
-						result:CW_Constants.RESULT_FAIL,
-						response_time: -1,
-						raw_response: "NO_RESPONSE"
-					};
+						};
 
-					reject( returnValue );
+						reject( returnValue );
+					}
+					// I am unreachable
 				}
-				// I am unreachable
-			}
-		);
+			);
+		}
+		catch( error )
+		{
+			let returnError = 
+			{	...new Error(),
+				raw_response: error,
+				message: 	error.message
+			};
+
+			throw returnError;
+		}
 	} // resolve_checkWebsiteAvailability()
 
 	/**
@@ -345,7 +358,7 @@ class CW_PromiseResolver
 				}
 			); // There's no way to get into a .catch from this .then apart from a code/system error
 		}
-		catch( error)
+		catch( error )
 		{
 			let returnError = 
 			{	...new Error(),
@@ -435,7 +448,7 @@ class CW_PromiseResolver
 		else // request all domains
 		{
 			let fs = require( "fs" );
-			let path = "../input/";
+			let path = "../input/"; // TODO: This can't be hard-coded
 
 			// Iterate all files in the input directory
 			fs.readdir( path,

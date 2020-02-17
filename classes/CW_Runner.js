@@ -342,9 +342,14 @@ class CW_Runner
 								adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 				
 								resolve( JSON.stringify( adviceObject ) );
-							});
+							}).catch(
+								( error ) =>
+								{
+									resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+								}
+							);
 				}
-				catch( error ) // I don't think we'll be able to reach this catch naturally
+				catch( error ) // We won't be able to reach this catch naturally
 				{
 					adviceObject.item_result.result = CW_Constants.RESULT_FAIL;
 					adviceObject.item_result.result_tags.push( error );
@@ -441,8 +446,6 @@ class CW_Runner
 
 		adviceObject.test_result.results.push( adviceObject.item_result );
 		adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: false } );
-
-		// delete adviceObject.domainResponses;
 
 		return adviceObject;
 	}

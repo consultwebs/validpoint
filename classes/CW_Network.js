@@ -107,7 +107,13 @@ class CW_Network
 		return new Promise( 
 			( resolve, reject ) => 
 			{
-				resolver.resolve_checkWebsiteAvailability( resolve, reject, { domain: domain, port: port } );
+				resolver.resolve_checkWebsiteAvailability( resolve, reject, { domain: domain, port: port } )
+					.catch(
+						( error ) =>
+						{
+							reject( error );
+						}
+					);
 			});
 	} // checkWebsiteAvailability()
 
