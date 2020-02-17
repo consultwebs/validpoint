@@ -77,12 +77,10 @@ exports.jsonConfig =
 	return "jsonConfig";
 };
 
-
-
 let commandRunner = 
 ( { domain = null, command = null, callback = null } ) =>
 {
-	CW_InputParser.makeRunnerObjects( domain ).then(
+	CW_InputParser.makeRunnerObjects( { domain: domain, directory: null } ).then(
 		( runObjects ) =>
 		{
 			runObjects.forEach(
