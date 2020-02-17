@@ -67,7 +67,13 @@ class CW_Network
 		return new Promise( 
 			( resolve, reject ) => 
 			{
-				resolver.resolve_checkWebsiteContent( resolve, reject, { url: url } );
+				resolver.resolve_checkWebsiteContent( resolve, reject, { url: url } )
+				.catch(
+					( error ) =>
+					{
+						reject( error );
+					}
+				);
 			});
 	} // checkWebsiteResponse()
 

@@ -115,36 +115,49 @@ class CW_PromiseResolver
 	 */
 	async resolve_checkWebsiteContent( resolve, reject, { url = null } )
 	{
-		let puppeteer = require( "puppeteer" );
+		try
+		{
+			let puppeteer = require( "puppeteer" );
 
-		let browser = await puppeteer.launch( { ignoreHTTPSErrors: true } );
-		let page = await browser.newPage();
-		await page.goto( "https://" + url );
+			let browser = await puppeteer.launch( { ignoreHTTPSErrors: true } );
+			let page = await browser.newPage();
+			await page.goto( "https://" + url );
 
-		let outerHtml = await page.evaluate(
-			() =>
-			{
-				let html = document.querySelector( "html" ).outerHTML;
-
-				// There's no HTML node
-				if( !html || html.length < 1 )
+			let outerHtml = await page.evaluate(
+				() =>
 				{
-					return "ERROR";
+					let html = document.querySelector( "html" ).outerHTML;
+
+					// There's no HTML node
+					if( !html || html.length < 1 )
+					{
+						return "ERROR";
+					}
+					
+					return document.querySelector( "html" ).outerHTML;
 				}
+			);
 				
-				return document.querySelector( "html" ).outerHTML;
-			}
-		);
+			await browser.close();
 			
-		await browser.close();
-		
-		if( !outerHtml || outerHtml == "ERROR" )
-		{
-			reject( "NO_HTML" );
+			if( !outerHtml || outerHtml == "ERROR" )
+			{
+				reject( "NO_HTML" );
+			}
+			else
+			{
+				resolve( outerHtml );
+			}
 		}
-		else
+		catch( error )
 		{
-			resolve( outerHtml );
+			let returnError = 
+			{	...new Error(),
+				raw_response: error,
+				message: 	error.message
+			};
+
+			throw returnError;
 		}
 	}
 
@@ -159,96 +172,109 @@ class CW_PromiseResolver
 	 */
 	resolve_checkWebsiteResponse( resolve, reject, { url = null, port = 80 } )
 	{
-		let returnValue;
-		let protocol= require( "http" );
-		if( port == 443 )
+		try
 		{
-			protocol = require( "https" );
-		}
-
-		let options = 
-		{
-			hostname: url,
-			port: port,
-			path: "/",
-			method: "GET"
-		};
-
-		const request = protocol.request( options,
-			( response ) =>
+			let returnValue;
+			let protocol= require( "http" );
+			if( port == 443 )
 			{
-				// If you don't have an on.data - even if you're not doing anything with the data - node never fires on.end
-				response.on( "data", ( data ) => {} );
+				protocol = require( "https" );
+			}
 
-				response.on( "end",
-					() =>
+			let options = 
+			{
+				hostname: url,
+				port: port,
+				path: "/",
+				method: "GET"
+			};
+
+			const request = protocol.request( options,
+				( response ) =>
+				{
+					// If you don't have an on.data - even if you're not doing anything with the data - node never fires on.end
+					response.on( "data", ( data ) => {} );
+
+					response.on( "end",
+						() =>
+						{
+							// Pull out the headers
+							let headers = response.headers;
+
+							returnValue = 
+							{
+								result: CW_Constants.RESULT_PASS,
+								response_time: -1,
+								raw_response: response.statusCode, // send the status code as the raw response
+								redirect_location: (undefined == headers.location) ? "" : headers.location
+							};
+
+							// 400-level errors
+							if( response.statusCode.toString().startsWith( "4" ) )
+							{
+								returnValue.result = CW_Constants.RESULT_FAIL;
+							}
+							else if( response.statusCode.toString().startsWith( "5" ) ) // 500-level errors
+							{
+								returnValue.result =  CW_Constants.RESULT_FAIL;
+							}
+							else if( response.statusCode.toString().startsWith( "3" ) ) // Redirects
+							{
+								// for redirects, report the redirect location as the raw response
+								returnValue.raw_response = returnValue.redirect_location;
+								returnValue.result = CW_Constants.RESULT_PUNT;
+							}
+							else if( response.statusCode != 200 ) // Everything else that's not '200'
+							{
+								returnValue.result =  CW_Constants.RESULT_FAIL;
+							}
+							
+							resolve( returnValue );
+						}
+					);
+				}
+			);
+
+			request.end();
+
+			request.on( "error",
+				( error ) =>
+				{
+					returnValue = 
 					{
-						// Pull out the headers
-						let headers = response.headers;
+						result: CW_Constants.RESULT_FAIL,
+						response_time: -1,
+						raw_response: ""
+					};
 
-						returnValue = 
-						{
-							result: CW_Constants.RESULT_PASS,
-							response_time: -1,
-							raw_response: response.statusCode, // send the status code as the raw response
-							redirect_location: (undefined == headers.location) ? "" : headers.location
-						};
-
-						// 400-level errors
-						if( response.statusCode.toString().startsWith( "4" ) )
-						{
-							returnValue.result = CW_Constants.RESULT_FAIL;
-						}
-						else if( response.statusCode.toString().startsWith( "5" ) ) // 500-level errors
-						{
-							returnValue.result =  CW_Constants.RESULT_FAIL;
-						}
-						else if( response.statusCode.toString().startsWith( "3" ) ) // Redirects
-						{
-							// for redirects, report the redirect location as the raw response
-							returnValue.raw_response = returnValue.redirect_location;
-							returnValue.result = CW_Constants.RESULT_PUNT;
-						}
-						else if( response.statusCode != 200 ) // Everything else that's not '200'
-						{
-							returnValue.result =  CW_Constants.RESULT_FAIL;
-						}
-						
-						resolve( returnValue );
+					if( error.code == "ENOTFOUND" )
+					{
+						returnValue.raw_response = "NOT_FOUND";
 					}
-				);
-			}
-		);
+					else if( error.code == "ETIMEDOUT" )
+					{
+						returnValue.raw_response = "TIMED_OUT";
+					}
+					else if( error.reason ) // If there's a failure reason that isn't contained in a predictable tag
+					{
+						returnValue.raw_response = error.reason;
+					}
 
-		request.end();
-
-		request.on( "error",
-			( error ) =>
-			{
-				returnValue = 
-				{
-					result: CW_Constants.RESULT_FAIL,
-					response_time: -1,
-					raw_response: ""
-				};
-
-				if( error.code == "ENOTFOUND" )
-				{
-					returnValue.raw_response = "NOT_FOUND";
+					// Reject calls for "website" command when domain and/or port are bad or an http(s) request completely fails (e.g. certificate handshake failure)
+					reject( returnValue );
 				}
-				else if( error.code == "ETIMEDOUT" )
-				{
-					returnValue.raw_response = "TIMED_OUT";
-				}
-				else if( error.reason ) // If there's a failure reason that isn't contained in a predictable tag
-				{
-					returnValue.raw_response = error.reason;
-				}
+			);
+		}
+		catch( error )
+		{
+			let returnError = 
+			{	...new Error(),
+				raw_response: error,
+				message: 	error.message
+			};
 
-				// Reject calls for "website" command when domain and/or port are bad or an http(s) request completely fails (e.g. certificate handshake failure)
-				reject( returnValue );
-			}
-		);
+			throw returnError;
+		}
 	} // resolve_checkWebsiteResponse()
 
 	/**

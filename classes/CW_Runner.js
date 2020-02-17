@@ -205,33 +205,45 @@ class CW_Runner
 			{
 				try
 				{
-					let result = await CW_Runner.network.checkWebsiteContent( { url: configObject.url } );
+					CW_Runner.network.checkWebsiteContent( { url: configObject.url } )
+						.then(
+							( result ) =>
+							{
+								// Parse the incoming HTML to find important elements
+								let HtmlParser = require( "node-html-parser" );
+								let root = HtmlParser.parse( result );
 
-					// Parse the incoming HTML to find important elements
-					let HtmlParser = require( "node-html-parser" );
-					let root = HtmlParser.parse( result );
+								// Stuff some nodes into an object for testing
+								adviceObject.item_result.raw_response = {
+									headNode: root.querySelector( "head" ),
+									titleNode:  root.querySelector( "head title" ),
+									bodyNode:  root.querySelector( "body" ),
+									h1Node:  root.querySelector( "h1" ),
+									metaNodes:  root.querySelectorAll( "meta" )
+								}
 
-					// Stuff some nodes into an object for testing
-					adviceObject.item_result.raw_response = {
-						headNode: root.querySelector( "head" ),
-						titleNode:  root.querySelector( "head title" ),
-						bodyNode:  root.querySelector( "body" ),
-						h1Node:  root.querySelector( "h1" ),
-						metaNodes:  root.querySelectorAll( "meta" )
-					}
+								adviceObject.test_result.results.push( adviceObject.item_result );
+								adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 
-					adviceObject.test_result.results.push( adviceObject.item_result );
-					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+								// remove large result sets
+								adviceObject.test_result.results.forEach(
+									result =>
+									{
+										result.raw_response = "";
+									}
+								);
 
-					// remove large result sets
-					adviceObject.test_result.results.forEach(
-						result =>
-						{
-							result.raw_response = "";
-						}
-					);
+								resolve( JSON.stringify( adviceObject ) );
+							}
+						)
+						.catch(
+							( error ) =>
+							{
+								resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+							}
+						);
 
-					resolve( JSON.stringify( adviceObject ) );
+
 				}
 				catch( error ) // There was an error getting the HTML of the page. Resolve the checker's rejection with a sane response
 				{
@@ -272,33 +284,29 @@ class CW_Runner
 		}
 
 		return new Promise(
-			async (resolve, reject) =>
+			(resolve, reject) =>
 			{
-				try
-				{
-					let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } );
-
-					adviceObject.item_result.result = result.result;
-					adviceObject.item_result.result_tags.push( result.result );
-					adviceObject.item_result.raw_response = result;
-					adviceObject.item_result.response_time = result.response_time;
-
-					adviceObject.test_result.results.push( adviceObject.item_result );
-					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-
-					resolve( JSON.stringify( adviceObject ) );
-				}
-				catch( error )
-				{
-					// This is here as a formality. There is no condition that can cause the PromiseResolver to reject 
-					//    other than a code or system error that would have prevented us reaching here in the first 
-					//    place. e.g. "module 'tcp-ping' is not installed"
-
-					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } ); // Strip unwanted output objects from the return value. This will never add Advice since there will be nothing in the test_result array.
-					resolve( JSON.stringify( adviceObject ) );
-				}
-
-
+				CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } )
+					.then(
+						( result ) =>
+						{
+							adviceObject.item_result.result = result.result;
+							adviceObject.item_result.result_tags.push( result.result );
+							adviceObject.item_result.raw_response = result;
+							adviceObject.item_result.response_time = result.response_time;
+		
+							adviceObject.test_result.results.push( adviceObject.item_result );
+							adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+		
+							resolve( JSON.stringify( adviceObject ) );
+						}
+					)
+					.catch(
+						( error ) =>
+						{
+							resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+						}
+					);
 			});
 	}
 	
@@ -724,13 +732,6 @@ class CW_Runner
 				{
 					// Each of the blocks above have their own catch, so this would only kick in if 
 					//   we specifically add a throw (don't do that) or reject to a contained catch()
-					//   (don't do that without good reason for breaking convention)
-
-					// adviceObject.item_result.raw_response = error.message;
-					// adviceObject.test_result.results.push( adviceObject.item_result );
-					// adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-					
-					// resolve( JSON.stringify( adviceObject ) );
 				}
 
 			}); // new Promise()
@@ -816,6 +817,12 @@ class CW_Runner
 										}
 
 									}
+								)
+								.catch(
+									( error ) =>
+									{
+										resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+									}
 								);
 						},
 						( result, completion ) =>
@@ -837,15 +844,23 @@ class CW_Runner
 								).catch(
 									error =>
 									{
-										adviceObject.item_result.result = error.result;
-										adviceObject.item_result.result_tags.push( error.result );
-										adviceObject.item_result.raw_response = error.raw_response;
-										adviceObject.item_result.response_time = error.response_time;
-				
-										adviceObject.test_result.results.push( adviceObject.item_result );
-										adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+										// Resolve a throw from a system error...
+										if( error.raw_response.message && error.raw_response.message.length > 0 )
+										{
+											resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+										}
+										else // ...or a rejection from a test error
+										{
+											adviceObject.item_result.result = error.result;
+											adviceObject.item_result.result_tags.push( error.result );
+											adviceObject.item_result.raw_response = error.raw_response;
+											adviceObject.item_result.response_time = error.response_time;
+					
+											adviceObject.test_result.results.push( adviceObject.item_result );
+											adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 
-										resolve( JSON.stringify( adviceObject ) );
+											resolve( JSON.stringify( adviceObject ) );
+										}
 									}
 								);
 						}

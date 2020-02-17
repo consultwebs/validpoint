@@ -52,61 +52,72 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 			}
 		}
 
-		if( this.command == "website-content" )
+		// Got a direct message back from a system error
+		if( this.test_result.result == CW_Constants.RESULT_FAIL &&
+			this.test_result.raw_response.message && this.test_result.raw_response.message.length > 0 )
 		{
-			let tags = this.resultTagsForContent( { inputObject: this.test_result.raw_response } );
-
-			// Nothing was wrong
-			if( tags.length < 1 )
-			{
-				this.severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PASS } );
-				this.content = this.contentForSeverity( { severity: this.severity } );
-			}
-			else
-			{
-				// handle more complicated severity determinations
-				this.content = "";
-				tags.forEach(
-					tag =>
-					{
-						let severity = this.resultTagToSeverity( { resultTag: tag.result_value, extraKey: tag.intermediate_key } );
-						if( severity > this.severity )
-						{
-							this.severity = severity;
-							this.test_result.result = tag.result_value;
-						}
-
-						this.content += this.contentForSeverity( { severity: severity, extraInput: tag.intermediate_key } ) + "\n";
-						this.result = tag.result_value;
-					}
-				);
-			}
-		}
-		else if(	(this.command == "http-response" || this.command == "https-response" || 
-					 this.command == "website" || this.command == "secure-website" ) 
-					&&  
-					(this.test_result.raw_response.raw_response == "NO_RESPONSE" || // raw_response for http(s)-response generated objects is an object containing a raw_response
-					 this.test_result.raw_response == "NOT_FOUND" || 
-					 this.test_result.raw_response == "TIMED_OUT" ) )
-		{
-			let extraInput = (this.command.indexOf( "http" ) === 0 ) ? this.test_result.raw_response.raw_response : this.test_result.raw_response;
-
-			this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
-			this.content = this.contentForSeverity( { severity: this.severity, extraInput: extraInput } );
-		}
-		else if(this.command == "website" || this.command == "secure-website" ) // website command passed useful information from the test back to here
-		{
-			let extraInput = this.test_result.raw_response;
-
-			this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result, extraKey: "REPLACEMENT" } );
-			this.content = this.contentForSeverity( { severity: this.severity, extraInput: "REPLACEMENT" } );
-			this.content = this.content.replace( '%response%', this.test_result.raw_response );
+			this.severity = CW_Constants.SEVERITY_DIRECT_MESSAGE;
+			this.content = this.test_result.raw_response.message;
 		}
 		else
 		{
-			this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
-			this.content = this.contentForSeverity( { severity: this.severity } );
+			if( this.command == "website-content" )
+			{
+				let tags = this.resultTagsForContent( { inputObject: this.test_result.raw_response } );
+
+				// Nothing was wrong
+				if( tags.length < 1 )
+				{
+					this.severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PASS } );
+					this.content = this.contentForSeverity( { severity: this.severity } );
+				}
+				else
+				{
+					// handle more complicated severity determinations
+					this.content = "";
+					tags.forEach(
+						tag =>
+						{
+							let severity = this.resultTagToSeverity( { resultTag: tag.result_value, extraKey: tag.intermediate_key } );
+							if( severity > this.severity )
+							{
+								this.severity = severity;
+								this.test_result.result = tag.result_value;
+							}
+
+							this.content += this.contentForSeverity( { severity: severity, extraInput: tag.intermediate_key } ) + "\n";
+							this.result = tag.result_value;
+						}
+					);
+				}
+			}
+			else if(	(this.command == "http-response" || this.command == "https-response" || 
+						this.command == "website" || this.command == "secure-website" ) 
+						&&  
+						(this.test_result.raw_response.raw_response == "NO_RESPONSE" || // raw_response for http(s)-response generated objects is an object containing a raw_response
+						this.test_result.raw_response == "NOT_FOUND" || 
+						this.test_result.raw_response == "TIMED_OUT" ) )
+			{
+				let extraInput = (this.command.indexOf( "http" ) === 0 ) ? this.test_result.raw_response.raw_response : this.test_result.raw_response;
+
+				this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
+				this.content = this.contentForSeverity( { severity: this.severity, extraInput: extraInput } );
+			}
+			else if(this.command == "website" || this.command == "secure-website" ) // website command passed useful information from the test back to here
+			{
+				let extraInput = this.test_result.raw_response;
+
+				this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result, extraKey: "REPLACEMENT" } );
+				this.content = this.contentForSeverity( { severity: this.severity, extraInput: "REPLACEMENT" } );
+				this.content = this.content.replace( '%response%', this.test_result.raw_response );
+			}
+			else
+			{
+				this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
+				this.content = this.contentForSeverity( { severity: this.severity } );
+			}
 		}
+		
 
 	}
 
