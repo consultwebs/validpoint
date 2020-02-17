@@ -462,7 +462,7 @@ class CW_PromiseResolver
 		}
 	} // resolve_checkDomain()
 
-	resolve_makeRunnerObjects( resolve, reject, { domain = null } )
+	resolve_makeRunnerObjects( resolve, reject, { domain = null, directory = null } )
 	{
 		let returnValue = [];
 
@@ -479,7 +479,8 @@ class CW_PromiseResolver
 					{
 						let runObject = {
 							"domain": loopDomain.trim(),
-							"file": loopDomain.trim() + ".json"
+							"file": loopDomain.trim() + ".json",
+							"directory": directory
 						};
 						returnValue.push( runObject );
 					}
@@ -489,13 +490,14 @@ class CW_PromiseResolver
 			{
 				let runObject = {
 					"domain": domain.trim(),
-					"file": domain.trim() + ".json"
+					"file": domain.trim() + ".json",
+					"directory": directory
 				};
 				returnValue.push( runObject );
 			}
 			resolve( returnValue );
 		}
-		else // request all domains
+		else // request all domains TODO: Update this
 		{
 			let fs = require( "fs" );
 			let path = "../input/"; // TODO: This can't be hard-coded

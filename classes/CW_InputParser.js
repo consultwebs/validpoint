@@ -24,7 +24,7 @@ class CW_InputParser
 		{
 			this.mPath = path;
 		}
-        this.mInputString = "";
+		this.mInputString = "";
     }
 
     /**
@@ -43,10 +43,6 @@ class CW_InputParser
             fileSystem.readFile( this.mPath + this.mFileName, "utf8", 
                 function( error, data )
                 {
-                    if( error )
-                    {
-                        throw new Error( error.message );
-                    }
                     passedThis.mInputString = data;
 					callback.bind( passedThis )();
                 });
@@ -90,7 +86,7 @@ class CW_InputParser
 	 * @returns Array
 	 * @param {*} domain 			The domain, comma-separated list of domains, or "all".
 	 */
-	static async makeRunnerObjects( domain )
+	static async makeRunnerObjects( { domain = null, directory = null } )
 	{
 		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
 		let resolver = new CW_PromiseResolver();
@@ -98,7 +94,7 @@ class CW_InputParser
 		return new Promise(
 			( resolve, reject ) =>
 			{
-				resolver.resolve_makeRunnerObjects( resolve, reject, { domain: domain } );
+				resolver.resolve_makeRunnerObjects( resolve, reject, { domain: domain, directory: directory } );
 			}
 		);
 

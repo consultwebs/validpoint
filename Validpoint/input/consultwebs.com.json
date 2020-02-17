@@ -1,0 +1,36 @@
+{
+    "name": "Consultwebs",
+	"domain": "consultwebs.com",
+	"url": "www.consultwebs.com",
+	"exclude_tests": 
+	{
+
+	},
+	"alert_levels": 
+	{
+		"ONSCREEN": "NOTICE",
+		"EMAIL": "ESSENTIAL",
+		"SMS": "URGENT"
+	},
+	"severity_thresholds": 
+	{
+		"local": 
+		{
+			"local-network": "ESSENTIAL",
+			"local-dns": "ESSENTIAL"
+		},
+		"website":
+		{
+			"http-response": "ESSENTIAL",
+			"https-response": "NOTICE",
+			"website": "ESSENTIAL",
+			"secure-website": "NOTICE"
+		},
+		"website-admin":
+		{
+			"http-port": "ESSENTIAL",
+			"https-port": "NOTICE",
+			"domain": "NOTICE"
+		}
+	}
+}

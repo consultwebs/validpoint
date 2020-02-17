@@ -20,63 +20,81 @@ require( "strict-mode" )(
 		const CW_InputParser =  require( "../../classes/CW_InputParser.js" );
 		let config = null;
 
-		let inputOptions = CW_Runner.processinputArguments();
-		let cmd = inputOptions.command;
-		let domain = inputOptions.domain;
-
-		CW_InputParser.makeRunnerObjects( domain ).then(
-			( runObjects ) =>
-			{
-				if( runObjects && runObjects.length > 0 )
+		let inputOptions = CW_Runner.processinputArguments()
+			.then(
+				( inputOptions ) =>
 				{
-					// The things that run in the forEach are synchronous, so checks for all domains run at once and return in no particular order
-					runObjects.forEach(
-						runObject =>
+					let cmds = inputOptions.command;
+					let domains = inputOptions.domain;
+					let inputDirectory = null;
+
+					if( inputOptions.directory && inputOptions.directory.length > 0 )
+					{
+						inputDirectory = inputOptions.directory;
+					}
+
+					// Foreach domain
+					domains.forEach(
+						domain =>
 						{
-							let parser = new CW_InputParser( runObject.file );
-
-							parser.init(
-								function() // init callback
+							// Foreach command
+							cmds.forEach(
+								command =>
 								{
-									try
-									{
-										// `this` is an instance of the InputParser
-										config = this.parseJsonString();
-					
-										if( config == null )
-										{
-											// TODO: Warn more usefully and process.exit. There's no "up" from here, so throwing doesn't make sense unless we love javascript error output. Also, there will be no useful input, so we can't continue anyway
-											throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
-										}
+									// 1. make runner object(s)
+									CW_InputParser.makeRunnerObjects( { domain: domain, directory: inputDirectory } )
+										.then(
+											( runObjects ) =>
+											{
+												runObjects.forEach(
+													runObject =>
+													{
+														// 2. parse the input config file
+														let parser = new CW_InputParser( runObject.file, runObject.directory );
 
-										let CW_Advice = require( "../../classes/CW_Advice.js" );
-										let advice = new CW_Advice();
-										runner.runCommand( { command: cmd, configObject: config, adviceObject: advice } )
-											.then(
-												(response) =>
-												{
-													console.log( response );
-												}
-											);
-									}
-									catch( exception ) // runCommand never receives rejections, so this will only be code or system errors - never test failures
-									{
-										console.log( "There was a problem running your command. The error reported was:" );
-										console.log( exception );
-										console.log( "Exiting now." );
-										process.exit( 1 );
-									}
-								}
-							);
-						}
-					);
-				}
-				else // We didn't get any JSON files for input
-				{
-					// TODO: Warn more usefully and process.exit. There's no "up" from here, so throwing doesn't make sense unless we love javascript error output. Also, there will be no useful input, so we can't continue anyway
-					throw new Error( "COULD NOT FIND ANY CONFIGURATION FILES TO RUN." );
-				}
-			}
-		);
+														parser.init(
+															function() // init callback
+															{
+																try
+																{
+																	config = this.parseJsonString();
+
+																	if( config == null )
+																	{
+																		throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
+																	}
+
+																	// 3. Setup advice
+																	let CW_Advice = require( "../../classes/CW_Advice.js" );
+																	let advice = new CW_Advice();
+																	// 4. runCommand
+																	runner.runCommand( { command: command, configObject: config, adviceObject: advice } )
+																		.then(
+																			(response) =>
+																			{
+																				// 5. Display results
+																				console.log( response );
+																				console.log(); // Make a blank line for separation until we have nicer progressinve output
+																			}
+																		);
+																}
+																catch( error ) // runCommand never receives rejections, so this will only be code or system errors - never test failures
+																{
+																	console.log( "There was a problem running your command. The error reported was:" );
+																	console.log( error );
+																	console.log( "Exiting now." );
+																	process.exit( 1 );
+																}
+															}); // parser.init()
+
+
+													}
+												);
+
+											}
+										);
+								}); // cmds.forEach
+						}); // domains.forEach
+				});// processinputArguments then
 	}
 );

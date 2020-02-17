@@ -889,78 +889,101 @@ class CW_Runner
 
 	static processinputArguments()
 	{
-		let returnValue =
+		return new Promise(
+		( resolve, reject ) =>
 		{
-			command: "",
-			domain: ""
-		};
 
-		// TODO: If there's a command and no domain, run the command for all domains
-		// TODO: If there's a domain and no command, run all commands for the domain
-		// TODO: If there is not a domain or a command, show the help screen
-		// TODO: Request help from a module call
+			let returnValue =
+			{
+				command: "",
+				domain: ""
+			};
 
-		// parse the requested command from the command line arguments, then run the command
-		let yargs = require( "yargs" );
-		yargs.scriptName( "./bin/Validpoint" )
-			.usage( "USAGE: $0 <command> -d [domain1,[domain2,...]] [-f file] [-c configFile] [-h]" )
-			.version( "0.0.1" )
-			.option( "d",
-			{
-				alias: "domain",
-				describe: "The domain name or a comma-delimited list of domain names",
-				demand: false,
-				type: "string",
-				nargs: 1
-			} )
-			.option( "f",
-			{
-				alias: "file",
-				describe: "A file or directory for test input",
-				demand: false,
-				type: "string",
-				conflicts: [ "d" ] // Don't allow users to specify a file or directory for input AND a domain to test
-			} )
-			.option( "c",
-			{
-				alias: "config",
-				describe: "A JSON file for test-run configuration",
-				demand: false,
-				type: "string"
-			} )
-			.option( "h",
-			{
-				alias: "help",
-				describe: "Show this help screen", // This doesn't have any effect
-				demand: false
-			})
-			.command( "$0", "Unknown command supplied", // If the user typed a command that we do not know how to handle, show the help screen and exit
-				() => {},
-				( argv ) =>
+			// TODO: If there's a command and no domain, run the command for all domains
+			// TODO: If there's a domain and no command, run all commands for the domain
+			// TODO: If there is not a domain or a command, show the help screen
+			// TODO: Request help from a module call
+
+			// parse the requested command from the command line arguments, then run the command
+			let yargs = require( "yargs" );
+			yargs.scriptName( "./bin/Validpoint" )
+				.usage( "USAGE: $0 <command> -d [domain1,[domain2,...]] [-f file] [-c configFile] [-h]" )
+				.version( "0.0.1" )
+				.option( "d",
 				{
-					console.log( "Unknown command: " + argv._["0"] );
-					yargs.showHelp();
-					process.exit( 1 );
-				}
-			)
-			.command( "local-network", "Test local network connectivity" )
-			.command( "local-dns", "Test local DNS resolution" )
-			.command( "http-port", "Test response time of web server port 80" )
-			.command( "https-port", "Test response time of web server port 443" )
-			.command( "domain", "Test domain registrar configuration" )
-			.command( "http-response", "Test response code and redirection for http" )
-			.command( "https-response", "Test response code and redirection for https" )
-			.command( "website", "Combined test of http-port and http-response" )
-			.command( "secure-website", "Combined test of https-port and https-response" )
-			.command( "website-content", "Test website content for essential content" )
-			.demandCommand( 1, "You must specify a command to run" )
-			.help( "help",  "Show this help screen" )
-			.argv;
+					alias: "domain",
+					describe: "The domain name or a comma-delimited list of domain names",
+					demand: false,
+					type: "string",
+					nargs: 1
+				} )
+				.option( "f",
+				{
+					alias: "file",
+					describe: "A file or directory for test input",
+					demand: false,
+					type: "string",
+					conflicts: [ "d" ] // Don't allow users to specify a file or directory for input AND a domain to test
+				} )
+				.option( "c",
+				{
+					alias: "config",
+					describe: "A JSON file for test-run configuration",
+					demand: false,
+					type: "string"
+				} )
+				.option( "h",
+				{
+					alias: "help",
+					describe: "Show this help screen",
+					demand: false
+				})
+				.option( "r",
+				{
+					alias: "raw",
+					describe: "Include raw test results",
+					demand: false
+				} )
+				.command( "local-network", "Test local network connectivity" )
+				.command( "local-dns", "Test local DNS resolution" )
+				.command( "http-port", "Test response time of web server port 80" )
+				.command( "https-port", "Test response time of web server port 443" )
+				.command( "domain", "Test domain registrar configuration" )
+				.command( "http-response", "Test response code and redirection for http" )
+				.command( "https-response", "Test response code and redirection for https" )
+				.command( "website", "Combined test of http-port and http-response" )
+				.command( "secure-website", "Combined test of https-port and https-response" )
+				.command( "website-content", "Test website content for essential content" )
+				.help( "help",  "Show this help screen" )
+				.argv;
 
-		returnValue.command = yargs.argv._[0];
-		returnValue.domain = yargs.argv.domain;
+			if( yargs.argv.file )
+			{
+				const CW_InputParser =  require( "../classes/CW_InputParser.js" );
+				let parser = new CW_InputParser( yargs.argv.file, "./" );
+				parser.init(
+					function() // init callback
+					{
+						let config = this.parseJsonString();
+						returnValue.command = config.commands;
+						returnValue.domain = config.domains;
+						returnValue.directory = config.directory;
+						returnValue.show_raw = (yargs.argv.raw) ? true : false;
 
-		return returnValue;
+						resolve( returnValue );
+					});
+			}
+			else
+			{
+				// Receiver expects an array for command and domain
+				returnValue.command = [ yargs.argv._[0] ];
+				returnValue.domain = [ yargs.argv.domain ];
+				returnValue.directory = null;
+				returnValue.show_raw = (yargs.argv.raw) ? true : false;
+				resolve( returnValue );
+			}
+		});
+		
 	}
 }
 
