@@ -378,20 +378,31 @@ class CW_Runner
 		adviceObject.item_result.category = "local";
 
 		return new Promise(
-			async (resolve, reject) =>
-			{
+			(resolve, reject) =>
+			{	
+				CW_Runner.network.checkLocalDns()
+					.then(
+						( result ) =>
+						{
+							// Handled in the same way as local-network
+							adviceObject.item_result.result = result;
+							adviceObject.item_result.result_tags.push( result );
+							adviceObject.item_result.raw_response = result;
 
-				let result = await CW_Runner.network.checkLocalDns();
+							adviceObject.test_result.results.push( adviceObject.item_result );
+							adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 
-				// Handled in the same way as local-network
-				adviceObject.item_result.result = result;
-				adviceObject.item_result.result_tags.push( result );
-				adviceObject.item_result.raw_response = result;
+							resolve( JSON.stringify( adviceObject ) );
+						}
+					)
+					.catch(
+						( error ) =>
+						{
+							resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+						}
+					);
 
-				adviceObject.test_result.results.push( adviceObject.item_result );
-				adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 
-				resolve( JSON.stringify( adviceObject ) );
 
 			});
 	} // command_Dns
@@ -413,17 +424,29 @@ class CW_Runner
 			async (resolve, reject) =>
 			{
 
-				let result = await CW_Runner.network.checkLocalNetwork();
+				CW_Runner.network.checkLocalNetwork()
+					.then(
+						( result ) =>
+						{
+							// `result` will either be PASS or FAIL. Nothing more meaningfiul is needed for this test
+							adviceObject.item_result.result = result;
+							adviceObject.item_result.result_tags.push( result );
+							adviceObject.item_result.raw_response = result;
 
-				// `result` will either be PASS or FAIL. Nothing more meaningfiul is needed for this test
-				adviceObject.item_result.result = result;
-				adviceObject.item_result.result_tags.push( result );
-				adviceObject.item_result.raw_response = result;
+							adviceObject.test_result.results.push( adviceObject.item_result );
+							adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 
-				adviceObject.test_result.results.push( adviceObject.item_result );
-				adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+							resolve( JSON.stringify( adviceObject ) );
+						}
+					)
+					.catch(
+						( error ) =>
+						{
+							resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
+						}
+					);
 
-				resolve( JSON.stringify( adviceObject ) );
+
 
 			});
 

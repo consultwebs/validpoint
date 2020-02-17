@@ -41,8 +41,19 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	 */
 	advise()
 	{
-		this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
-		this.content = this.contentForSeverity( { severity: this.severity } );
+		let directMessage = null;
+		// If there was a system error, it will be passed up as a direct message
+		if( this.test_result.result == CW_Constants.RESULT_FAIL &&
+			this.test_result.raw_response && this.test_result.raw_response.message && this.test_result.raw_response.message.length > 0 )
+		{
+			this.severity = CW_Constants.SEVERITY_DIRECT_MESSAGE;
+			this.content = this.test_result.raw_response.message;
+		}
+		else
+		{
+			this.severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
+			this.content = this.contentForSeverity( { severity: this.severity } );
+		}
 	}
 
 	/**
@@ -78,7 +89,7 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	 * 
 	 * @param {*} resultTag				The result tag to map  
 	 */
-	resultTagToSeverity( { resultTag = null } )
+	resultTagToSeverity( { resultTag = null, extraInput = null } )
 	{
 		switch( resultTag )
 		{

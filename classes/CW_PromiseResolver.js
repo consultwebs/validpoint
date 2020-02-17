@@ -36,23 +36,35 @@ class CW_PromiseResolver
 	 */
 	resolve_localNetwork( resolve, reject )
 	{
-		// Set the default status to "down"
-		let ping = require( "ping" );
-		let msg = CW_Constants.RESULT_FAIL;
+		try
+		{
+			// Set the default status to "down"
+			let ping = require( "ping" );
+			let msg = CW_Constants.RESULT_FAIL;
 
-		// Perform a ping to prove the default status
-		ping.sys.probe( PING_HOST,
-			async ( isAlive ) =>
-			{
-				if( isAlive )
+			// Perform a ping to prove the default status
+			ping.sys.probe( PING_HOST,
+				async ( isAlive ) =>
 				{
-					msg = CW_Constants.RESULT_PASS;
+					if( isAlive )
+					{
+						msg = CW_Constants.RESULT_PASS;
+					}
+					
+					resolve( msg );
+					// No need to reject() since all errors put us in a resolvable failure state
 				}
-				
-				resolve( msg );
-				// No need to reject() since all errors put us in a resolvable failure state
-			}
-		);
+			);
+		}
+		catch( error)
+		{
+			let returnError = 
+			{	...new Error(),
+				raw_response: error,
+				message: 	error.message
+			};
+			throw returnError;
+		}
 	} // resolve_localNetwork
 
 	/**
@@ -64,21 +76,33 @@ class CW_PromiseResolver
 	 */
 	resolve_checkLocalDns( resolve, reject )
 	{
-		let dns = require( "dns" );
-		let msg = CW_Constants.RESULT_FAIL;
+		try
+		{
+			let dns = require( "dns" );
+			let msg = CW_Constants.RESULT_FAIL;
 
-		dns.resolve4( DNS_HOST,
-			( error, addresses ) =>
-			{
-				// If there was no error, it's a pass
-				if( !error ) // Default is "down" so there's nothing to change for an error response
+			dns.resolve4( DNS_HOST,
+				( error, addresses ) =>
 				{
-					msg = CW_Constants.RESULT_PASS;
+					// If there was no error, it's a pass
+					if( !error ) // Default is "down" so there's nothing to change for an error response
+					{
+						msg = CW_Constants.RESULT_PASS;
+					}
+					resolve( msg );
+					// No need to reject() since all errors put us in a resolvable failure state
 				}
-				resolve( msg );
-				// No need to reject() since all errors put us in a resolvable failure state
-			}
-		);
+			);
+		}
+		catch( error)
+		{
+			let returnError = 
+			{	...new Error(),
+				raw_response: error,
+				message: 	error.message
+			};
+			throw returnError;
+		}
 	} // resolve_checkDns()
 
 	/**
