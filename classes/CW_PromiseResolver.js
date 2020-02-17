@@ -317,30 +317,43 @@ class CW_PromiseResolver
 	 */
 	resolve_getWhoisInfo( resolve, reject, { domain = null }  )
 	{
-		const whois = require( "whois" );
-		const whoisParser = require( "parser-whoisv2" );
+		try
+		{
+			const whois = require( "whois" );
+			const whoisParser = require( "parser-whoisv2" );
 
-		whois.lookup(
-			domain,
-			( error, response ) =>
-			{
-				let lineItems = whoisParser.parseWhoIsData( response )
-				lineItems.forEach(
-						item => 
-						{
-							let lowerCaseAttribute = item.attribute.toLowerCase();
-							if( lowerCaseAttribute.includes( "expiration" ) )
+			whois.lookup(
+				domain,
+				( error, response ) =>
+				{
+					// TODO: See what happens if we can get this return a non-array
+					let lineItems = whoisParser.parseWhoIsData( response )
+					lineItems.forEach(
+							item => 
 							{
-								resolve( item.value );
+								let lowerCaseAttribute = item.attribute.toLowerCase();
+								if( lowerCaseAttribute.includes( "expiration" ) )
+								{
+									resolve( item.value );
+								}
+								else if( lowerCaseAttribute.includes( "error:" ) )
+								{
+									reject( "NO_WHOIS" );
+								}
 							}
-							else if( lowerCaseAttribute.includes( "error:" ) )
-							{
-								reject( "NO_WHOIS" );
-							}
-						}
-					);
-			}
-		); // There's no way to get into a .catch from this .then apart from a code/system error
+						);
+				}
+			); // There's no way to get into a .catch from this .then apart from a code/system error
+		}
+		catch( error)
+		{
+			let returnError = 
+			{	...new Error(),
+				raw_response: error,
+				message: 	error.message
+			};
+			throw returnError;
+		}
 	} // resolve_getWhoisInfo()
 
 	/**
@@ -355,23 +368,35 @@ class CW_PromiseResolver
 	 */
 	resolve_checkDomain( resolve, reject, { domain = null, recordType = null, queryServer = null } )
 	{
-		let dig = require( "node-dig-dns" );
-		dig( [ domain, recordType ] )
-			.then(
-				( result ) =>
-				{
-					// Require CNAME and A records. Failure to find one of those means the whois server couldn't find the domain or failed to respond
-					if( (recordType == "NS" || recordType == "A") && 
-						(!result.answer || result.answer.length < 1)  )
+		try
+		{
+			let dig = require( "node-dig-dns" );
+			dig( [ domain, recordType ] )
+				.then(
+					( result ) =>
 					{
-						reject( "NO_ANSWER" );
+						// Require CNAME and A records. Failure to find one of those means the whois server couldn't find the domain or failed to respond
+						if( (recordType == "NS" || recordType == "A") && 
+							(!result.answer || result.answer.length < 1)  )
+						{
+							reject( "NO_ANSWER" );
+						}
+						else
+						{
+							resolve( result.answer );
+						}
 					}
-					else
-					{
-						resolve( result.answer );
-					}
-				}
-			); // There's no way to get into a .catch from this .then apart from a code/system error
+				); // There's no way to get into a .catch from this .then apart from a code/system error
+		}
+		catch( error)
+		{
+			let returnError = 
+			{	...new Error(),
+				raw_response: error,
+				message: 	error.message
+			};
+			throw returnError;
+		}
 	} // resolve_checkDomain()
 
 	resolve_makeRunnerObjects( resolve, reject, { domain = null } )

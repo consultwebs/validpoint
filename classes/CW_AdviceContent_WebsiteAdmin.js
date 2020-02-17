@@ -58,14 +58,22 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 				tags.forEach(
 					tag =>
 					{
-						let severity = this.resultTagToSeverity( { resultTag: tag.result_value } );
+						let severity = this.resultTagToSeverity( { resultTag: tag.result_value, extraInput: tags } );
 						if( severity > this.severity )
 						{
 							this.severity = severity;
 							this.test_result.result = tag.result_value;
 						}
 
-						this.content += this.contentForSeverity( { severity: severity, extraInput: tag.intermediate_key } ) + "\n";
+						if( severity == CW_Constants.SEVERITY_DIRECT_MESSAGE && tags[0].message != undefined && tags[0].message.length > 0 )
+						{
+							this.content += tags[0].message;
+						}
+						else
+						{
+							this.content += this.contentForSeverity( { severity: severity, extraInput: tag.intermediate_key } ) + "\n";
+						}
+
 						this.result = tag.result_value;
 					}
 				);
@@ -117,6 +125,16 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 				{
 					intermediate_key: inputObject,
 					result_value: CW_Constants.RESULT_FAIL
+				}
+			);
+		}
+		else if( inputObject && inputObject.message && inputObject.message.length > 1 )
+		{
+			returnValue.push(
+				{
+					intermediate_key: CW_Constants.NAME_SEVERITY_DIRECT_MESSAGE,
+					result_value: CW_Constants.RESULT_FAIL,
+					message: inputObject.message
 				}
 			);
 		}
@@ -248,8 +266,9 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 	 * TODO: Get this setting from client configuration and override the system config setting
 	 * 
 	 * @param {*} resultTag				The result tag to map  
+	 * @param {*} extraInput			Extra input to consider
 	 */
-	resultTagToSeverity( { resultTag = null } )
+	resultTagToSeverity( { resultTag = null, extraInput = null } )
 	{
 		switch( resultTag )
 		{
@@ -257,7 +276,14 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 			case "PUNT":
 				return CW_Constants.SEVERITY_NOTICE;
 			case "FAIL":
-				return CW_Constants.SEVERITY_URGENT;
+				if( extraInput && extraInput[0] && extraInput[0].intermediate_key && extraInput[0].intermediate_key == CW_Constants.NAME_SEVERITY_DIRECT_MESSAGE )
+				{
+					return CW_Constants.SEVERITY_DIRECT_MESSAGE;
+				}
+				else
+				{
+					return CW_Constants.SEVERITY_URGENT;
+				}
 			default:
 				return super.resultTagToSeverity( { resultTag: resultTag } );
 		}

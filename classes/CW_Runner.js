@@ -327,17 +327,22 @@ class CW_Runner
 			{
 				try
 				{
-					let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } );
+					// let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } );
 
-					adviceObject.item_result.result = result.result;
-					adviceObject.item_result.result_tags.push( result.result );
-					adviceObject.item_result.raw_response = result;
-					adviceObject.item_result.response_time = result.response_time;
-	
-					adviceObject.test_result.results.push( adviceObject.item_result );
-					adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
-	
-					resolve( JSON.stringify( adviceObject ) );
+					CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } )
+						.then(
+							(result) =>
+							{
+								adviceObject.item_result.result = result.result;
+								adviceObject.item_result.result_tags.push( result.result );
+								adviceObject.item_result.raw_response = result;
+								adviceObject.item_result.response_time = result.response_time;
+				
+								adviceObject.test_result.results.push( adviceObject.item_result );
+								adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+				
+								resolve( JSON.stringify( adviceObject ) );
+							});
 				}
 				catch( error ) // I don't think we'll be able to reach this catch naturally
 				{

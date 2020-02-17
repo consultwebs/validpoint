@@ -62,6 +62,7 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 			case CW_Constants.SEVERITY_ESSENTIAL:
 			case CW_Constants.SEVERITY_URGENT:
 				return strings[ this.command ][ CW_Constants.NAME_SEVERITY_URGENT ];
+				// TODO: Verify this
 			default:
 				return "";
 		}
