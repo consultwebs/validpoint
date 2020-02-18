@@ -830,7 +830,7 @@ class CW_Runner
 									error =>
 									{
 										// Resolve a throw from a system error...
-										if( error.raw_response.message && error.raw_response.message.length > 0 )
+										if( error.raw_response && error.raw_response.message && error.raw_response.message.length > 0 )
 										{
 											resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
 										}
@@ -888,7 +888,7 @@ class CW_Runner
 
 			// parse the requested command from the command line arguments, then run the command
 			let yargs = require( "yargs" );
-			yargs.scriptName( "./bin/Validpoint" )
+			yargs.scriptName( "./bin/validpoint" )
 				.usage( "USAGE: $0 <command> -d [domain1,[domain2,...]] [-f file] [-c configFile] [-h]" )
 				.version( "0.0.1" )
 				.option( "d",

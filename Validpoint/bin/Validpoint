@@ -4,9 +4,9 @@
  * CW website validator access hub.
  * 
  * Invoking: 
- * ./bin/Validpoint command (-d [domain1,[domain2,[domain3...]]])
+ * ./bin/validpoint command (-d [domain1,[domain2,[domain3...]]])
  * See all commands and options:
- * ./bin/Validpoint help
+ * ./bin/validpoint help
  */
 
 require( "strict-mode" )(

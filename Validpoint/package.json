@@ -1,12 +1,12 @@
 {
-  "name": "Validpoint",
+  "name": "validpoint",
   "version": "0.0.1",
   "description": "Consultwebs service validator",
   "license": "MIT",
   "type": "module",
   "main": "index.mjs",
   "bin": {
-    "Validpoint": "bin/Validpoint"
+    "validpoint": "bin/validpoint"
   },
   "repository": {
     "type": "git",
