@@ -31,7 +31,7 @@ class CW_Runner
 	{
 		let returnValue = "";
 
-		if( CW_Constants.VALID_COMMANDS.indexOf( input ) >= 0 )
+		if( CW_Constants.VALID_COMMANDS.indexOf( input ) >= 0 || input == "all" )
         {
             returnValue = input;
 		}
@@ -954,7 +954,7 @@ class CW_Runner
 					{
 						let config = this.parseJsonString();
 
-						if( config.commands && config.commands.length > 0 )
+						if( config.commands && config.commands.length > 0 && config.commands[0] != "all" )
 						{
 							returnValue.command = config.commands;
 						}
@@ -974,7 +974,7 @@ class CW_Runner
 			else
 			{
 				// Receiver expects an array for command and domain
-				if( !yargs.argv._[0] || yargs.argv._[0].length < 1 )
+				if( !yargs.argv._[0] || yargs.argv._[0].length < 1 || yargs.argv._[0] == "all" )
 				{
 					returnValue.command = CW_Constants.VALID_COMMANDS;
 				}
