@@ -902,17 +902,10 @@ class CW_Runner
 				.option( "f",
 				{
 					alias: "file",
-					describe: "A file or directory for test input",
+					describe: "Use a JSON file for input configuration",
 					demand: false,
 					type: "string",
 					conflicts: [ "d" ] // Don't allow users to specify a file or directory for input AND a domain to test
-				} )
-				.option( "c",
-				{
-					alias: "config",
-					describe: "A JSON file for test-run configuration",
-					demand: false,
-					type: "string"
 				} )
 				.option( "h",
 				{
