@@ -19,7 +19,13 @@ module.exports = Object.freeze(
 	SEVERITY_ESSENTIAL: 2,
 	SEVERITY_URGENT: 3,
 	SEVERITY_CLI: 99,					// Errors on the CLI tests indicate system/network failure, leading to the inability to run further tests
-	SEVERITY_DIRECT_MESSAGE: 99			// A direct message is a system failure - like a missing module
+	SEVERITY_DIRECT_MESSAGE: 99,			// A direct message is a system failure - like a missing module
+
+	VALID_COMMANDS: [ 
+		"local-network", "local-dns", 
+		"http-port", "https-port", "domain",
+		"http-response", "https-response", "website", "secure-website",  "website-content"
+	]
 
 
 

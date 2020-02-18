@@ -22,28 +22,16 @@ class CW_Runner
 	}
 
 	/**
-	 * A maintained array of known commands for validation. If the requested command cannot be found,
-	 *    returns "all"
+	 * A maintained array of known commands for validation.
 	 * 
 	 * @returns string
 	 * @param {*} input		The command to sanitize 
 	 */
 	sanitizeCommand( input )
 	{
-		let returnValue = "all"; // "all" isn't (yet) implemented, actually
+		let returnValue = "";
 
-		// local: local-netowrk, local-dns
-		// website-admin: http-port, https-port, domain
-		// website: http-response, https-response, website, secure-website, website-content
-
-		let validCommands = [ 
-			"all", 
-			"local-network", "local-dns", 
-			"http-port", "https-port", "domain",
-			"http-response", "https-response", "website", "secure-website",  "website-content"
-		];
-
-		if( validCommands.indexOf( input ) >= 0 )
+		if( CW_Constants.VALID_COMMANDS.indexOf( input ) >= 0 )
         {
             returnValue = input;
 		}
@@ -178,9 +166,6 @@ class CW_Runner
 						);
 					}
 				);
-			case "all":
-				console.log( "ALL not yet implemented" );
-				break;
 			default:
 				// There's actually no way to get here unless the validCommands array is incorrect
 				break;
@@ -899,9 +884,6 @@ class CW_Runner
 				domain: ""
 			};
 
-			// TODO: If there's a command and no domain, run the command for all domains
-			// TODO: If there's a domain and no command, run all commands for the domain
-			// TODO: If there is not a domain or a command, show the help screen
 			// TODO: Request help from a module call
 
 			// parse the requested command from the command line arguments, then run the command
@@ -971,7 +953,16 @@ class CW_Runner
 					function() // init callback
 					{
 						let config = this.parseJsonString();
-						returnValue.command = config.commands;
+
+						if( config.commands && config.commands.length > 0 )
+						{
+							returnValue.command = config.commands;
+						}
+						else
+						{
+							returnValue.command = CW_Constants.VALID_COMMANDS;
+						}
+						
 						returnValue.domain = config.domains;
 						returnValue.directory = config.directory;
 						returnValue.show_raw = (yargs.argv.raw) ? true : false;
@@ -983,7 +974,14 @@ class CW_Runner
 			else
 			{
 				// Receiver expects an array for command and domain
-				returnValue.command = [ yargs.argv._[0] ];
+				if( !yargs.argv._[0] || yargs.argv._[0].length < 1 )
+				{
+					returnValue.command = CW_Constants.VALID_COMMANDS;
+				}
+				else
+				{
+					returnValue.command = [ yargs.argv._[0] ];
+				}
 				returnValue.domain = [ yargs.argv.domain ];
 				returnValue.directory = null;
 				returnValue.show_raw = (yargs.argv.raw) ? true : false;
