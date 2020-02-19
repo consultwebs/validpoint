@@ -195,7 +195,7 @@ class CW_Runner
 							( result ) =>
 							{
 								// Parse the incoming HTML to find important elements
-								let HtmlParser = require( "node-html-parser" );
+								let HtmlParser = require( "../validpoint/node_modules/node-html-parser" );
 								let root = HtmlParser.parse( result );
 
 								// Stuff some nodes into an object for testing
@@ -476,7 +476,7 @@ class CW_Runner
 	  */
 	 command_Domain( { configObject = null, adviceObject = null } )
 	 {
-		let async = require( "async" );
+		let async = require( "../validpoint/node_modules/async" );
 		let StringUtil = require( "./CW_StringUtil.js" );
 
 		adviceObject.item_result.command = "domain";
@@ -734,7 +734,7 @@ class CW_Runner
 	 */
 	command_Website( { configObject = null, adviceObject =  null, port = 80 } )
 	{
-		let async = require( "async" );
+		let async = require( "../validpoint/node_modules/async" );
 
 		adviceObject.item_result.command = "website";
 		adviceObject.item_result.category = "website";
@@ -887,7 +887,7 @@ class CW_Runner
 			// TODO: Request help from a module call
 
 			// parse the requested command from the command line arguments, then run the command
-			let yargs = require( "yargs" );
+			let yargs = require( "../validpoint/node_modules/yargs" );
 			yargs.scriptName( "./bin/validpoint" )
 				.usage( "USAGE: $0 <command> -d [domain1,[domain2,...]] [-f file] [-c configFile] [-h]" )
 				.version( "0.0.1" )

@@ -3,16 +3,17 @@
   "version": "0.0.1",
   "description": "Consultwebs service validator",
   "license": "MIT",
-  "type": "module",
   "main": "index.mjs",
   "bin": {
-    "validpoint": "bin/validpoint"
+    "validpoint": "./bin/validpoint"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/consultwebs/validpoint"
   },
-  "scripts": {},
+  "scripts": {
+	  "start": "./bin/validpoint"
+  },
   "dependencies": {
     "async": "^3.1.0",
     "node-dig-dns": "^0.2.10",

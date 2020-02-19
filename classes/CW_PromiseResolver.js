@@ -39,7 +39,7 @@ class CW_PromiseResolver
 		try
 		{
 			// Set the default status to "down"
-			let ping = require( "ping" );
+			let ping = require( "../validpoint/node_modules/ping" );
 			let msg = CW_Constants.RESULT_FAIL;
 
 			// Perform a ping to prove the default status
@@ -78,7 +78,7 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			let dns = require( "dns" );
+			let dns = require( "../validpoint/node_modules/dns" );
 			let msg = CW_Constants.RESULT_FAIL;
 
 			dns.resolve4( DNS_HOST,
@@ -117,7 +117,7 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			let puppeteer = require( "puppeteer" );
+			let puppeteer = require( "../validpoint/node_modules/puppeteer" );
 
 			let browser = await puppeteer.launch( { ignoreHTTPSErrors: true } );
 			let page = await browser.newPage();
@@ -175,10 +175,10 @@ class CW_PromiseResolver
 		try
 		{
 			let returnValue;
-			let protocol= require( "http" );
+			let protocol= require( "../validpoint/node_modules/http" );
 			if( port == 443 )
 			{
-				protocol = require( "https" );
+				protocol = require( "../validpoint/node_modules/https" );
 			}
 
 			let options = 
@@ -291,7 +291,7 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			let tcpPing = require( "tcp-ping" );
+			let tcpPing = require( "../validpoint/node_modules/tcp-ping" );
 			let returnValue;
 
 			// Ping configuration parameters
@@ -382,8 +382,8 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			const whois = require( "whois" );
-			const whoisParser = require( "parser-whoisv2" );
+			const whois = require( "../validpoint/node_modules/whois" );
+			const whoisParser = require( "../validpoint/node_modules/parser-whoisv2" );
 
 			whois.lookup(
 				domain,
@@ -433,7 +433,7 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			let dig = require( "node-dig-dns" );
+			let dig = require( "../validpoint/node_modules/node-dig-dns" );
 			dig( [ domain, recordType ] )
 				.then(
 					( result ) =>

@@ -74,7 +74,7 @@ require( "strict-mode" )(
 																			{
 																				// 5. Display results
 																				console.log( response );
-																				console.log(); // Make a blank line for separation until we have nicer progressinve output
+																				console.log(); // Make a blank line for separation until we have nicer progressive output
 																			}
 																		);
 																}
