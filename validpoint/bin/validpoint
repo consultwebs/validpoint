@@ -59,6 +59,12 @@ require( "strict-mode" )(
 																{
 																	config = this.parseJsonString();
 
+																	config = 
+																	{	...config,
+																		show_raw: inputOptions.show_raw,
+																		be_quiet: inputOptions.quiet
+																	}
+
 																	if( config == null )
 																	{
 																		throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
@@ -73,8 +79,12 @@ require( "strict-mode" )(
 																			(response) =>
 																			{
 																				// 5. Display results
-																				console.log( response );
-																				console.log(); // Make a blank line for separation until we have nicer progressive output
+																				if( config.show_raw || config.be_quiet ) // will probably remove the be_quiet allowance here
+																				{
+																					console.log();
+																					console.log( response );
+																					console.log(); // Make a blank line for separation until we have nicer progressive output
+																				}
 																			}
 																		);
 																}

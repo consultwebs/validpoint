@@ -444,6 +444,10 @@ class CW_PromiseResolver
 						{
 							reject( "NO_ANSWER" );
 						}
+						else if( !result.answer || result.answer.length < 1 )
+						{
+							resolve( [ "" ] );
+						}
 						else
 						{
 							resolve( result.answer );

@@ -12,10 +12,11 @@
     "url": "git+https://github.com/consultwebs/validpoint"
   },
   "scripts": {
-	  "start": "./bin/validpoint"
+    "start": "./bin/validpoint"
   },
   "dependencies": {
     "async": "^3.1.0",
+    "colors": "^1.4.0",
     "node-dig-dns": "^0.2.10",
     "node-html-parser": "^1.2.0",
     "parser-whoisv2": "^1.0.0",

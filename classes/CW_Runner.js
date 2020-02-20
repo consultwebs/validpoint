@@ -9,6 +9,8 @@ const network = new CW_Network();
 let CW_Constants = require( "./CW_Constants.js" );
 let CW_Advice = require( "./CW_Advice.js" );
 
+const colors = require( "../validpoint/node_modules/colors" );
+
 class CW_Runner
 {
 	/**
@@ -153,7 +155,6 @@ class CW_Runner
 					}
 				);
 			case "domain":
-				// this.command_Domain( { configObject: configObject, adviceObject: adviceObject } );
 				return new Promise(
 					(resolve, reject) =>
 					{
@@ -474,8 +475,13 @@ class CW_Runner
 	  * @param {*} configObject				A parsed config object from JSON input
 	  * @param {*} adviceObject		A constructed CW_Advice instance
 	  */
-	 command_Domain( { configObject = null, adviceObject = null } )
+	  command_Domain( { configObject = null, adviceObject = null } )
 	 {
+		if( !configObject.be_quiet )
+		{
+			process.stdout.write( "Beginning Domain tests...   \n".blue.bold );
+		}
+
 		let async = require( "../validpoint/node_modules/async" );
 		let StringUtil = require( "./CW_StringUtil.js" );
 
@@ -509,6 +515,10 @@ class CW_Runner
 						[
 							( completion ) =>
 							{
+								if( !configObject.be_quiet )
+								{
+									process.stdout.write( "Testing name server records for '".white.bold + configObject.domain.white.bold + "'...   ".white.bold );
+								}
 								// get nameserver records first so that we can get all the other data from an authority because non-authorities don't always answer completely
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "NS", queryServer: null } )
 								.then(
@@ -522,18 +532,50 @@ class CW_Runner
 													);
 											});
 
+											// TODO: Abstract in-progress advice to use the Advice mechanism prior to a call to advise()
+											if( !configObject.be_quiet )
+											{
+												if( adviceObject.domainResponses.servers.ns && adviceObject.domainResponses.servers.ns.length > 0 )
+												{
+													process.stdout.write( "good\n".green );
+													process.stdout.write( "Found response for '".white + configObject.domain.white + "' with name servers ".white );
+													let serverArray = adviceObject.domainResponses.servers.ns;
+
+													serverArray.forEach(
+														(server, index) =>
+														{
+															process.stdout.write( "'".blue + server.blue + "'".blue );
+															if( (index + 1) < serverArray.length )
+															{
+																process.stdout.write( ", ".white );
+															}
+														});
+												}
+												else
+												{
+													process.stdout.write( "failed\nWill get advice\n".red );
+												}
+												process.stdout.write( "\n" );
+											}
+											
 											completion( null, adviceObject );
 									}
 								)
 								.catch( // resolve received rejections
 									( error ) =>
 									{
+										// TODO: output error
 										resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
 									}
 								); 
 							},
 							( result, completion ) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
 							{
+								if( !configObject.be_quiet )
+								{
+									process.stdout.write( "Testing mail server records for '".white.bold + configObject.domain.white.bold + "'...   ".white.bold );
+								}
+
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX" } )
 								.then(
 									( result ) =>
@@ -545,6 +587,33 @@ class CW_Runner
 													StringUtil.stripTrailingDot( resultItem.value ) 
 													);
 											});
+
+											// TODO: Abstract in-progress advice to use the Advice mechanism prior to a call to advise()
+											if( !configObject.be_quiet )
+											{
+												if( adviceObject.domainResponses.servers.ns && adviceObject.domainResponses.servers.mx.length > 0 )
+												{
+													process.stdout.write( "good\n".green );
+													process.stdout.write( "Found response for '".white + configObject.domain.white + "' with mail servers ".white );
+													let serverArray = adviceObject.domainResponses.servers.mx;
+
+													serverArray.forEach(
+														(server, index) =>
+														{
+															process.stdout.write( "'".blue + server.blue + "'".blue );
+															if( (index + 1) < serverArray.length )
+															{
+																process.stdout.write( ", ".white );
+															}
+														});
+												}
+												else
+												{
+													process.stdout.write( "failed\nWill get advice\n".red );
+												}
+												process.stdout.write( "\n" );
+											}
+											
 											completion( null, adviceObject );
 									}
 								)
@@ -557,6 +626,11 @@ class CW_Runner
 							},
 							( result, completion ) => // Step 3. Perform a dig query against an authoritative name server to get an A record for the domain (should be the @ record)
 							{
+								if( !configObject.be_quiet )
+								{
+									process.stdout.write( "Testing \"A\" records for '".white.bold + configObject.domain.white.bold + "'...   ".white.bold );
+								}
+
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
 								.then(
 									( result ) =>
@@ -569,6 +643,33 @@ class CW_Runner
 												{
 													adviceObject.domainResponses.servers.tld_a.push( StringUtil.stripTrailingDot( resultItem.value ) );
 												});
+
+												// TODO: Abstract in-progress advice to use the Advice mechanism prior to a call to advise()
+												if( !configObject.be_quiet )
+												{
+													if( adviceObject.domainResponses.servers.tld_a && adviceObject.domainResponses.servers.tld_a.length > 0 )
+													{
+														process.stdout.write( "good\n".green );
+														process.stdout.write( "Found response for '".white + configObject.domain.white + "' with \"A\" records ".white );
+														let serverArray = adviceObject.domainResponses.servers.tld_a;
+
+														serverArray.forEach(
+															(server, index) =>
+															{
+																process.stdout.write( "'".blue + server.blue + "'".blue );
+																if( (index + 1) < serverArray.length )
+																{
+																	process.stdout.write( ", ".white );
+																}
+															});
+													}
+													else
+													{
+														process.stdout.write( "failed\nWill get advice\n".red );
+													}
+													process.stdout.write( "\n" );
+												}
+												
 												completion( null, adviceObject );
 										}
 									})
@@ -581,6 +682,11 @@ class CW_Runner
 							},
 							( result, completion ) => // Step 4. Perform a dig query against an authoritative name server to get an A record for the www.<domain> 
 							{
+								if( !configObject.be_quiet )
+								{
+									process.stdout.write( "Testing \"A\" records for 'www.".white.bold + configObject.domain.white.bold + "'...   ".white.bold );
+								}
+
 								CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
 								.then(
 									( result ) =>
@@ -604,6 +710,49 @@ class CW_Runner
 													adviceObject.domainResponses.servers.www_a.push( result[0].value );
 												}
 											}
+
+											// TODO: Abstract in-progress advice to use the Advice mechanism prior to a call to advise()
+											if( !configObject.be_quiet )
+											{
+												// It's OK for there to be no response here.
+												process.stdout.write( "good\n".green );
+
+												if( (adviceObject.domainResponses.servers.www_cname && adviceObject.domainResponses.servers.www_cname.length > 0) ||
+													(adviceObject.domainResponses.servers.www_a && adviceObject.domainResponses.servers.www_a.length > 0) )
+												{
+													process.stdout.write( "Found response for 'www.".white + configObject.domain.white + "' with \"A\" records ".white );
+													let serverArray = adviceObject.domainResponses.servers.www_cname;
+													let a_serverArray = adviceObject.domainResponses.servers.www_a;
+
+													a_serverArray.forEach(
+														(server, index) =>
+														{
+															process.stdout.write( "'".blue + server.blue + "'".blue );
+															if( (index + 1) < serverArray.length || serverArray.length > 0 )
+															{
+																process.stdout.write( ", ".white );
+															}
+														});
+
+													serverArray.forEach(
+														(server, index) =>
+														{
+															process.stdout.write( "'".blue + server.blue + "'".blue );
+															if( (index + 1) < serverArray.length )
+															{
+																process.stdout.write( ", ".white );
+															}
+														});
+
+													
+												}
+												else
+												{
+													process.stdout.write( "No A recoirds configured for 'www'".green );
+												}
+												process.stdout.write( "\n" );
+											}
+
 											completion( null, adviceObject );
 										}
 										else
@@ -620,6 +769,11 @@ class CW_Runner
 							},
 							( result, completion ) => // Step 5. Perform a dig query against an authoritative name server to get a CNAME record for the URL
 							{
+								if( !configObject.be_quiet )
+								{
+									process.stdout.write( "Testing \"CNAME\" records for 'www.".white.bold + configObject.domain.white.bold + "'...   ".white.bold );
+								}
+
 								CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
 								.then(
 									( result ) =>
@@ -629,8 +783,42 @@ class CW_Runner
 											result.forEach( 
 												resultItem =>
 												{
-													adviceObject.domainResponses.servers.www_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
+													if( resultItem.value && resultItem.value.length > 0 )
+													{
+														adviceObject.domainResponses.servers.www_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
+													}
 												});
+
+												// TODO: Abstract in-progress advice to use the Advice mechanism prior to a call to advise()
+												if( !configObject.be_quiet )
+												{
+													// It's OK for there to be no response here.
+													process.stdout.write( "good\n".green );
+
+													if( adviceObject.domainResponses.servers.www_cname && adviceObject.domainResponses.servers.www_cname.length > 0)
+													{
+														process.stdout.write( "Found response for 'www.".white + configObject.domain.white + "' with \"CNAME\" records ".white );
+														let serverArray = adviceObject.domainResponses.servers.www_cname;
+
+														serverArray.forEach(
+															(server, index) =>
+															{
+																process.stdout.write( "'".blue + server.blue + "'".blue );
+																if( (index + 1) < serverArray.length )
+																{
+																	process.stdout.write( ", ".white );
+																}
+															});
+
+														
+													}
+													else
+													{
+														process.stdout.write( "No A recoirds configured for 'www'".green );
+													}
+													process.stdout.write( "\n" );
+												}
+
 												completion( null, adviceObject );
 										}
 										else
@@ -657,7 +845,11 @@ class CW_Runner
 											result.forEach( 
 												resultItem =>
 												{
-													adviceObject.domainResponses.servers.tld_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
+													// It's OK to not get a cname response
+													if( resultItem.value )
+													{
+														adviceObject.domainResponses.servers.tld_cname.push( StringUtil.stripTrailingDot( resultItem.value ) );
+													}
 												});
 												completion( null, adviceObject );
 										}
