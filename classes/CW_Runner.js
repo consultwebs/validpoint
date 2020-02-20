@@ -477,9 +477,23 @@ class CW_Runner
 	  */
 	  command_Domain( { configObject = null, adviceObject = null } )
 	 {
+
+		// TODO: Incorporate colors.setTheme so we can use better names for our purpose
+		colors.setTheme(
+			{
+				title: [ "brightGreen", "bold" ],
+				header: [ "white", "bold" ],
+				text: "white",
+				error: "red",
+				warn: "yellow",
+				ok: "green",
+				subject: [ "brightWhite", "bold" ],
+				result: "cyan"
+			});
+
 		if( !configObject.be_quiet )
 		{
-			process.stdout.write( "Beginning Domain tests...   \n".blue.bold );
+			process.stdout.write( "Beginning Domain tests...   \n".title );
 		}
 
 		let async = require( "../validpoint/node_modules/async" );
@@ -517,7 +531,7 @@ class CW_Runner
 							{
 								if( !configObject.be_quiet )
 								{
-									process.stdout.write( "Testing name server records for '".white.bold + configObject.domain.white.bold + "'...   ".white.bold );
+									process.stdout.write( "Testing name server records for ".header + configObject.domain.subject + "...   ".header );
 								}
 								// get nameserver records first so that we can get all the other data from an authority because non-authorities don't always answer completely
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "NS", queryServer: null } )
@@ -537,23 +551,23 @@ class CW_Runner
 											{
 												if( adviceObject.domainResponses.servers.ns && adviceObject.domainResponses.servers.ns.length > 0 )
 												{
-													process.stdout.write( "good\n".green );
-													process.stdout.write( "Found response for '".white + configObject.domain.white + "' with name servers ".white );
+													process.stdout.write( "good\n".ok );
+													process.stdout.write( "Found response for ".text + configObject.domain.subject + " with name servers: ".text );
 													let serverArray = adviceObject.domainResponses.servers.ns;
 
 													serverArray.forEach(
 														(server, index) =>
 														{
-															process.stdout.write( "'".blue + server.blue + "'".blue );
+															process.stdout.write( "'".text + server.result + "'".text );
 															if( (index + 1) < serverArray.length )
 															{
-																process.stdout.write( ", ".white );
+																process.stdout.write( ", ".text );
 															}
 														});
 												}
 												else
 												{
-													process.stdout.write( "failed\nWill get advice\n".red );
+													process.stdout.write( "failed\nWill get advice\n".error );
 												}
 												process.stdout.write( "\n" );
 											}
@@ -564,7 +578,6 @@ class CW_Runner
 								.catch( // resolve received rejections
 									( error ) =>
 									{
-										// TODO: output error
 										resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
 									}
 								); 
@@ -573,7 +586,7 @@ class CW_Runner
 							{
 								if( !configObject.be_quiet )
 								{
-									process.stdout.write( "Testing mail server records for '".white.bold + configObject.domain.white.bold + "'...   ".white.bold );
+									process.stdout.write( "Testing mail server records for ".white.bold + configObject.domain.brightWhite.bold + "...   ".white.bold );
 								}
 
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX" } )
@@ -594,13 +607,13 @@ class CW_Runner
 												if( adviceObject.domainResponses.servers.ns && adviceObject.domainResponses.servers.mx.length > 0 )
 												{
 													process.stdout.write( "good\n".green );
-													process.stdout.write( "Found response for '".white + configObject.domain.white + "' with mail servers ".white );
+													process.stdout.write( "Found response for ".white + configObject.domain.brightWhite.bold + " with mail servers: ".white );
 													let serverArray = adviceObject.domainResponses.servers.mx;
 
 													serverArray.forEach(
 														(server, index) =>
 														{
-															process.stdout.write( "'".blue + server.blue + "'".blue );
+															process.stdout.write( "'".white + server.cyan + "'".white );
 															if( (index + 1) < serverArray.length )
 															{
 																process.stdout.write( ", ".white );
@@ -628,7 +641,7 @@ class CW_Runner
 							{
 								if( !configObject.be_quiet )
 								{
-									process.stdout.write( "Testing \"A\" records for '".white.bold + configObject.domain.white.bold + "'...   ".white.bold );
+									process.stdout.write( "Testing \"A\" records for domain ".white.bold + configObject.domain.brightWhite.bold + "...   ".white.bold );
 								}
 
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
@@ -650,13 +663,13 @@ class CW_Runner
 													if( adviceObject.domainResponses.servers.tld_a && adviceObject.domainResponses.servers.tld_a.length > 0 )
 													{
 														process.stdout.write( "good\n".green );
-														process.stdout.write( "Found response for '".white + configObject.domain.white + "' with \"A\" records ".white );
+														process.stdout.write( "Found response for ".white + configObject.domain.brightWhite.bold + " with \"A\" records: ".white );
 														let serverArray = adviceObject.domainResponses.servers.tld_a;
 
 														serverArray.forEach(
 															(server, index) =>
 															{
-																process.stdout.write( "'".blue + server.blue + "'".blue );
+																process.stdout.write( "'".white + server.cyan + "'".white );
 																if( (index + 1) < serverArray.length )
 																{
 																	process.stdout.write( ", ".white );
@@ -684,7 +697,7 @@ class CW_Runner
 							{
 								if( !configObject.be_quiet )
 								{
-									process.stdout.write( "Testing \"A\" records for 'www.".white.bold + configObject.domain.white.bold + "'...   ".white.bold );
+									process.stdout.write( "Testing \"A\" records for URL ".white.bold + configObject.url.brightWhite.bold + "...   ".white.bold );
 								}
 
 								CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
@@ -720,14 +733,14 @@ class CW_Runner
 												if( (adviceObject.domainResponses.servers.www_cname && adviceObject.domainResponses.servers.www_cname.length > 0) ||
 													(adviceObject.domainResponses.servers.www_a && adviceObject.domainResponses.servers.www_a.length > 0) )
 												{
-													process.stdout.write( "Found response for 'www.".white + configObject.domain.white + "' with \"A\" records ".white );
+													process.stdout.write( "Found response for ".white + configObject.url.brightWhite.bold + " with \"A\" records: ".white );
 													let serverArray = adviceObject.domainResponses.servers.www_cname;
 													let a_serverArray = adviceObject.domainResponses.servers.www_a;
 
 													a_serverArray.forEach(
 														(server, index) =>
 														{
-															process.stdout.write( "'".blue + server.blue + "'".blue );
+															process.stdout.write( "'".white + server.cyan + "'".white );
 															if( (index + 1) < serverArray.length || serverArray.length > 0 )
 															{
 																process.stdout.write( ", ".white );
@@ -737,7 +750,7 @@ class CW_Runner
 													serverArray.forEach(
 														(server, index) =>
 														{
-															process.stdout.write( "'".blue + server.blue + "'".blue );
+															process.stdout.write( "'".white + server.cyan + "'".white );
 															if( (index + 1) < serverArray.length )
 															{
 																process.stdout.write( ", ".white );
@@ -748,7 +761,7 @@ class CW_Runner
 												}
 												else
 												{
-													process.stdout.write( "No A recoirds configured for 'www'".green );
+													process.stdout.write( "No A records configured for 'www' (OK)".green );
 												}
 												process.stdout.write( "\n" );
 											}
@@ -771,7 +784,7 @@ class CW_Runner
 							{
 								if( !configObject.be_quiet )
 								{
-									process.stdout.write( "Testing \"CNAME\" records for 'www.".white.bold + configObject.domain.white.bold + "'...   ".white.bold );
+									process.stdout.write( "Testing \"CNAME\" records for URL ".white.bold + configObject.url.brightWhite.bold + "...   ".white.bold );
 								}
 
 								CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
@@ -797,13 +810,13 @@ class CW_Runner
 
 													if( adviceObject.domainResponses.servers.www_cname && adviceObject.domainResponses.servers.www_cname.length > 0)
 													{
-														process.stdout.write( "Found response for 'www.".white + configObject.domain.white + "' with \"CNAME\" records ".white );
+														process.stdout.write( "Found response for ".white + configObject.url.brightWhite.bold + " with \"CNAME\" records: ".white );
 														let serverArray = adviceObject.domainResponses.servers.www_cname;
 
 														serverArray.forEach(
 															(server, index) =>
 															{
-																process.stdout.write( "'".blue + server.blue + "'".blue );
+																process.stdout.write( "'".white + server.cyan + "'".white );
 																if( (index + 1) < serverArray.length )
 																{
 																	process.stdout.write( ", ".white );
@@ -814,7 +827,7 @@ class CW_Runner
 													}
 													else
 													{
-														process.stdout.write( "No A recoirds configured for 'www'".green );
+														process.stdout.write( "No CNAME records configured for 'www' (OK?)".green );
 													}
 													process.stdout.write( "\n" );
 												}
