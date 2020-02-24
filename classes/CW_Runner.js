@@ -227,13 +227,38 @@ class CW_Runner
 							AdviceContent.progressAdvice( { configObject: configObject, adviceObject: adviceObject, testKey: "SSL" } );
 
 							adviceObject.test_result.results.push( adviceObject.item_result );
-							adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+							adviceObject.finalizeOutput( { stripConfigObject: false, stripItemResult: true } );
+
+							CW_Runner.network.checkSSLExpiration( { url: configObject.url } )
+								.then(
+									(result) =>
+									{
+										AdviceContent.progressContent( { configObject: configObject,
+											input: "Checking SSL certificate expiration...   ".header 
+										});
+
+										adviceObject.item_result = {
+											command: "ssl",
+											category: "website",
+											result_tags: []
+										};
+
+
+										adviceObject.item_result.result = result.status;
+										adviceObject.item_result.result_tags.push( result.status );
+										adviceObject.item_result.raw_response = result;
+
+										AdviceContent.progressAdvice( { configObject: configObject, adviceObject: adviceObject, testKey: "SSL_EXPIRATION" } );
+
+										adviceObject.test_result.results.push( adviceObject.item_result );
+										adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+										resolve( JSON.stringify( adviceObject ) );
+									}
+								);
 
 							// TODO: Output advice for non-progressive output
-
-							
-
-							resolve( JSON.stringify( adviceObject ) );
+							// resolve( JSON.stringify( adviceObject ) );
 						}
 					);
 

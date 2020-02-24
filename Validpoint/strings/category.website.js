@@ -17,6 +17,17 @@ module.exports =
 			"URGENT": 		"Your website is currently responding with a \"500\" error, meaning that it has encountered an unknown technical error. People will not be able to reach your website using this address. Please contact your hosting provider for support"
 		}
 	},
+	"ssl":
+	{
+		"EXPIRE_SOON":
+		{
+			"NOTICE": "Your SSL certificate is expiring soon and should be renewed right away. Contact your hosting provider for support"
+		},
+		"EXPIRED":
+		{
+			"URGENT": "Your SSL certificate has expired and people will not be able to reach your website. Contact your hosting provider for support"
+		}
+	},
 	"https-response":
 	{
 		"URGENT": 		"Your secure website is currently responding with an invalid response code: %raw_response%. People will not be able to reach your website using this address. Please contact your hosting provider for support",

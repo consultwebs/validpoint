@@ -321,7 +321,6 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 		let severity = 0;
 		let serverArray = [];
 		let tags = [];
-
 		if( !configObject.be_quiet )
 		{
 
@@ -329,7 +328,54 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 			switch( testKey )
 			{
 				case "SSL":
-					console.log( "GOT SSL" );
+					process.stdout.write( "Finding SSL grade...   ".header );
+
+					if( this.test_result.raw_response.grade )
+					{
+						process.stdout.write( "good\n".ok );
+						process.stdout.write( "Received grade: ".text );
+						process.stdout.write( this.test_result.raw_response.grade.ok + "\n" );
+					}
+					else
+					{
+						process.stdout.write( "failed\n".error );
+						process.stdout.write( this.test_result.raw_response.message.error + "\n" );
+					}
+
+					break;
+				case "SSL_EXPIRATION":
+					if( this.test_result.result == CW_Constants.RESULT_FAIL )
+					{
+						process.stdout.write( "failed\n".error );
+						process.stdout.write( this.test_result.raw_response.message.error + "\n" );
+					}
+					else if( this.test_result.raw_response.daysLeft > 30 )
+					{
+						process.stdout.write( "good\n".ok );
+						process.stdout.write( "Days until expiration: ".text );
+						process.stdout.write( this.test_result.raw_response.daysLeft.toString().result + "\n" );
+					}
+					else if( this.test_result.raw_response.daysLeft > 0 )
+					{
+						process.stdout.write( "warning\n".warn );
+						process.stdout.write( "Days until expiration: ".warn );
+						process.stdout.write( this.test_result.raw_response.daysLeft.toString().warn + "\n" );
+
+						severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PUNT } );
+						let content = this.contentForSeverity( { severity: severity, extraInput: "EXPIRE_SOON" } );
+
+						process.stdout.write( content.warn + "\n" );
+					}
+					else
+					{
+						process.stdout.write( "expired\n".error );
+
+						severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_FAIL } );
+						let content = this.contentForSeverity( { severity: severity, extraInput: "EXPIRED" } );
+
+						process.stdout.write( content.error + "\n" );
+					}
+
 					break;
 				// TODO: These conditions need to be refactored
 				case "WEBSITE_CONTENT":

@@ -138,14 +138,14 @@ class CW_PromiseResolver
 			message: ""
 		};
 
-		let input = {
+		let options = {
 			"host": url,
 			"fromCache": true,
 			"maxAge": 24,
 			"all": "on"
 		};
 
-		ssllabs.scan( input,
+		ssllabs.scan( options,
 			( error, host ) =>
 			{
 				if( error )
@@ -187,6 +187,48 @@ class CW_PromiseResolver
 				
 			}
 		);
+	}
+
+	/**
+	 * Check a site's SSL certificate expiration date
+	 * 
+	 * @author costmo
+	 * @param	{*}		resolve		Resolve function	
+	 * @param	{*}		reject		Reject function
+	 * @param {*} url			The URL of the site to check
+	 */
+	resolve_checkSSLExpiration( resolve, reject, { url = null } )
+	{
+		// TODO: try/catch
+
+		let returnValue = {
+			daysLeft: "",
+			status: "",
+			message: ""
+		};
+
+		let expiration = require( "../validpoint/node_modules/check-cert-expiration" );
+
+		expiration( url,
+			(error, result) =>
+			{
+				if( error )
+				{
+					returnValue.daysLeft = 0;
+					returnValue.status = CW_Constants.RESULT_FAIL;
+					returnValue.message = error.reason;
+
+					resolve( returnValue );
+				}
+				else
+				{
+					returnValue.daysLeft = result.daysLeft;
+					returnValue.status = CW_Constants.RESULT_PASS;
+					resolve( returnValue );
+				}
+			}
+		);
+		
 	}
 
 	/**
