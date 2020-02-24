@@ -30,7 +30,7 @@ module.exports =
 	},
 	"domain":
 	{
-		"URGENT": 		"There was a problem with your domainm name. Please contact your hosting provider",
+		"URGENT": 		"There was a problem with your domain name. Please contact your hosting provider",
 		"NO_ANSWER":
 		{
 			"URGENT": 	"There was no response about your domain when we performed a 'dig' for information. People will not be able to reach your website until this is resolved. Please contact your web hosting provider for support."

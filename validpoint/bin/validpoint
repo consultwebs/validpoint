@@ -59,15 +59,19 @@ require( "strict-mode" )(
 																{
 																	config = this.parseJsonString();
 
+																	if( config == null )
+																	{
+																		throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
+																	}
+																	else if( config.error && config.error.length > 0 )
+																	{
+																		throw new Error( config.error );
+																	}
+
 																	config = 
 																	{	...config,
 																		show_raw: inputOptions.show_raw,
 																		be_quiet: inputOptions.quiet
-																	}
-
-																	if( config == null )
-																	{
-																		throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
 																	}
 
 																	// 3. Setup advice

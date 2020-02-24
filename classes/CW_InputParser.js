@@ -18,7 +18,7 @@ class CW_InputParser
 		this.mFileName = fileName;
 		if( !path )
 		{
-			this.mPath = "../input/";
+			this.mPath = "./";
 		}
 		else
 		{
@@ -43,8 +43,19 @@ class CW_InputParser
             fileSystem.readFile( this.mPath + this.mFileName, "utf8", 
                 function( error, data )
                 {
-                    passedThis.mInputString = data;
-					callback.bind( passedThis )();
+					if( error )
+					{
+						// Pass missing file errors to the caller
+						passedThis.mInputString = JSON.stringify( { "error": "Make sure that this file exists: " + error.path} );
+						callback.bind( passedThis )();
+					}
+					else
+					{
+						passedThis.mInputString = data;
+						callback.bind( passedThis )();
+					}
+
+                    
                 });
         }
         catch( exception )
