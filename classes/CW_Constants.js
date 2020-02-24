@@ -25,7 +25,19 @@ module.exports = Object.freeze(
 		"local-network", "local-dns", 
 		"http-port", "https-port", "domain",
 		"http-response", "https-response", "website", "secure-website",  "website-content"
-	]
+	],
+
+	COLOR_THEME:
+	{
+		title: [ "brightGreen", "bold" ],
+		header: [ "white", "bold" ],
+		text: "white",
+		error: "red",
+		warn: "yellow",
+		ok: "green",
+		subject: [ "brightWhite", "bold" ],
+		result: "cyan"
+	}
 
 
 

@@ -32,6 +32,240 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 	}
 
 	/**
+	 * Offers advice while tests are in-progress
+	 * 
+	 * @returns	mixed			Returns an objcet or prints to the screen
+	 * @author costmo
+	 * 
+	 * @param {*} testKey		A key to identify what is being tested
+	 * @param {*} configObject	A constructed configuration object
+	 * @param {*} returnType	"screen" to display the results, anything else to get an object 
+	 */
+	inProgressAdvice( {testKey = null, configObject = null, returnType = "screen"} )
+	{
+		let returnValue = {
+			printAnswer: "",
+			printSubject: "",
+			printDetail: ""
+		};
+
+		let severity = 0;
+
+		let serverArray = [];
+		let tags = [];
+
+		// which test to run
+		switch( testKey )
+		{
+			case "NS":
+				// Show a header
+				returnValue.printSubject = "Found response for ".text + configObject.domain.subject + " with name servers: ".text;
+				// Fill an array with results to display
+				serverArray = this.test_result.servers.ns;
+
+				// Push errors or notices to the `tags` array
+				if( this.test_result.servers.ns.length < 1 )
+				{
+					tags.push(
+						{
+							intermediate_key: "NS_NONE",
+							result_value: CW_Constants.RESULT_FAIL
+						}
+					);
+				}
+				break;
+			case "MX":
+				returnValue.printSubject = "Found response for ".text + configObject.domain.subject + " with mail servers: ".text;
+				serverArray = this.test_result.servers.mx;
+
+				if( this.test_result.servers.mx.length < 1 )
+				{
+					tags.push(
+						{
+							intermediate_key: "MX_NONE",
+							result_value: CW_Constants.RESULT_FAIL
+						}
+					);
+				}
+				break;
+			case "TLD_A":
+				returnValue.printSubject = "Found response for ".text + configObject.domain.subject + " with \"A\" records: ".text;
+				serverArray = this.test_result.servers.tld_a;
+
+				if( this.test_result.servers.tld_a.length < 1 )
+				{
+					tags.push(
+						{
+							intermediate_key: "TLD_A_NONE",
+							result_value: CW_Constants.RESULT_FAIL
+						}
+					);
+				}
+				break;
+			case "WWW_A":
+				returnValue.printSubject = "Found response for ".text + configObject.url.subject + " with \"A\" records: ".text;
+				serverArray = this.test_result.servers.www_a;
+
+				if( this.test_result.servers.www_a.length < 1 )
+				{
+					tags.push(
+						{
+							intermediate_key: "WWW_A_NONE",
+							result_value: CW_Constants.RESULT_PUNT
+						}
+					);
+				}
+				break;
+			case "WWW_CNAME":
+					returnValue.printSubject = "Found response for ".text + configObject.url.subject + " with \"CNAME\" records: ".text;
+					serverArray = this.test_result.servers.www_cname;
+	
+					if( this.test_result.servers.www_cname.length < 1 && this.test_result.servers.www_a.length < 1 )
+					{
+						tags.push(
+							{
+								intermediate_key: "WWW_CNAME_A_NONE",
+								result_value: CW_Constants.RESULT_FAIL
+							}
+						);
+					}
+					break;
+			case "TLD_CNAME":
+				if( this.test_result.servers.tld_cname.length > 0 )
+				{
+					returnValue.printSubject = "Found response for ".text + configObject.domain.subject + " with \"CNAME\" records: ".text;
+					serverArray = this.test_result.servers.tld_cname;
+				}
+				else
+				{
+					tags.push(
+						{
+							intermediate_key: "TLD_CNAME_NONE",
+							result_value: CW_Constants.RESULT_PASS
+						}
+					)
+				}
+				break;
+			case "WHOIS":
+				if( !this.test_result.days_til_expiry || this.test_result.days_til_expiry < 1 )
+				{
+					tags.push(
+						{
+							intermediate_key: "DOMAIN_EXPIRED",
+							result_value: CW_Constants.RESULT_FAIL
+						}
+					);
+				}
+				else if( this.test_result.days_til_expiry < 90 )
+				{
+					serverArray = [ "Your domain is expiring in " + this.test_result.days_til_expiry + " days" ];
+					tags.push(
+						{
+							intermediate_key: "DOMAIN_WILL_EXPIRE",
+							result_value: CW_Constants.RESULT_PUNT
+						}
+					);
+				}
+				else
+				{
+					returnValue.printSubject = "Domain ".text + configObject.url.subject + " will expire in: ".text;
+					serverArray = [ this.test_result.days_til_expiry + " days" ];
+				}
+				break;
+
+		}
+
+		// No tags present means a passed test
+		if( tags.length < 1 )
+		{
+			severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PASS } );
+			
+			returnValue.result = CW_Constants.RESULT_PASS;
+			returnValue.printAnswer = "good".ok;
+			
+			returnValue.printDetail = "";
+
+			serverArray.forEach(
+				(server, index) =>
+				{
+					returnValue.printDetail += "'".text + server.result + "'".text;
+					if( (index + 1) < serverArray.length )
+					{
+						returnValue.printDetail += ", ".text;
+					}
+				});
+		}
+		else // There was either a failure or a notification
+		{
+			returnValue.printSubject = "";
+			returnValue.printAnswer = "failed".error;
+			returnValue.printDetail = "";
+
+			tags.forEach(
+				tag =>
+				{
+					severity = this.resultTagToSeverity( { resultTag: tag.result_value, extraInput: tags } );
+
+					// Handle direct messages, which are system/program errors
+					if( severity == CW_Constants.SEVERITY_DIRECT_MESSAGE && tags[0].message != undefined && tags[0].message.length > 0 )
+					{
+						returnValue.printDetail += tags[0].message;
+					}
+					else  // lookup the content based on the info we have
+					{
+						returnValue.printDetail += this.contentForSeverity( { severity: severity, extraInput: tag.intermediate_key } ) + "\n";
+					}
+
+					// Notices
+					if( severity == CW_Constants.SEVERITY_NOTICE )
+					{
+						returnValue.printAnswer = "warning".warn;
+						serverArray.forEach(
+							(server, index) =>
+							{
+								returnValue.printDetail += server.warn;
+								if( (index + 1) < serverArray.length )
+								{
+									returnValue.printDetail += "\n";
+								}
+							});
+						returnValue.printDetail = returnValue.printDetail.warn;
+
+					}
+					else if( severity == CW_Constants.SEVERITY_OK ) // "OK" conditions that may have extra output
+					{
+						returnValue.printAnswer = "good".ok;
+						returnValue.printDetail = returnValue.printDetail.ok;
+					}
+					else // Errors (not a notice or "OK" with a tag)
+					{
+						returnValue.printDetail = returnValue.printDetail.error;
+					}
+				}
+			);
+		}
+
+		// For live progress, display results on the screen
+		if( returnType == "screen" )
+		{
+			process.stdout.write( returnValue.printAnswer + "\n" );
+			process.stdout.write( returnValue.printSubject );
+			if( returnValue.printDetail )
+			{
+				process.stdout.write( returnValue.printDetail + "\n" );
+			}
+			else
+			{
+				process.stdout.write( "\n" );
+			}
+		}
+		else // or else, return the info we've gathered so the caller can process and respond
+		{
+			return returnValue;
+		}
+	}
+
+	/**
 	 * Advice content hub for "website" requests.
 	 * 
 	 * Once an Advice object has its test results, the parser runs this category-specific method to 
@@ -102,6 +336,8 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 
 	/**
 	 * A string of tests to riun gathered domain info through to look for problems.
+	 * 
+	 * // TODO: Have this run its data through inProgressAdvice instead of repeating the logic here
 	 * 
 	 * @returns Array
 	 * @author costmo
@@ -240,8 +476,22 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 		
 		switch( severity )
 		{
+			case CW_Constants.SEVERITY_OK:
+				if( extraInput && 
+					undefined != (strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_OK ]) )
+				{
+					return strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_OK ];
+				}
 			case CW_Constants.SEVERITY_NOTICE:
-				return strings[ this.command ][ CW_Constants.NAME_SEVERITY_NOTICE ];
+				if( extraInput && 
+					undefined != (strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_NOTICE ]) )
+				{
+					return strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_NOTICE ];
+				}
+				else
+				{
+					return strings[ this.command ][ CW_Constants.NAME_SEVERITY_NOTICE ];
+				}
 			case CW_Constants.SEVERITY_ESSENTIAL:
 			case CW_Constants.SEVERITY_URGENT:
 				if( extraInput && 

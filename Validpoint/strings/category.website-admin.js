@@ -41,6 +41,15 @@ module.exports =
 		{
 			"URGENT": "You currently have no CNAME defined for your WWW.  Please contact your web hosting provider for support."
 		},
+		"WWW_A_NONE":
+		{
+			"URGENT": "You currently have no CNAME defined for your WWW.  Please contact your web hosting provider for support.",
+			"NOTICE": "You currently have no CNAME defined for your WWW address. This may be acceptable, but isn't the norm. You should contact your hosting provider if you are unsure."
+		},
+		"WWW_CNAME_A_NONE":
+		{
+			"URGENT": "Your \"WWW\" address doesn't have an \"A\" record or a \"CNAME\" which means that people who try to reach your domain using \"www\" will not get to your website. Please contact your hosting provider for support."
+		},
 		"MX_NONE":
 		{
 			"URGENT": "You have no mail servers defined for your domain name, which menas people will not be able to send you emails using your company's unique name.  Please contact your web hosting provider for support."
@@ -49,13 +58,18 @@ module.exports =
 		{
 			"URGENT": "Your top-level domain is not an A record.  Please contact your web hosting provider for support."
 		},
+		"TLD_CNAME_NONE":
+		{
+			"OK": "Your top-level domain does not have a \"CNAME\" record, which is normal."
+		},
 		"DOMAIN_EXPIRED":
 		{
 			"URGENT": "Your domain name has expired and you may lose access to your website and domain.  Please contact your web hosting provider for support."
 		},
 		"DOMAIN_WILL_EXPIRE":
 		{
-			"URGENT": "Your domain name will expire soon. To avoid losing access to your website and domain, contact your web hosting provider."
+			"URGENT": "Your domain name will expire soon. To avoid losing access to your website and domain, contact your web hosting provider.",
+			"NOTICE": "Your domain name will expire soon. To avoid losing access to your website and domain, contact your web hosting provider."
 		}
 	}
 };

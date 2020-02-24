@@ -6,6 +6,8 @@
  */
 
 let CW_Constants = require( "./CW_Constants.js" );
+const colors = require( "../validpoint/node_modules/colors" );
+colors.setTheme( CW_Constants.COLOR_THEME );
 
 class CW_AdviceContent
 {
@@ -53,6 +55,53 @@ class CW_AdviceContent
 				return CW_Constants.SEVERITY_IGNORE;
 			default:
 				return CW_Constants.SEVERITY_IGNORE;
+		}
+	}
+
+	static progressTitle( {configObject = null, input = null} )
+	{
+		
+		if( configObject.be_quiet === false )
+		{
+			process.stdout.write( input.title + "\n" );
+		}
+	}
+
+	static progressContent( {configObject = null, input = null} )
+	{
+		if( configObject.be_quiet === false )
+		{
+			process.stdout.write( input );
+		}
+	}
+
+	static progressResult( {configObject = null, input = null} )
+	{
+		if( configObject.be_quiet === false )
+		{
+			process.stdout.write( input.ok + "\n" );
+		}
+	}
+
+	static progressAdvice( {configObject = null, adviceObject = null, testKey = null} )
+	{
+		// Don't go further if we aren't going to show output
+		if( configObject.be_quiet === false )
+		{
+			// Create an instance of one of this class' children to get in-progress advice
+			let ChildClass = null;
+			let child = null;
+
+			if( adviceObject.item_result.category == "website-admin" )
+			{
+				ChildClass = require( "./CW_AdviceContent_WebsiteAdmin" );
+				child = new ChildClass( { command:  adviceObject.item_result.command, testResult:adviceObject.domainResponses, configObject: configObject } );
+			}
+
+			if( child != null )
+			{
+				child.inProgressAdvice( {testKey: testKey, configObject: configObject, returnType: "screen"} );
+			}
 		}
 	}
 
