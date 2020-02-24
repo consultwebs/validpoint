@@ -151,7 +151,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 				if( extraInput && 
 					undefined != (strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_URGENT ]) )
 				{
-					return strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_URGENT ];
+					return strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_URGENT ]
 				}
 				else
 				{
@@ -204,7 +204,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 	}
 
 	/**
-	 * A string of tests to riun gathered domain info through to look for problems.
+	 * A string of tests to run gathered test info to look for problems.
 	 * 
 	 * @returns Array
 	 * @author costmo
@@ -298,6 +298,221 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 		}
 		
 		return returnValue;
+	}
+
+	/**
+	 * Offers advice while tests are in-progress
+	 * 
+	 * @returns	mixed			Returns an objcet or prints to the screen
+	 * @author costmo
+	 * 
+	 * @param {*} testKey		A key to identify what is being tested
+	 * @param {*} configObject	A constructed configuration object
+	 * @param {*} returnType	"screen" to display the results, anything else to get an object 
+	 */
+	inProgressAdvice( {testKey = null, configObject = null, returnType = "screen"} )
+	{
+		let returnValue = {
+			printAnswer: "",
+			printSubject: "",
+			printDetail: ""
+		};
+
+		let severity = 0;
+		let serverArray = [];
+		let tags = [];
+
+		if( !configObject.be_quiet )
+		{
+
+			// which test to run
+			switch( testKey )
+			{
+				// TODO: These conditions need to be refactored
+				case "WEBSITE_CONTENT":
+					// Show a header
+					tags = [];
+
+					
+					// We got an empty response
+					if( typeof this.test_result.raw_response !== "object" )
+					{
+						tags.push(
+							{
+								intermediate_key: this.test_result,
+								result_value: CW_Constants.RESULT_FAIL
+							}
+						);
+					}
+					else
+					{
+						// TODO: Look for "HTML" tag
+
+						let content = "";
+
+						// These can all be done at once, but are separated here to show "progress"
+						process.stdout.write( "Looking for HTML \"HEAD\" tag...   ".header );
+						if( (!this.test_result.raw_response.headNode.childNodes) || 
+							(this.test_result.raw_response.headNode.childNodes.length < 1) )
+						{
+							process.stdout.write( "failed\n".error );
+							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_FAIL } );
+							content = this.contentForSeverity( { severity: severity, extraInput: "HEAD_NONE" } );
+							process.stdout.write( content.error + "\n" );
+						}
+						else
+						{
+							process.stdout.write( "good\n".ok );
+						}
+
+						process.stdout.write( "Looking for HTML \"BODY\" tag...   ".header );
+						if( (!this.test_result.raw_response.bodyNode.childNodes) || 
+							(this.test_result.raw_response.bodyNode.childNodes.length < 1) ||
+							(this.test_result.raw_response.bodyNode.rawText.length < 1) )
+						{
+							process.stdout.write( "failed\n".error );
+							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_FAIL } );
+							content = this.contentForSeverity( { severity: severity, extraInput: "BODY_NONE" } );
+							process.stdout.write( content.error + "\n" );
+						}
+						else
+						{
+							process.stdout.write( "good\n".ok );
+						}
+
+						process.stdout.write( "Looking for HTML \"TITLE\" tag...   ".header );
+						if( (!this.test_result.raw_response.titleNode.childNodes) || 
+							(this.test_result.raw_response.titleNode.childNodes.length < 1) ||
+							(this.test_result.raw_response.titleNode.rawText.length < 1) )
+						{
+							process.stdout.write( "failed\n".error );
+							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_FAIL } );
+							content = this.contentForSeverity( { severity: severity, extraInput: "TITLE_NONE" } );
+							process.stdout.write( content.error + "\n" );
+						}
+						else
+						{
+							process.stdout.write( "good\n".ok );
+						}
+
+
+						process.stdout.write( "Looking for HTML \"H1\" tag...   ".header );
+						if( (!this.test_result.raw_response.h1Node.childNodes) || 
+							(this.test_result.raw_response.h1Node.childNodes.length < 1) )
+						{
+							process.stdout.write( "warning\n".warn );
+							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PUNT } );
+							let content = this.contentForSeverity( { severity: severity, extraInput: "H1_NONE" } );
+
+							process.stdout.write( content.warn + "\n" );
+						}
+						else
+						{
+							process.stdout.write( "good\n".ok );
+						}
+
+						let foundNoindex = false;
+						process.stdout.write( "Looking for HTML \"NOINDEX\" tag...   ".header );
+						if( this.test_result.raw_response.metaNodes &&
+							this.test_result.raw_response.metaNodes.length > 0 )
+						{
+							this.test_result.raw_response.metaNodes.forEach(
+								node =>
+								{
+									if( node.rawAttrs.indexOf( "noindex" ) > -1 )
+									{
+										foundNoindex = true;
+									}
+									
+								}
+							);
+							
+							if( foundNoindex )
+							{
+								process.stdout.write( "warning\n".warn );
+								severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PUNT } );
+								let content = this.contentForSeverity( { severity: severity, extraInput: "NOINDEX" } );
+
+								process.stdout.write( content.warn + "\n" );
+							}
+							else
+							{
+								process.stdout.write( "good\n".ok );
+							}
+
+						}
+					}
+					break; // case "WEBSITE_CONTENT":
+				case "WEBSITE_AVAILABILITY":
+					let extraInput = this.test_result.raw_response;
+					let CW_PromiseResolver = require( "./CW_PromiseResolver" );
+
+					process.stdout.write( "Testing port availability...   ".header );
+					if( parseFloat( extraInput.raw_response.avg ) + "" !== "NaN" )
+					{
+						process.stdout.write( "good\n".ok );
+
+						if( extraInput.raw_response.avg > CW_PromiseResolver.MAX_HTTTP_RESPONSE_TIME )
+						{
+							process.stdout.write( "Response time: ".header + extraInput.raw_response.avg.toString().warn + "ms\n".warn );
+							process.stdout.write( this.contentForSeverity( { severity: CW_Constants.SEVERITY_NOTICE, extraInput: "TIMED_OUT" } ).warn + "\n" );
+						}
+						else
+						{
+							process.stdout.write( "Response time: ".header + Math.ceil( extraInput.raw_response.avg ).toString().result + "ms\n".result );
+						}
+					}
+					else
+					{
+						process.stdout.write( "good\n".ok );
+					}
+
+					break; // case "WEBSITE_AVAILABILITY":
+				case "WEBSITE_RESPONSE":
+					let responseInput = this.test_result.raw_response;
+
+					process.stdout.write( "Testing site response status code...   ".header );
+
+					if( responseInput.result == CW_Constants.RESULT_PUNT ) // handle redirect -- 4xx and 5xx responses show up as errors
+					{
+
+						if( responseInput.raw_response.indexOf( configObject.domain ) > -1 )
+						{
+							process.stdout.write( "good\n".ok );
+						}
+						else // TODO: Warn/fail on bad response codes 
+						{
+							process.stdout.write( "warning\n".warn );
+							process.stdout.write( responseInput.warn + "\n" );
+						}
+					}
+					else if( responseInput.result == CW_Constants.RESULT_PASS )
+					{
+						process.stdout.write( "good\n".ok );
+					}
+					else
+					{
+						process.stdout.write( "fail\n".error );
+						process.stdout.write( responseInput.error + "\n" );
+					}
+
+					break; // case "WEBSITE_AVAILABILITY":
+			} // switch( testKey )
+		} // if( !configObject.be_quiet )
+
+
+
+		// TODO: Make returnValue something useful
+
+		// For live progress, display results on the screen
+		if( returnType == "screen" )
+		{
+			// process.stdout.write( returnValue.printAnswer + "\n" );
+		}
+		else // or else, return the info we've gathered so the caller can process and respond
+		{
+			return returnValue;
+		}
 	}
 
 

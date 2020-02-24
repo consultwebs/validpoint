@@ -37,7 +37,9 @@ module.exports = Object.freeze(
 		ok: "green",
 		subject: [ "brightWhite", "bold" ],
 		result: "cyan"
-	}
+	},
+
+	MAX_HTTTP_RESPONSE_TIME: 5000
 
 
 

@@ -13,7 +13,7 @@ let CW_Constants = require( "./CW_Constants.js" );
  // TODO: Add an array of hosts to ping, iterate and check them until we find one that responds or there are none left to check
 const PING_HOST = "8.8.4.4"; // Google public DNS server
 const DNS_HOST = "www.google.com";
-const MAX_HTTTP_RESPONSE_TIME = 5000;
+const MAX_HTTTP_RESPONSE_TIME = 5000; // TODO: Move this to constants
 
 class CW_PromiseResolver
 {
@@ -78,7 +78,7 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			let dns = require( "../validpoint/node_modules/dns" );
+			let dns = require( "dns" );
 			let msg = CW_Constants.RESULT_FAIL;
 
 			dns.resolve4( DNS_HOST,
@@ -175,10 +175,10 @@ class CW_PromiseResolver
 		try
 		{
 			let returnValue;
-			let protocol= require( "../validpoint/node_modules/http" );
+			let protocol= require( "http" );
 			if( port == 443 )
 			{
-				protocol = require( "../validpoint/node_modules/https" );
+				protocol = require( "https" );
 			}
 
 			let options = 
@@ -192,6 +192,7 @@ class CW_PromiseResolver
 			const request = protocol.request( options,
 				( response ) =>
 				{
+					
 					// If you don't have an on.data - even if you're not doing anything with the data - node never fires on.end
 					response.on( "data", ( data ) => {} );
 

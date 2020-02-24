@@ -11,6 +11,8 @@ let CW_Advice = require( "./CW_Advice.js" );
 
 const colors = require( "../validpoint/node_modules/colors" );
 
+// TODO: Running "all" commands causes the headers to be printed first, then the results - get them (a)synced up
+
 class CW_Runner
 {
 	/**
@@ -189,12 +191,22 @@ class CW_Runner
 		return new Promise(
 			async (resolve, reject) =>
 			{
+				let AdviceContent = require( "./CW_AdviceContent.js" );
+
+				AdviceContent.progressContent( { configObject: configObject,
+					input: "Downloading content for  ".header + configObject.url.subject + "...   ".header 
+				});
+
 				try
 				{
 					CW_Runner.network.checkWebsiteContent( { url: configObject.url } )
 						.then(
 							( result ) =>
 							{
+								AdviceContent.progressContent( { configObject: configObject,
+									input: "done\n".ok 
+								});
+
 								// Parse the incoming HTML to find important elements
 								let HtmlParser = require( "../validpoint/node_modules/node-html-parser" );
 								let root = HtmlParser.parse( result );
@@ -207,6 +219,8 @@ class CW_Runner
 									h1Node:  root.querySelector( "h1" ),
 									metaNodes:  root.querySelectorAll( "meta" )
 								}
+
+								AdviceContent.progressAdvice( { configObject: configObject, adviceObject: adviceObject, testKey: "WEBSITE_CONTENT" } );
 
 								adviceObject.test_result.results.push( adviceObject.item_result );
 								adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
@@ -272,14 +286,26 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
+				let AdviceContent = require( "./CW_AdviceContent.js" );
+
+				AdviceContent.progressContent( { configObject: configObject,
+					input: "Checking port " + port.toString().subject + " response code for ".header + configObject.url.subject + "...   ".header 
+				});
+
 				CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } )
 					.then(
 						( result ) =>
 						{
+							AdviceContent.progressContent( { configObject: configObject,
+								input: "done\n".ok 
+							});
+
 							adviceObject.item_result.result = result.result;
 							adviceObject.item_result.result_tags.push( result.result );
 							adviceObject.item_result.raw_response = result;
 							adviceObject.item_result.response_time = result.response_time;
+
+							AdviceContent.progressAdvice( { configObject: configObject, adviceObject: adviceObject, testKey: "WEBSITE_RESPONSE" } );
 		
 							adviceObject.test_result.results.push( adviceObject.item_result );
 							adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
@@ -319,6 +345,12 @@ class CW_Runner
 		return new Promise(
 			async (resolve, reject) =>
 			{
+				let AdviceContent = require( "./CW_AdviceContent.js" );
+
+				AdviceContent.progressContent( { configObject: configObject,
+					input: "Checking port " + port.toString().subject + " availability for ".header + configObject.url.subject + "...   ".header 
+				});
+
 				try
 				{
 					// let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } );
@@ -327,11 +359,17 @@ class CW_Runner
 						.then(
 							(result) =>
 							{
+								AdviceContent.progressContent( { configObject: configObject,
+									input: "done".ok 
+								});
+
 								adviceObject.item_result.result = result.result;
 								adviceObject.item_result.result_tags.push( result.result );
 								adviceObject.item_result.raw_response = result;
 								adviceObject.item_result.response_time = result.response_time;
-				
+
+								AdviceContent.progressAdvice( { configObject: configObject, adviceObject: adviceObject, testKey: "WEBSITE_AVAILABILITY" } );
+
 								adviceObject.test_result.results.push( adviceObject.item_result );
 								adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
 				
@@ -374,6 +412,12 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{	
+				let AdviceContent = require( "./CW_AdviceContent.js" );
+
+				AdviceContent.progressContent( { configObject: configObject,
+					input: "Checking Internet name resolution...   ".header 
+				});
+
 				CW_Runner.network.checkLocalDns()
 					.then(
 						( result ) =>
@@ -382,6 +426,8 @@ class CW_Runner
 							adviceObject.item_result.result = result;
 							adviceObject.item_result.result_tags.push( result );
 							adviceObject.item_result.raw_response = result;
+
+							AdviceContent.progressAdvice( { configObject: configObject, adviceObject: adviceObject, testKey: "LOCAL_DNS" } );
 
 							adviceObject.test_result.results.push( adviceObject.item_result );
 							adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
@@ -417,6 +463,11 @@ class CW_Runner
 		return new Promise(
 			async (resolve, reject) =>
 			{
+				let AdviceContent = require( "./CW_AdviceContent.js" );
+
+				AdviceContent.progressContent( { configObject: configObject,
+					input: "Checking local network connectivity...   ".header 
+				});
 
 				CW_Runner.network.checkLocalNetwork()
 					.then(
@@ -426,6 +477,8 @@ class CW_Runner
 							adviceObject.item_result.result = result;
 							adviceObject.item_result.result_tags.push( result );
 							adviceObject.item_result.raw_response = result;
+
+							AdviceContent.progressAdvice( { configObject: configObject, adviceObject: adviceObject, testKey: "LOCAL_NETWORK" } );
 
 							adviceObject.test_result.results.push( adviceObject.item_result );
 							adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
@@ -477,9 +530,6 @@ class CW_Runner
 	  */
 	  command_Domain( { configObject = null, adviceObject = null } )
 	 {
-
-		// TODO: Remove this
-		colors.setTheme( CW_Constants.COLOR_THEME );
 
 		let async = require( "../validpoint/node_modules/async" );
 		let StringUtil = require( "./CW_StringUtil.js" );
@@ -805,6 +855,7 @@ class CW_Runner
 	command_Website( { configObject = null, adviceObject =  null, port = 80 } )
 	{
 		let async = require( "../validpoint/node_modules/async" );
+		let AdviceContent = require( "./CW_AdviceContent.js" );
 
 		adviceObject.item_result.command = "website";
 		adviceObject.item_result.category = "website";
@@ -813,6 +864,10 @@ class CW_Runner
 		{
 			adviceObject.item_result.command = "secure-website";
 		}
+
+		AdviceContent.progressContent( { configObject: configObject,
+			input: "Checking website availability for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
+		});
 
 		// wrap the entire waterfall in a promise
 		return new Promise(
@@ -827,12 +882,17 @@ class CW_Runner
 								.then(
 									( result ) =>
 									{
+										AdviceContent.progressContent( { configObject: configObject,
+											input: "done\n".ok 
+										});
 										try
 										{
 											adviceObject.item_result.result = result.result;
 											adviceObject.item_result.result_tags.push( result.result );
 											adviceObject.item_result.raw_response = result;
 											adviceObject.item_result.response_time = result.response_time;
+
+											AdviceContent.progressAdvice( { configObject: configObject, adviceObject: adviceObject, testKey: "WEBSITE_AVAILABILITY" } );
 					
 											adviceObject.test_result.results.push( adviceObject.item_result );
 											adviceObject.finalizeOutput( { stripConfigObject: false, stripItemResult: false } );
@@ -882,14 +942,24 @@ class CW_Runner
 						},
 						( result, completion ) =>
 						{
+							AdviceContent.progressContent( { configObject: configObject,
+								input: "Checking website response for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
+							});
+
 							CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
 								.then(
 									( result ) =>
 									{
+										AdviceContent.progressContent( { configObject: configObject,
+											input: "done\n".ok 
+										});
+
 										adviceObject.item_result.result = result.result;
 										adviceObject.item_result.result_tags.push( result.result );
 										adviceObject.item_result.raw_response = result;
 										adviceObject.item_result.response_time = result.response_time;
+
+										AdviceContent.progressAdvice( { configObject: configObject, adviceObject: adviceObject, testKey: "WEBSITE_RESPONSE" } );
 				
 										adviceObject.test_result.results.push( adviceObject.item_result );
 										adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
@@ -899,6 +969,10 @@ class CW_Runner
 								).catch(
 									error =>
 									{
+										AdviceContent.progressContent( { configObject: configObject,
+											input: "done\n".ok 
+										});
+
 										// Resolve a throw from a system error...
 										if( error.raw_response && error.raw_response.message && error.raw_response.message.length > 0 )
 										{
@@ -910,6 +984,8 @@ class CW_Runner
 											adviceObject.item_result.result_tags.push( error.result );
 											adviceObject.item_result.raw_response = error.raw_response;
 											adviceObject.item_result.response_time = error.response_time;
+
+											AdviceContent.progressAdvice( { configObject: configObject, adviceObject: adviceObject, testKey: "WEBSITE_RESPONSE" } );
 					
 											adviceObject.test_result.results.push( adviceObject.item_result );
 											adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );

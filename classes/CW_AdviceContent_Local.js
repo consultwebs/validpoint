@@ -31,6 +31,66 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	}
 
 	/**
+	 * Offers advice while tests are in-progress
+	 * 
+	 * @returns	mixed			Returns an objcet or prints to the screen
+	 * @author costmo
+	 * 
+	 * @param {*} testKey		A key to identify what is being tested
+	 * @param {*} configObject	A constructed configuration object
+	 * @param {*} returnType	"screen" to display the results, anything else to get an object 
+	 */
+	inProgressAdvice( {testKey = null, configObject = null, returnType = "screen"} )
+	{
+		let returnValue = {
+			printAnswer: "",
+			printSubject: "",
+			printDetail: ""
+		};
+
+		let severity = 0;
+
+		let serverArray = [];
+		let tags = [];
+		switch( testKey )
+		{
+			case "LOCAL_DNS":
+			case "LOCAL_NETWORK":
+				if( this.test_result.result == CW_Constants.RESULT_PASS )
+				{
+					returnValue.printAnswer = "good".ok;
+				}
+				else if( this.test_result.result == CW_Constants.RESULT_FAIL &&
+					this.test_result.raw_response && this.test_result.raw_response.message && this.test_result.raw_response.message.length > 0 )
+				{
+					returnValue.printAnswer = "fail".error;
+					returnValue.printDetail = this.test_result.raw_response.message;
+				}
+				else
+				{
+					returnValue.printAnswer = "fail".error;
+					severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
+					returnValue.printDetail = this.contentForSeverity( { severity: severity } ).error;
+				}
+				break;
+		}
+
+		if( returnType == "screen" && !configObject.be_quiet )
+		{
+			process.stdout.write( returnValue.printAnswer + "\n" );
+			if( returnValue.printDetail.length > 0 )
+			{
+				process.stdout.write( returnValue.printDetail + "\n" );
+			}
+		}
+		else
+		{
+			return returnValue;
+		}
+
+	}
+
+	/**
 	 * Advice content hub for "local" requests.
 	 * 
 	 * Once an Advice object has its test results, the parser runs this category-specific method to 

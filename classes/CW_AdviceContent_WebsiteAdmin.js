@@ -57,6 +57,21 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 		// which test to run
 		switch( testKey )
 		{
+			case "WEBSITE_AVAILABILITY":
+				returnValue.printSubject = "Checking response time...   ".text;
+				// returnValue.printSubject += configObject.url.subject + " responded in: ".text;
+				returnValue.printSubject += Math.ceil( this.test_result.raw_response.response_time ).toString().result + "ms".result;
+
+				if( this.test_result.raw_response.response_time < CW_Constants.MAX_HTTTP_RESPONSE_TIME )
+				{
+					returnValue.printSubject += " good".ok;
+				}
+				else
+				{
+					returnValue.printSubject += " warning\n".warn;
+					returnValue.printSubject += this.contentForSeverity( { severity: CW_Constants.SEVERITY_NOTICE, extraInput: "TIMED_OUT" } ).warn;
+				}
+				break;
 			case "NS":
 				// Show a header
 				returnValue.printSubject = "Found response for ".text + configObject.domain.subject + " with name servers: ".text;
@@ -181,7 +196,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 			severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PASS } );
 			
 			returnValue.result = CW_Constants.RESULT_PASS;
-			returnValue.printAnswer = "good".ok;
+			// returnValue.printAnswer = "good".ok;
 			
 			returnValue.printDetail = "";
 

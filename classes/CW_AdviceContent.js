@@ -84,7 +84,7 @@ class CW_AdviceContent
 	}
 
 	static progressAdvice( {configObject = null, adviceObject = null, testKey = null} )
-	{
+	{		
 		// Don't go further if we aren't going to show output
 		if( configObject.be_quiet === false )
 		{
@@ -95,7 +95,25 @@ class CW_AdviceContent
 			if( adviceObject.item_result.category == "website-admin" )
 			{
 				ChildClass = require( "./CW_AdviceContent_WebsiteAdmin" );
-				child = new ChildClass( { command:  adviceObject.item_result.command, testResult:adviceObject.domainResponses, configObject: configObject } );
+				if( adviceObject.domainResponses )
+				{
+					child = new ChildClass( { command:  adviceObject.item_result.command, testResult:adviceObject.domainResponses, configObject: configObject } );
+				}
+				else if( adviceObject.item_result )
+				{
+					child = new ChildClass( { command:  adviceObject.item_result.command, testResult:adviceObject.item_result, configObject: configObject } );
+				}
+				
+			}
+			else if( adviceObject.item_result.category == "website" )
+			{
+				ChildClass = require( "./CW_AdviceContent_Website" );
+				child = new ChildClass( { command:  adviceObject.item_result.command, testResult:adviceObject.item_result, configObject: configObject } );
+			}
+			else if( adviceObject.item_result.category == "local" )
+			{
+				ChildClass = require( "./CW_AdviceContent_Local" );
+				child = new ChildClass( { command:  adviceObject.item_result.command, testResult:adviceObject.item_result, configObject: configObject } );
 			}
 
 			if( child != null )

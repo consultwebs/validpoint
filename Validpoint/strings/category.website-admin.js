@@ -7,6 +7,11 @@ module.exports =
 		"NO_RESPONSE":
 		{
 			"URGENT": "There was no response from your web server's connection port. People will not be able to reach your website using this address. Please contact your hosting provider for support"
+		},
+		"TIMED_OUT":
+		{
+			"NOTICE": 	"Your website took too long to respond. People may not be able to reach your website using this address. Please contact your hosting provider for support",
+			"URGENT": 	"Your website took too long to respond. People may not be able to reach your website using this address. Please contact your hosting provider for support"
 		}
 	},
 	"https-port":
@@ -16,6 +21,11 @@ module.exports =
 		"NO_RESPONSE":
 		{
 			"URGENT": "There was no response from your secure web server's connection port. People will not be able to reach your website using this address. Please contact your hosting provider for support"
+		},
+		"TIMED_OUT":
+		{
+			"NOTICE": 	"Your website took too long to respond. People may not be able to reach your website using this address. Please contact your hosting provider for support",
+			"URGENT": 	"Your website took too long to respond. People may not be able to reach your website using this address. Please contact your hosting provider for support"
 		}
 	},
 	"domain":

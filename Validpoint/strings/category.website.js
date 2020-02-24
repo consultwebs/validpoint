@@ -47,7 +47,8 @@ module.exports =
 		},
 		"TIMED_OUT":
 		{
-			"URGENT": 	"Your website never responded. People will not be able to reach your website using this address. Please contact your hosting provider for support"
+			"NOTICE": 	"Your website took too long to respond. People may not be able to reach your website using this address. Please contact your hosting provider for support",
+			"URGENT": 	"Your website took too long to respond. People may not be able to reach your website using this address. Please contact your hosting provider for support"
 		},
 		"REPLACEMENT":
 		{
@@ -78,23 +79,28 @@ module.exports =
 		},
 		"HEAD_NONE":
 		{
-			"NOTICE": "Your website does not have a HEAD tag. This has a serious impact on SEO ranking. Contact your website developer for help."
+			"NOTICE": "Your website does not have a HEAD tag. This has a serious impact on SEO ranking. Contact your website developer for help.",
+			"URGENT": "Your website does not have a HEAD tag. This has a serious impact on SEO ranking. Contact your website developer for help."
 		},
 		"TITLE_NONE":
 		{
+			"NOTICE": "Your website does not have a TITLE tag. This has a serious impact on SEO ranking. Contact your website developer for help.",
 			"URGENT": "Your website does not have a TITLE tag. This has a serious impact on SEO ranking. Contact your website developer for help."
 		},
 		"BODY_NONE":
 		{
+			"NOTICE": "Your website does not have a BODY tag. This has a serious impact on SEO ranking, and people may not be able to view your website. Contact your website developer for help.",
 			"URGENT": "Your website does not have a BODY tag. This has a serious impact on SEO ranking, and people may not be able to view your website. Contact your website developer for help."
 		},
 		"H1_NONE":
 		{
+			"URGENT": "Your website does not have an H1 tag. This has a serious impact on SEO ranking. Contact your website developer for help.",
 			"NOTICE": "Your website does not have an H1 tag. This has a serious impact on SEO ranking. Contact your website developer for help."
 		},
 		"NOINDEX":
 		{
-			"NOTICE": "Your website currently has NOINDEX set, so search engines will not index your content. This has a serious impact on SEO ranking. Contact your website developer for help."
+			"NOTICE": "Your website currently has NOINDEX set, so search engines will not index your content. This has a serious impact on SEO ranking. Contact your website developer for help.",
+			"URGENT": "Your website currently has NOINDEX set, so search engines will not index your content. This has a serious impact on SEO ranking. Contact your website developer for help."
 		}
 	}
 };
