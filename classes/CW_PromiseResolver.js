@@ -10,8 +10,7 @@
 
 let CW_Constants = require( "./CW_Constants.js" );
 
- // TODO: Add an array of hosts to ping, iterate and check them until we find one that responds or there are none left to check
-const PING_HOST = "8.8.4.4"; // Google public DNS server
+const PING_HOSTS = ["8.8.8.8", "1.1.1.1", "1.0.0.1", "139.130.4.5"]; // Google, Cloudflare, Cloudflare, Telstra
 const DNS_HOST = "www.google.com";
 const MAX_HTTTP_RESPONSE_TIME = 5000; // TODO: Move this to constants
 
@@ -40,21 +39,35 @@ class CW_PromiseResolver
 		{
 			// Set the default status to "down"
 			let ping = require( "../validpoint/node_modules/ping" );
-			let msg = CW_Constants.RESULT_FAIL;
+			let resolved = false;
 
-			// Perform a ping to prove the default status
-			ping.sys.probe( PING_HOST,
-				async ( isAlive ) =>
+			PING_HOSTS.forEach(
+				(pingHost, index) =>
 				{
-					if( isAlive )
-					{
-						msg = CW_Constants.RESULT_PASS;
-					}
-					
-					resolve( msg );
-					// No need to reject() since all errors put us in a resolvable failure state
+					// Perform a ping to prove the default status
+					ping.sys.probe( pingHost,
+						( isAlive ) =>
+						{
+							if( isAlive && !resolved )
+							{
+								// resolve on first success								
+								if( !resolved )
+								{
+									resolve( CW_Constants.RESULT_PASS );
+									resolved = true;
+								}
+							}
+
+							if( ((index + 1) == PING_HOSTS.length) && !resolved )
+							{
+								resolve( CW_Constants.RESULT_FAIL );
+							}
+							// No need to reject() since all failures put us in a resolvable failure state
+						}
+					);
 				}
 			);
+			
 		}
 		catch( error)
 		{
@@ -104,6 +117,77 @@ class CW_PromiseResolver
 			throw returnError;
 		}
 	} // resolve_checkDns()
+
+	/**
+	 * Check a site's SSL certificate
+	 * 
+	 * @author costmo
+	 * @param	{*}		resolve		Resolve function	
+	 * @param	{*}		reject		Reject function
+	 * @param {*} url			The URL of the site to check
+	 */
+	resolve_checkSSL( resolve, reject, { url = null } )
+	{
+		// TODO: try/catch
+
+		let ssllabs = require( "../validpoint/node_modules/node-ssllabs" );
+
+		let returnValue = {
+			grade: "",
+			status: "",
+			message: ""
+		};
+
+		let input = {
+			"host": url,
+			"fromCache": true,
+			"maxAge": 24,
+			"all": "on"
+		};
+
+		ssllabs.scan( input,
+			( error, host ) =>
+			{
+				if( error )
+				{
+					console.log( "Error" );
+					console.log( error );
+					// TODO: Do something
+				}
+				else
+				{
+					
+					// iterate endpoints
+					host.endpoints.forEach(
+						endpoint =>
+						{
+							if( endpoint.grade )
+							{
+								returnValue.grade = endpoint.grade;
+							}
+							if( endpoint.statusMessage && endpoint.statusMessage == "Ready" )
+							{
+								returnValue.status = CW_Constants.RESULT_PASS;
+								returnValue.message = endpoint.statusMessage;
+							}
+							else if( endpoint.statusMessage )
+							{
+								returnValue.status = CW_Constants.RESULT_FAIL;
+								returnValue.message = endpoint.statusMessage;
+							}
+							else
+							{
+								returnValue.status = CW_Constants.RESULT_FAIL;
+								returnValue.message = "Unknown failure";
+							}
+						}
+					);
+					resolve( returnValue );
+				}
+				
+			}
+		);
+	}
 
 	/**
 	 * Verify that essential HTML tags exist on the user's site

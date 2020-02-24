@@ -328,6 +328,9 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 			// which test to run
 			switch( testKey )
 			{
+				case "SSL":
+					console.log( "GOT SSL" );
+					break;
 				// TODO: These conditions need to be refactored
 				case "WEBSITE_CONTENT":
 					// Show a header

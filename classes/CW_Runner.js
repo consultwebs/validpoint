@@ -72,6 +72,19 @@ class CW_Runner
 		// Rejections have been resolved before getting back to here, so we only return resolved Promises
 		switch( command )
 		{
+			case "ssl":
+				return new Promise(
+					(resolve, reject) =>
+					{
+						this.command_SSL( { configObject: configObject, adviceObject: adviceObject } )
+						.then(
+							(result) =>
+							{
+								resolve( result );
+							}
+						);
+					}
+				);
 			case "website-content":
 				return new Promise(
 					(resolve, reject) =>
@@ -175,6 +188,61 @@ class CW_Runner
 		}
 
 	} // runCommand()
+
+	/**
+	 * Check a server's SSl certificate
+	 * (Convenience method to decouple logic from the runCommand switch list)
+	 * 
+	 * @author costmo
+	 * @param {*} configObject			A populated config object
+	 * @param {*} adviceObject		A constructed CW_Advice instance
+	 */
+	command_SSL( { configObject = null, adviceObject =  null } )
+	{
+		adviceObject.item_result.command = "ssl";
+		adviceObject.item_result.category = "website";
+
+		return new Promise(
+			( resolve, reject ) =>
+			{
+				let AdviceContent = require( "./CW_AdviceContent.js" );
+
+				AdviceContent.progressContent( { configObject: configObject,
+					input: "Retrieving SSL certificate information for ".header + configObject.url.subject + "...   ".header 
+				});
+
+				CW_Runner.network.checkSSL( { url: configObject.url } )
+					.then(
+						(result) =>
+						{
+							
+							AdviceContent.progressContent( { configObject: configObject,
+								input: "done\n".ok 
+							});
+
+							adviceObject.item_result.result = result.status;
+							adviceObject.item_result.result_tags.push( result.status );
+							adviceObject.item_result.raw_response = result;
+
+							AdviceContent.progressAdvice( { configObject: configObject, adviceObject: adviceObject, testKey: "SSL" } );
+
+							adviceObject.test_result.results.push( adviceObject.item_result );
+							adviceObject.finalizeOutput( { stripConfigObject: true, stripItemResult: true } );
+
+							// TODO: Output advice for non-progressive output
+
+							
+
+							resolve( JSON.stringify( adviceObject ) );
+						}
+					);
+
+
+
+
+
+			});
+	}
 
 	/**
 	 * Check website content for essential tags
@@ -353,8 +421,6 @@ class CW_Runner
 
 				try
 				{
-					// let result = await CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } );
-
 					CW_Runner.network.checkWebsiteAvailability( { domain: configObject.domain, port: port } )
 						.then(
 							(result) =>
@@ -1081,6 +1147,7 @@ class CW_Runner
 				.command( "website", "Combined test of http-port and http-response" )
 				.command( "secure-website", "Combined test of https-port and https-response" )
 				.command( "website-content", "Test website content for essential content" )
+				.command( "ssl", "Test website SSL certificate" )
 				.help( "help",  "Show this help screen" )
 				.argv;
 

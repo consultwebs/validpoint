@@ -84,7 +84,7 @@ class CW_AdviceContent
 	}
 
 	static progressAdvice( {configObject = null, adviceObject = null, testKey = null} )
-	{		
+	{
 		// Don't go further if we aren't going to show output
 		if( configObject.be_quiet === false )
 		{

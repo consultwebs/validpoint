@@ -166,6 +166,25 @@ class CW_Network
 		);
 	}
 
+	/**
+	 * Check a server's SSL certificate
+	 * 
+	 * @returns Promise
+	 * @param {*} url		The domain/URL to query
+	 */
+	checkSSL( { url = null } )
+	{
+		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
+		let resolver = new CW_PromiseResolver();
+
+		return new Promise(
+			( resolve, reject ) =>
+			{
+				resolver.resolve_checkSSL( resolve, reject, { url: url } );
+			}
+		);
+	}
+
 
 }
 
