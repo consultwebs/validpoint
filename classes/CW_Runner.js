@@ -72,6 +72,19 @@ class CW_Runner
 		// Rejections have been resolved before getting back to here, so we only return resolved Promises
 		switch( command )
 		{
+			case "all-website-content":
+				return new Promise(
+					(resolve, reject) =>
+					{
+						this.command_AllWebsiteContent( { configObject: configObject, adviceObject: adviceObject } )
+						.then(
+							(result) =>
+							{
+								resolve( result );
+							}
+						);
+					}
+				);
 			case "ssl":
 				return new Promise(
 					(resolve, reject) =>
@@ -266,6 +279,28 @@ class CW_Runner
 
 
 
+			});
+	}
+
+	/**
+	 * Returns all website content for external processing
+	 * 
+	 * @author costmo
+	 * @param {*} configObject			A populated config object
+	 * @param {*} adviceObject		A constructed CW_Advice instance
+	 */
+	command_AllWebsiteContent( { configObject = null, adviceObject =  null } )
+	{
+		return new Promise(
+			(resolve, reject) =>
+			{
+				CW_Runner.network.checkWebsiteContent( { url: configObject.url } )
+					.then(
+						( result ) =>
+						{
+							resolve( result );
+						}
+					);
 			});
 	}
 

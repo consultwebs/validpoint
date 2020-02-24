@@ -11,6 +11,12 @@ const runner = new CW_Runner();
 const CW_InputParser =  require( "../classes/CW_InputParser.js" );
 let config = null;
 
+exports.commandHook = 
+( command, domain, callback ) =>
+{
+	commandRunner( { domain: domain, command: command, callback: callback } );
+};
+
 exports.testDomain = 
 ( domain, callback ) =>
 {
@@ -86,7 +92,7 @@ let commandRunner =
 			runObjects.forEach(
 				runObject =>
 				{
-					let parser = new CW_InputParser( runObject.file, "./input/" );
+					let parser = new CW_InputParser( runObject.file, "./" );
 
 					parser.init(
 						async function()
@@ -98,6 +104,10 @@ let commandRunner =
 								if( config == null )
 								{
 									throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
+								}
+								else if( config.error && config.error.length > 0 )
+								{
+									throw new Error( config.error );
 								}
 
 								let CW_Advice = require( "../classes/CW_Advice.js" );
@@ -113,10 +123,7 @@ let commandRunner =
 							}
 							catch( error )
 							{
-								// TODO: Handle exceptions - update to match error handling in bin/ValidPoint
-								// The only thing that could happen here is handling config inpt errors. All other errors have been caught and handled before reaching here.
-
-								console.log( "UNCAUGHT ERROR" );
+								// The only thing that could happen here is handling config input errors. All other errors have been caught and handled before reaching here.
 								console.log( error );
 							}
 						}

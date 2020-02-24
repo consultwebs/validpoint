@@ -4,6 +4,7 @@
   "description": "Consultwebs service validator",
   "license": "MIT",
   "main": "index.mjs",
+  "type": "module",
   "bin": {
     "validpoint": "./bin/validpoint"
   },

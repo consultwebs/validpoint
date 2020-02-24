@@ -150,13 +150,10 @@ class CW_PromiseResolver
 			{
 				if( error )
 				{
-					console.log( "Error" );
-					console.log( error );
-					// TODO: Do something
+					// TODO: Do something. invalid certificates do not trigger this error
 				}
 				else
 				{
-					
 					// iterate endpoints
 					host.endpoints.forEach(
 						endpoint =>

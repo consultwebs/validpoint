@@ -24,7 +24,7 @@ module.exports = Object.freeze(
 	VALID_COMMANDS: [ 
 		"local-network", "local-dns", 
 		"http-port", "https-port", "domain",
-		"http-response", "https-response", "website", "secure-website",  "website-content", "ssl"
+		"http-response", "https-response", "website", "secure-website",  "website-content", "ssl", "all-website-content"
 	],
 
 	COLOR_THEME:
