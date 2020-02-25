@@ -21,7 +21,7 @@ class CW_Network
 	 * @author costmo
 	 * @returns Promise
 	 */
-    async checkLocalNetwork()
+    checkLocalNetwork()
     {
 		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
 		let resolver = new CW_PromiseResolver();
@@ -40,7 +40,7 @@ class CW_Network
 	 * @author costmo
 	 * @returns Promise
 	 */
-	async checkLocalDns()
+	checkLocalDns()
 	{
 		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
 		let resolver = new CW_PromiseResolver();
@@ -59,7 +59,7 @@ class CW_Network
 	 * @returns Promise
 	 * @param {*} url			The URL of the site to check
 	 */
-	async checkWebsiteContent( { url = null } )
+	checkWebsiteContent( { url = null } )
 	{
 		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
 		let resolver = new CW_PromiseResolver();
@@ -85,7 +85,7 @@ class CW_Network
 	 * @param {*} url			The URL of the site to check
 	 * @param {*} port			The port to check (80 or 443)
 	 */
-	async checkWebsiteResponse( { url = null, port = 80 } )
+	checkWebsiteResponse( { url = null, port = 80 } )
 	{
 		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
 		let resolver = new CW_PromiseResolver();
@@ -132,7 +132,7 @@ class CW_Network
 	 * @returns Promise
 	 * @param {*} domain		The domain name to lookup 
 	 */
-	async getWhoisInfo( { domain = null } )
+	getWhoisInfo( { domain = null } )
 	{
 		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
 		let resolver = new CW_PromiseResolver();
@@ -153,7 +153,7 @@ class CW_Network
 	 * @param {*} recordType	The type of record to find ("A", "CNAME", "MX" etc.)
 	 * @param {*} queryServer	The server to query. If null, will use the current user's configured DNS server
 	 */
-	async checkDomain( { domain = null, recordType = null, queryServer = null } )
+	checkDomain( { domain = null, recordType = null, queryServer = null } )
 	{
 		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
 		let resolver = new CW_PromiseResolver();

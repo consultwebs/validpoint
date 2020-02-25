@@ -411,7 +411,7 @@ class CW_PromiseResolver
 	 * @param {*} domain		The domain name of the site to check
 	 * @param {*} port			The port to check (80 or 443)
 	 */
-	async resolve_checkWebsiteAvailability( resolve, reject, { domain = null, port = 80 } )
+	resolve_checkWebsiteAvailability( resolve, reject, { domain = null, port = 80 } )
 	{
 		try
 		{
@@ -596,7 +596,7 @@ class CW_PromiseResolver
 
 		// Parse `domain` from command line input
 		// Request for a specific domain
-		if( domain != "all" )
+		if( domain && domain != "all" )
 		{
 			// input is a comma separated list of domains
 			if( domain.indexOf( "," ) >= 0)
@@ -628,7 +628,7 @@ class CW_PromiseResolver
 		else // request all domains TODO: Update this
 		{
 			let fs = require( "fs" );
-			let path = "../input/"; // TODO: This can't be hard-coded
+			let path = "./";
 
 			// Iterate all files in the input directory
 			fs.readdir( path,
@@ -637,7 +637,7 @@ class CW_PromiseResolver
 					items.forEach(
 						item =>
 						{
-							if( item.endsWith( ".json" ) )
+							if( item.endsWith( ".json" ) && item !== "config.json" && !item.startsWith( "package" ) )
 							{
 								let runObject = {
 									"domain": item.substring( 0, (item.length - 5) ),
@@ -647,6 +647,7 @@ class CW_PromiseResolver
 							}
 						}
 					);
+
 					resolve( returnValue );
 				});
 		}

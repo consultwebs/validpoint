@@ -52,7 +52,7 @@ class CW_Runner
 	 * @param {*} configObject		An object holding the ingested configuration values
 	 * @param {*} adviceObject			An instance of CW_Advice to pass down from the caller
 	 */
-	async runCommand( { command = "", configObject = null, adviceObject = null } )
+	runCommand( { command = "", configObject = null, adviceObject = null } )
     {
         // sanity check the requested command
 		command = this.sanitizeCommand( command );
@@ -317,7 +317,7 @@ class CW_Runner
 		adviceObject.item_result.category = "website";
 
 		return new Promise(
-			async (resolve, reject) =>
+			(resolve, reject) =>
 			{
 				let AdviceContent = require( "./CW_AdviceContent.js" );
 
@@ -471,7 +471,7 @@ class CW_Runner
 		}
 
 		return new Promise(
-			async (resolve, reject) =>
+			(resolve, reject) =>
 			{
 				let AdviceContent = require( "./CW_AdviceContent.js" );
 
@@ -587,7 +587,7 @@ class CW_Runner
 		adviceObject.item_result.category = "local";
 
 		return new Promise(
-			async (resolve, reject) =>
+			(resolve, reject) =>
 			{
 				let AdviceContent = require( "./CW_AdviceContent.js" );
 

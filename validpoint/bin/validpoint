@@ -28,6 +28,8 @@ require( "strict-mode" )(
 					let domains = inputOptions.domain;
 					let inputDirectory = null;
 
+					let objectsToRun = 0;
+
 					if( inputOptions.directory && inputOptions.directory.length > 0 )
 					{
 						inputDirectory = inputOptions.directory;
@@ -39,13 +41,18 @@ require( "strict-mode" )(
 						{
 							// Foreach command
 							cmds.forEach(
-								command =>
+								(command, index) =>
 								{
 									// 1. make runner object(s)
 									CW_InputParser.makeRunnerObjects( { domain: domain, directory: inputDirectory } )
 										.then(
 											( runObjects ) =>
 											{
+												if( runObjects.length > 0 )
+												{
+													objectsToRun += runObjects.length;
+												}
+
 												runObjects.forEach(
 													runObject =>
 													{
@@ -89,6 +96,15 @@ require( "strict-mode" )(
 																					console.log( response );
 																					console.log(); // Make a blank line for separation until we have nicer progressive output
 																				}
+
+																				if( (index + 1) == cmds.length )
+																				{
+																					if( objectsToRun < 1 )
+																					{
+																						console.log( "There were no domains and/or commands to run. Try `validpoint --help`".warn );
+																					}
+																				}
+
 																			}
 																		);
 																}
@@ -100,11 +116,7 @@ require( "strict-mode" )(
 																	process.exit( 1 );
 																}
 															}); // parser.init()
-
-
-													}
-												);
-
+													});
 											}
 										);
 								}); // cmds.forEach

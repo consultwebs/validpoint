@@ -97,7 +97,7 @@ class CW_InputParser
 	 * @returns Array
 	 * @param {*} domain 			The domain, comma-separated list of domains, or "all".
 	 */
-	static async makeRunnerObjects( { domain = null, directory = null } )
+	static makeRunnerObjects( { domain = null, directory = null } )
 	{
 		let CW_PromiseResolver = require( "./CW_PromiseResolver" );
 		let resolver = new CW_PromiseResolver();
