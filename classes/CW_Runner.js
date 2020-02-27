@@ -220,18 +220,17 @@ class CW_Runner
 			{
 				let AdviceContent = require( "./CW_AdviceContent.js" );
 
-				AdviceContent.progressContent( { configObject: configObject,
-					input: "Retrieving SSL certificate information for ".header + configObject.url.subject + "...   ".header 
-				});
+				// AdviceContent.progressContent( { configObject: configObject,
+				// 	input: "Retrieving SSL certificate information for ".header + configObject.url.subject + "...   ".header 
+				// });
 
 				CW_Runner.network.checkSSL( { url: configObject.url } )
 					.then(
 						(result) =>
 						{
-							
-							AdviceContent.progressContent( { configObject: configObject,
-								input: "done\n".ok 
-							});
+							// AdviceContent.progressContent( { configObject: configObject,
+							// 	input: "done\n".ok 
+							// });
 
 							adviceObject.item_result.result = result.status;
 							adviceObject.item_result.result_tags.push( result.status );
@@ -321,9 +320,9 @@ class CW_Runner
 			{
 				let AdviceContent = require( "./CW_AdviceContent.js" );
 
-				AdviceContent.progressContent( { configObject: configObject,
-					input: "Downloading content for  ".header + configObject.url.subject + "...   ".header 
-				});
+				// AdviceContent.progressContent( { configObject: configObject,
+				// 	input: "Downloading content for  ".header + configObject.url.subject + "...   ".header 
+				// });
 
 				try
 				{
@@ -331,9 +330,9 @@ class CW_Runner
 						.then(
 							( result ) =>
 							{
-								AdviceContent.progressContent( { configObject: configObject,
-									input: "done\n".ok 
-								});
+								// AdviceContent.progressContent( { configObject: configObject,
+								// 	input: "done\n".ok 
+								// });
 
 								// Parse the incoming HTML to find important elements
 								let HtmlParser = require( "../validpoint/node_modules/node-html-parser" );
@@ -416,17 +415,17 @@ class CW_Runner
 			{
 				let AdviceContent = require( "./CW_AdviceContent.js" );
 
-				AdviceContent.progressContent( { configObject: configObject,
-					input: "Checking port " + port.toString().subject + " response code for ".header + configObject.url.subject + "...   ".header 
-				});
+				// AdviceContent.progressContent( { configObject: configObject,
+				// 	input: "Checking port " + port.toString().subject + " response code for ".header + configObject.url.subject + "...   ".header 
+				// });
 
 				CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } )
 					.then(
 						( result ) =>
 						{
-							AdviceContent.progressContent( { configObject: configObject,
-								input: "done\n".ok 
-							});
+							// AdviceContent.progressContent( { configObject: configObject,
+							// 	input: "done\n".ok 
+							// });
 
 							adviceObject.item_result.result = result.result;
 							adviceObject.item_result.result_tags.push( result.result );
@@ -475,9 +474,9 @@ class CW_Runner
 			{
 				let AdviceContent = require( "./CW_AdviceContent.js" );
 
-				AdviceContent.progressContent( { configObject: configObject,
-					input: "Checking port " + port.toString().subject + " availability for ".header + configObject.url.subject + "...   ".header 
-				});
+				// AdviceContent.progressContent( { configObject: configObject,
+				// 	input: "Checking port " + port.toString().subject + " availability for ".header + configObject.url.subject + "...   ".header 
+				// });
 
 				try
 				{
@@ -485,9 +484,9 @@ class CW_Runner
 						.then(
 							(result) =>
 							{
-								AdviceContent.progressContent( { configObject: configObject,
-									input: "done".ok 
-								});
+								// AdviceContent.progressContent( { configObject: configObject,
+								// 	input: "done".ok 
+								// });
 
 								adviceObject.item_result.result = result.result;
 								adviceObject.item_result.result_tags.push( result.result );
@@ -540,14 +539,14 @@ class CW_Runner
 			{	
 				let AdviceContent = require( "./CW_AdviceContent.js" );
 
-				AdviceContent.progressContent( { configObject: configObject,
-					input: "Checking Internet name resolution...   ".header 
-				});
-
 				CW_Runner.network.checkLocalDns()
 					.then(
 						( result ) =>
 						{
+							AdviceContent.progressContent( { configObject: configObject,
+								input: "Checking Internet name resolution...   ".header 
+							});
+
 							// Handled in the same way as local-network
 							adviceObject.item_result.result = result;
 							adviceObject.item_result.result_tags.push( result );
@@ -564,6 +563,9 @@ class CW_Runner
 					.catch(
 						( error ) =>
 						{
+							AdviceContent.progressContent( { configObject: configObject,
+								input: "Internet name resolution failed...   ".error 
+							});
 							resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
 						}
 					);
@@ -591,14 +593,15 @@ class CW_Runner
 			{
 				let AdviceContent = require( "./CW_AdviceContent.js" );
 
-				AdviceContent.progressContent( { configObject: configObject,
-					input: "Checking local network connectivity...   ".header 
-				});
 
 				CW_Runner.network.checkLocalNetwork()
 					.then(
 						( result ) =>
-						{
+						{	
+							AdviceContent.progressContent( { configObject: configObject,
+								input: "Checking local network connectivity...   ".header 
+							});
+
 							// `result` will either be PASS or FAIL. Nothing more meaningfiul is needed for this test
 							adviceObject.item_result.result = result;
 							adviceObject.item_result.result_tags.push( result );
@@ -615,6 +618,9 @@ class CW_Runner
 					.catch(
 						( error ) =>
 						{
+							AdviceContent.progressContent( { configObject: configObject,
+								input: "Local network connectivity test failed...   ".error 
+							});
 							resolve( JSON.stringify( this.constructErroredAdviceObject( { adviceObject: adviceObject, input: error } ) ) );
 						}
 					);
@@ -694,9 +700,9 @@ class CW_Runner
 							( completion ) =>
 							{
 								
-								AdviceContent.progressContent( { configObject: configObject,
-									input: "Testing name server records for ".header + configObject.domain.subject + "...   ".header 
-								});
+								// AdviceContent.progressContent( { configObject: configObject,
+								// 	input: "Testing name server records for ".header + configObject.domain.subject + "...   ".header 
+								// });
 
 								// get nameserver records first so that we can get all the other data from an authority because non-authorities don't always answer completely
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "NS", queryServer: null } )
@@ -725,9 +731,9 @@ class CW_Runner
 							},
 							( result, completion ) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
 							{
-								AdviceContent.progressContent( { configObject: configObject,
-									input: "Testing mail server records for ".header + configObject.domain.subject + "...   ".header
-								});
+								// AdviceContent.progressContent( { configObject: configObject,
+								// 	input: "Testing mail server records for ".header + configObject.domain.subject + "...   ".header
+								// });
 
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX" } )
 								.then(
@@ -991,9 +997,9 @@ class CW_Runner
 			adviceObject.item_result.command = "secure-website";
 		}
 
-		AdviceContent.progressContent( { configObject: configObject,
-			input: "Checking website availability for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
-		});
+		// AdviceContent.progressContent( { configObject: configObject,
+		// 	input: "Checking website availability for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
+		// });
 
 		// wrap the entire waterfall in a promise
 		return new Promise(
@@ -1008,9 +1014,9 @@ class CW_Runner
 								.then(
 									( result ) =>
 									{
-										AdviceContent.progressContent( { configObject: configObject,
-											input: "done\n".ok 
-										});
+										// AdviceContent.progressContent( { configObject: configObject,
+										// 	input: "done\n".ok 
+										// });
 										try
 										{
 											adviceObject.item_result.result = result.result;
@@ -1068,17 +1074,17 @@ class CW_Runner
 						},
 						( result, completion ) =>
 						{
-							AdviceContent.progressContent( { configObject: configObject,
-								input: "Checking website response for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
-							});
+							// AdviceContent.progressContent( { configObject: configObject,
+							// 	input: "Checking website response for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
+							// });
 
 							CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
 								.then(
 									( result ) =>
 									{
-										AdviceContent.progressContent( { configObject: configObject,
-											input: "done\n".ok 
-										});
+										// AdviceContent.progressContent( { configObject: configObject,
+										// 	input: "done\n".ok 
+										// });
 
 										adviceObject.item_result.result = result.result;
 										adviceObject.item_result.result_tags.push( result.result );
@@ -1095,9 +1101,9 @@ class CW_Runner
 								).catch(
 									error =>
 									{
-										AdviceContent.progressContent( { configObject: configObject,
-											input: "done\n".ok 
-										});
+										// AdviceContent.progressContent( { configObject: configObject,
+										// 	input: "done\n".ok 
+										// });
 
 										// Resolve a throw from a system error...
 										if( error.raw_response && error.raw_response.message && error.raw_response.message.length > 0 )
@@ -1226,7 +1232,7 @@ class CW_Runner
 						}
 						else
 						{
-							returnValue.command = CW_Constants.VALID_COMMANDS;
+							returnValue.command = CW_Constants.DEFAULT_COMMANDS;
 						}
 						
 						returnValue.domain = config.domains;
@@ -1242,7 +1248,7 @@ class CW_Runner
 				// Receiver expects an array for command and domain
 				if( !yargs.argv._[0] || yargs.argv._[0].length < 1 || yargs.argv._[0] == "all" )
 				{
-					returnValue.command = CW_Constants.VALID_COMMANDS;
+					returnValue.command = CW_Constants.DEFAULT_COMMANDS;
 				}
 				else
 				{

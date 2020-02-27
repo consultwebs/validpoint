@@ -74,7 +74,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 				break;
 			case "NS":
 				// Show a header
-				returnValue.printSubject = "Found response for ".text + configObject.domain.subject + " with name servers: ".text;
+				returnValue.printSubject = "Found name servers for ".text + configObject.domain.subject + ": ".text;
 				// Fill an array with results to display
 				serverArray = this.test_result.servers.ns;
 
@@ -90,7 +90,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 				}
 				break;
 			case "MX":
-				returnValue.printSubject = "Found response for ".text + configObject.domain.subject + " with mail servers: ".text;
+				returnValue.printSubject = "Found mail servers for ".text + configObject.domain.subject + ": ".text;
 				serverArray = this.test_result.servers.mx;
 
 				if( this.test_result.servers.mx.length < 1 )
@@ -104,7 +104,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 				}
 				break;
 			case "TLD_A":
-				returnValue.printSubject = "Found response for ".text + configObject.domain.subject + " with \"A\" records: ".text;
+				returnValue.printSubject = "Found \"A\" records for ".text + configObject.domain.subject + ": ".text;
 				serverArray = this.test_result.servers.tld_a;
 
 				if( this.test_result.servers.tld_a.length < 1 )
@@ -118,7 +118,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 				}
 				break;
 			case "WWW_A":
-				returnValue.printSubject = "Found response for ".text + configObject.url.subject + " with \"A\" records: ".text;
+				returnValue.printSubject = "Found \"A\" records for ".text + configObject.url.subject + ": ".text;
 				serverArray = this.test_result.servers.www_a;
 
 				if( this.test_result.servers.www_a.length < 1 )
@@ -132,7 +132,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 				}
 				break;
 			case "WWW_CNAME":
-					returnValue.printSubject = "Found response for ".text + configObject.url.subject + " with \"CNAME\" records: ".text;
+					returnValue.printSubject = "Found \"CNAME\" records for ".text + configObject.url.subject + ": ".text;
 					serverArray = this.test_result.servers.www_cname;
 	
 					if( this.test_result.servers.www_cname.length < 1 && this.test_result.servers.www_a.length < 1 )
@@ -148,7 +148,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 			case "TLD_CNAME":
 				if( this.test_result.servers.tld_cname.length > 0 )
 				{
-					returnValue.printSubject = "Found response for ".text + configObject.domain.subject + " with \"CNAME\" records: ".text;
+					returnValue.printSubject = "Found \"CNAME\" records for ".text + configObject.domain.subject + ": ".text;
 					serverArray = this.test_result.servers.tld_cname;
 				}
 				else
@@ -173,7 +173,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 				}
 				else if( this.test_result.days_til_expiry < 90 )
 				{
-					serverArray = [ "Your domain is expiring in " + this.test_result.days_til_expiry + " days" ];
+					serverArray = [ configObject.domain.subject + " is expiring in " + this.test_result.days_til_expiry + " days" ];
 					tags.push(
 						{
 							intermediate_key: "DOMAIN_WILL_EXPIRE",
@@ -183,7 +183,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 				}
 				else
 				{
-					returnValue.printSubject = "Domain ".text + configObject.url.subject + " will expire in: ".text;
+					returnValue.printSubject = configObject.domain.subject + " is expiring in " + this.test_result.days_til_expiry + " days";
 					serverArray = [ this.test_result.days_til_expiry + " days" ];
 				}
 				break;

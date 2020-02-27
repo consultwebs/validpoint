@@ -27,6 +27,12 @@ module.exports = Object.freeze(
 		"http-response", "https-response", "website", "secure-website",  "website-content", "ssl", "all-website-content"
 	],
 
+	DEFAULT_COMMANDS: [ 
+		"local-network", "local-dns", 
+		"http-port", "https-port", "domain",
+		"http-response", "https-response", "website", "secure-website",  "website-content", "all-website-content"
+	],
+
 	COLOR_THEME:
 	{
 		title: [ "brightGreen", "bold" ],

@@ -37,7 +37,7 @@ require( "strict-mode" )(
 
 					// Foreach domain
 					domains.forEach(
-						domain =>
+						( domain ) =>
 						{
 							// Foreach command
 							cmds.forEach(
@@ -52,7 +52,7 @@ require( "strict-mode" )(
 												{
 													objectsToRun += runObjects.length;
 												}
-
+												
 												runObjects.forEach(
 													runObject =>
 													{
@@ -84,6 +84,7 @@ require( "strict-mode" )(
 																	// 3. Setup advice
 																	let CW_Advice = require( "../../classes/CW_Advice.js" );
 																	let advice = new CW_Advice();
+
 																	// 4. runCommand
 																	runner.runCommand( { command: command, configObject: config, adviceObject: advice } )
 																		.then(
