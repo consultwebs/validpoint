@@ -20,6 +20,10 @@ require( "strict-mode" )(
 		const CW_InputParser =  require( "../../classes/CW_InputParser.js" );
 		let config = null;
 
+		const CW_Constants =  require( "../../classes/CW_Constants.js" );
+		const colors = require( "../node_modules/colors" );
+		colors.setTheme( CW_Constants.COLOR_THEME );
+
 		let inputOptions = CW_Runner.processinputArguments()
 			.then(
 				( inputOptions ) =>
@@ -102,7 +106,7 @@ require( "strict-mode" )(
 																				{
 																					if( objectsToRun < 1 )
 																					{
-																						console.log( "There were no domains and/or commands to run. Try `validpoint --help`".warn );
+																						console.log( "There were no commands to run. Try `validpoint --help`".warn );
 																					}
 																				}
 

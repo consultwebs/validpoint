@@ -58,8 +58,8 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 		switch( testKey )
 		{
 			case "WEBSITE_AVAILABILITY":
-				returnValue.printSubject = "Checking response time...   ".text;
-				// returnValue.printSubject += configObject.url.subject + " responded in: ".text;
+				//returnValue.printSubject = "Checking response time...   ".text;
+				returnValue.printSubject = configObject.url.subject + " responded in: ".text;
 				returnValue.printSubject += Math.ceil( this.test_result.raw_response.response_time ).toString().result + "ms".result;
 
 				if( this.test_result.raw_response.response_time < CW_Constants.MAX_HTTTP_RESPONSE_TIME )

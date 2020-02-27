@@ -921,9 +921,9 @@ class CW_Runner
 							},
 							( result, completion ) => // Step 7. Perform a whois lookup to get the domain expiration
 							{
-								AdviceContent.progressContent( { configObject: configObject,
-									input: "Testing domain registration details for ".header + configObject.domain.subject + "...   ".header
-								});
+								// AdviceContent.progressContent( { configObject: configObject,
+								// 	input: "Testing domain registration details for ".header + configObject.domain.subject + "...   ".header
+								// });
 
 								CW_Runner.network.getWhoisInfo( { domain: configObject.domain } )
 								.then(
@@ -1150,6 +1150,62 @@ class CW_Runner
 		return network;
 	}
 
+	static getYargs()
+	{
+		let yargs = require( "../validpoint/node_modules/yargs" );
+		yargs.scriptName( "validpoint" )
+			.usage( "USAGE: $0 <command> -d [domain1,[domain2,...]] [-f file] [-r] [-q] [-h]" )
+			.version( "0.0.1" )
+			.option( "d",
+			{
+				alias: "domain",
+				describe: "The domain name or a comma-delimited list of domain names",
+				demand: false,
+				type: "string",
+				nargs: 1
+			} )
+			.option( "f",
+			{
+				alias: "file",
+				describe: "Use a JSON file for input configuration",
+				demand: false,
+				type: "string",
+				conflicts: [ "d" ] // Don't allow users to specify a file or directory for input AND a domain to test
+			} )
+			.option( "h",
+			{
+				alias: "help",
+				describe: "Show this help screen",
+				demand: false
+			})
+			.option( "r",
+			{
+				alias: "raw",
+				describe: "Include raw test results",
+				demand: false
+			} )
+			.option( "q",
+			{
+				alias: "quiet",
+				describe: "Suppress in-progress output and only show the result",
+				demand: false
+			} )
+			.command( "local-network", "Test local network connectivity" )
+			.command( "local-dns", "Test local DNS resolution" )
+			.command( "http-port", "Test response time of web server port 80" )
+			.command( "https-port", "Test response time of web server port 443" )
+			.command( "domain", "Test domain registrar configuration" )
+			.command( "http-response", "Test response code and redirection for http" )
+			.command( "https-response", "Test response code and redirection for https" )
+			.command( "website", "Combined test of http-port and http-response" )
+			.command( "secure-website", "Combined test of https-port and https-response" )
+			.command( "website-content", "Test website content for essential content" )
+			.command( "ssl", "Test website SSL certificate" )
+			.help( "help",  "Show this help screen" );
+
+		return yargs;
+	}
+
 	static processinputArguments()
 	{
 		return new Promise(
@@ -1165,57 +1221,8 @@ class CW_Runner
 			// TODO: Request help from a module call
 
 			// parse the requested command from the command line arguments, then run the command
-			let yargs = require( "../validpoint/node_modules/yargs" );
-			yargs.scriptName( "validpoint" )
-				.usage( "USAGE: $0 <command> -d [domain1,[domain2,...]] [-f file] [-c configFile] [-h]" )
-				.version( "0.0.1" )
-				.option( "d",
-				{
-					alias: "domain",
-					describe: "The domain name or a comma-delimited list of domain names",
-					demand: false,
-					type: "string",
-					nargs: 1
-				} )
-				.option( "f",
-				{
-					alias: "file",
-					describe: "Use a JSON file for input configuration",
-					demand: false,
-					type: "string",
-					conflicts: [ "d" ] // Don't allow users to specify a file or directory for input AND a domain to test
-				} )
-				.option( "h",
-				{
-					alias: "help",
-					describe: "Show this help screen",
-					demand: false
-				})
-				.option( "r",
-				{
-					alias: "raw",
-					describe: "Include raw test results",
-					demand: false
-				} )
-				.option( "q",
-				{
-					alias: "quiet",
-					describe: "Suppress in-progress output and only show the result",
-					demand: false
-				} )
-				.command( "local-network", "Test local network connectivity" )
-				.command( "local-dns", "Test local DNS resolution" )
-				.command( "http-port", "Test response time of web server port 80" )
-				.command( "https-port", "Test response time of web server port 443" )
-				.command( "domain", "Test domain registrar configuration" )
-				.command( "http-response", "Test response code and redirection for http" )
-				.command( "https-response", "Test response code and redirection for https" )
-				.command( "website", "Combined test of http-port and http-response" )
-				.command( "secure-website", "Combined test of https-port and https-response" )
-				.command( "website-content", "Test website content for essential content" )
-				.command( "ssl", "Test website SSL certificate" )
-				.help( "help",  "Show this help screen" )
-				.argv;
+			let yargs = CW_Runner.getYargs();
+			yargs.argv;
 
 			if( yargs.argv.file )
 			{
