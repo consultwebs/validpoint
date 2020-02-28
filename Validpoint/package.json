@@ -29,5 +29,8 @@
     "tcp-ping": "^0.1.1",
     "whois": "^2.12.0",
     "yargs": "^15.1.0"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.6.3"
   }
 }
