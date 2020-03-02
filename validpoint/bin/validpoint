@@ -76,7 +76,15 @@ require( "strict-mode" )(
 																	}
 																	else if( config.error && config.error.length > 0 )
 																	{
-																		throw new Error( config.error );
+																		// config.error happens when a json file does not exist for the domain...
+																		//   In the absence of a domain.json file, populate a config object with reasonable 
+																		//   parameters for the given domain
+																		config = 
+																		{	...config,
+																			name: domain,
+																			domain: domain,
+																			url: "www." + domain
+																		}
 																	}
 
 																	config = 
