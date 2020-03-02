@@ -1233,9 +1233,13 @@ class CW_Runner
 					{
 						let config = this.parseJsonString();
 
+						if( config.preflight_commands && config.preflight_commands.length > 0 )
+						{
+							returnValue.command = config.preflight_commands;
+						}
 						if( config.commands && config.commands.length > 0 && config.commands[0] != "all" )
 						{
-							returnValue.command = config.commands;
+							returnValue.command = returnValue.command.concat( config.commands );
 						}
 						else
 						{

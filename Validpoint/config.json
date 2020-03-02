@@ -1,12 +1,35 @@
 {
-	"directory": "./input/",
 	"domains": 
+	{
+		"consultwebs.com":
+		{
+			"name": "Consultwebs",
+			"url": "www.consultwebs.com",
+			"preflight_commands":
+			[
+				"local-network", "local-dns"
+			],
+			"commands":
+			[
+				"https-port", "domain", "https-response", 
+				"secure-website",  "website-content"
+			]
+		},
+		"appideas.com": {},
+		"bravoreviews.com": {
+			"url": "meta.bravoreviews.com",
+			"commands":
+			[
+				"https-response", "ssl"
+			]
+		}
+	},
+	"preflight_commands":
 	[
-		"consultwebs.com", "appideas.com"
+		"local-network", "local-dns"
 	],
 	"commands":
 	[
-		"local-network", "local-dns", 
 		"http-port", "https-port", "domain",
 		"http-response", "https-response", "website", "secure-website",  "website-content"
 	]
