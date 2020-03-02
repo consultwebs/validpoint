@@ -13,14 +13,14 @@ require( "strict-mode" )(
     () =>
     {
 		// Get an instance of the runner
-		const CW_Runner = require( "../../classes/CW_Runner.js" );
+		const CW_Runner = require( "../src/CW_Runner.js" );
 		const runner = new CW_Runner();
 
 		// And an instance of the parser
-		const CW_InputParser =  require( "../../classes/CW_InputParser.js" );
+		const CW_InputParser =  require( "../src/CW_InputParser.js" );
 		let config = null;
 
-		const CW_Constants =  require( "../../classes/CW_Constants.js" );
+		const CW_Constants =  require( "../src/CW_Constants.js" );
 		const colors = require( "../node_modules/colors" );
 		colors.setTheme( CW_Constants.COLOR_THEME );
 
@@ -86,7 +86,7 @@ require( "strict-mode" )(
 																	}
 
 																	// 3. Setup advice
-																	let CW_Advice = require( "../../classes/CW_Advice.js" );
+																	let CW_Advice = require( "../src/CW_Advice.js" );
 																	let advice = new CW_Advice();
 
 																	// 4. runCommand

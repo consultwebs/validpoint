@@ -5,8 +5,8 @@
  * @author costmo
  */
 
-let CW_Constants = require( "./CW_Constants.js" );
-const colors = require( "../validpoint/node_modules/colors" );
+let CW_Constants = require( "./CW_Constants" );
+const colors = require( "colors" );
 colors.setTheme( CW_Constants.COLOR_THEME );
 
 class CW_AdviceContent

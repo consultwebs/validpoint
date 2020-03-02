@@ -7,9 +7,9 @@
  * @author costmo
  */
 
-let CW_Constants = require( "./CW_Constants.js" );
+let CW_Constants = require( "./CW_Constants" );
 
-let CW_AdviceContent = require( "./CW_AdviceContent.js" );
+let CW_AdviceContent = require( "./CW_AdviceContent" );
 class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 {
 	/**
@@ -487,7 +487,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 	 */
 	contentForSeverity( { severity = null, extraInput = null } )
 	{
-		let strings = require( "../validpoint/strings/category.website-admin.js" );
+		let strings = require( "../strings/category.website-admin.js" );
 		
 		switch( severity )
 		{

@@ -4,11 +4,11 @@ require( "strict-mode" )(
 
 });
 
-const CW_Runner = require( "../classes/CW_Runner.js" );
+const CW_Runner = require( "./src/CW_Runner.js" );
 const runner = new CW_Runner();
 
 // And an instance of the parser
-const CW_InputParser =  require( "../classes/CW_InputParser.js" );
+const CW_InputParser =  require( "./src/CW_InputParser.js" );
 let config = null;
 
 exports.commandHook = 
@@ -110,7 +110,7 @@ let commandRunner =
 									throw new Error( config.error );
 								}
 
-								let CW_Advice = require( "../classes/CW_Advice.js" );
+								let CW_Advice = require( "./src/CW_Advice.js" );
 								let advice = new CW_Advice();
 
 								runner.runCommand( { command: command, configObject: config, adviceObject: advice } )

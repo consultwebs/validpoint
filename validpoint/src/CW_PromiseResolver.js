@@ -8,7 +8,7 @@
  * TODO: The PromiseResolver will need to be divided into subclasses for maintainability
  */
 
-let CW_Constants = require( "./CW_Constants.js" );
+let CW_Constants = require( "./CW_Constants" );
 
 const PING_HOSTS = ["8.8.8.8", "1.1.1.1", "1.0.0.1", "139.130.4.5"]; // Google, Cloudflare, Cloudflare, Telstra
 const DNS_HOST = "www.google.com";
@@ -38,7 +38,7 @@ class CW_PromiseResolver
 		try
 		{
 			// Set the default status to "down"
-			let ping = require( "../validpoint/node_modules/ping" );
+			let ping = require( "ping" );
 			let resolved = false;
 
 			PING_HOSTS.forEach(
@@ -130,7 +130,7 @@ class CW_PromiseResolver
 	{
 		// TODO: try/catch
 
-		let ssllabs = require( "../validpoint/node_modules/node-ssllabs" );
+		let ssllabs = require( "node-ssllabs" );
 
 		let returnValue = {
 			grade: "",
@@ -204,7 +204,7 @@ class CW_PromiseResolver
 			message: ""
 		};
 
-		let expiration = require( "../validpoint/node_modules/check-cert-expiration" );
+		let expiration = require( "check-cert-expiration" );
 
 		expiration( url,
 			(error, result) =>
@@ -240,7 +240,7 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			let puppeteer = require( "../validpoint/node_modules/puppeteer" );
+			let puppeteer = require( "puppeteer" );
 
 			let browser = await puppeteer.launch( { ignoreHTTPSErrors: true } );
 			let page = await browser.newPage();
@@ -415,7 +415,7 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			let tcpPing = require( "../validpoint/node_modules/tcp-ping" );
+			let tcpPing = require( "tcp-ping" );
 			let returnValue;
 
 			// Ping configuration parameters
@@ -506,8 +506,8 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			const whois = require( "../validpoint/node_modules/whois" );
-			const whoisParser = require( "../validpoint/node_modules/parser-whoisv2" );
+			const whois = require( "whois" );
+			const whoisParser = require( "parser-whoisv2" );
 
 			whois.lookup(
 				domain,
@@ -557,7 +557,7 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			let dig = require( "../validpoint/node_modules/node-dig-dns" );
+			let dig = require( "node-dig-dns" );
 			dig( [ domain, recordType ] )
 				.then(
 					( result ) =>
@@ -637,7 +637,7 @@ class CW_PromiseResolver
 					items.forEach(
 						item =>
 						{
-							if( item.endsWith( ".json" ) && item !== "config.json" && !item.startsWith( "package" ) )
+							if( item.endsWith( ".json" ) && item !== "validpoint.json" && !item.startsWith( "package" ) )
 							{
 								let runObject = {
 									"domain": item.substring( 0, (item.length - 5) ),

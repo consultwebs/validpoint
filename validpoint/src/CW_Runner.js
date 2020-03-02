@@ -3,13 +3,13 @@
  * 
  * @author costmo
  */
-const CW_Network = require( "./CW_Network.js" );
+const CW_Network = require( "./CW_Network" );
 const network = new CW_Network();
 
-let CW_Constants = require( "./CW_Constants.js" );
-let CW_Advice = require( "./CW_Advice.js" );
+let CW_Constants = require( "./CW_Constants" );
+let CW_Advice = require( "./CW_Advice" );
 
-const colors = require( "../validpoint/node_modules/colors" );
+const colors = require( "colors" );
 
 // TODO: Running "all" commands causes the headers to be printed first, then the results - get them (a)synced up
 
@@ -218,7 +218,7 @@ class CW_Runner
 		return new Promise(
 			( resolve, reject ) =>
 			{
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 				// AdviceContent.progressContent( { configObject: configObject,
 				// 	input: "Retrieving SSL certificate information for ".header + configObject.url.subject + "...   ".header 
@@ -318,7 +318,7 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 				// AdviceContent.progressContent( { configObject: configObject,
 				// 	input: "Downloading content for  ".header + configObject.url.subject + "...   ".header 
@@ -335,7 +335,7 @@ class CW_Runner
 								// });
 
 								// Parse the incoming HTML to find important elements
-								let HtmlParser = require( "../validpoint/node_modules/node-html-parser" );
+								let HtmlParser = require( "node-html-parser" );
 								let root = HtmlParser.parse( result );
 
 								// Stuff some nodes into an object for testing
@@ -413,7 +413,7 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 				// AdviceContent.progressContent( { configObject: configObject,
 				// 	input: "Checking port " + port.toString().subject + " response code for ".header + configObject.url.subject + "...   ".header 
@@ -472,7 +472,7 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 				// AdviceContent.progressContent( { configObject: configObject,
 				// 	input: "Checking port " + port.toString().subject + " availability for ".header + configObject.url.subject + "...   ".header 
@@ -537,7 +537,7 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{	
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 				CW_Runner.network.checkLocalDns()
 					.then(
@@ -591,7 +591,7 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 
 				CW_Runner.network.checkLocalNetwork()
@@ -663,9 +663,9 @@ class CW_Runner
 	  command_Domain( { configObject = null, adviceObject = null } )
 	 {
 
-		let async = require( "../validpoint/node_modules/async" );
-		let StringUtil = require( "./CW_StringUtil.js" );
-		let AdviceContent = require( "./CW_AdviceContent.js" );
+		let async = require( "async" );
+		let StringUtil = require( "./CW_StringUtil" );
+		let AdviceContent = require( "./CW_AdviceContent" );
 
 		// AdviceContent.progressTitle( { configObject: configObject, input: "Beginning Domain tests...   \n" } );
 
@@ -986,8 +986,8 @@ class CW_Runner
 	 */
 	command_Website( { configObject = null, adviceObject =  null, port = 80 } )
 	{
-		let async = require( "../validpoint/node_modules/async" );
-		let AdviceContent = require( "./CW_AdviceContent.js" );
+		let async = require( "async" );
+		let AdviceContent = require( "./CW_AdviceContent" );
 
 		adviceObject.item_result.command = "website";
 		adviceObject.item_result.category = "website";
@@ -1152,7 +1152,7 @@ class CW_Runner
 
 	static getYargs()
 	{
-		let yargs = require( "../validpoint/node_modules/yargs" );
+		let yargs = require( "yargs" );
 		yargs.scriptName( "validpoint" )
 			.usage( "USAGE: $0 <command> -d [domain1,[domain2,...]] [-f file] [-r] [-q] [-h]" )
 			.version( "0.0.1" )
@@ -1211,31 +1211,43 @@ class CW_Runner
 		return new Promise(
 		( resolve, reject ) =>
 		{
-
 			let returnValue =
 			{
 				command: "",
 				domain: ""
 			};
 
-			// TODO: Request help from a module call
-
 			// parse the requested command from the command line arguments, then run the command
 			let yargs = CW_Runner.getYargs();
 			yargs.argv;
 
-			if( yargs.argv.file )
+			// Pull a file name from the command line or use the default "validpoint.json"
+			let usefile = "";
+			if( !yargs.argv.file && !yargs.argv.domain )
 			{
-				const CW_InputParser =  require( "../classes/CW_InputParser.js" );
-				let parser = new CW_InputParser( yargs.argv.file, "./" );
+				usefile = "validpoint.json";
+			}
+			else
+			{
+				usefile = yargs.argv.file;
+			}
+			
+			if( usefile.length > 0 )
+			{
+				const CW_InputParser =  require( "./CW_InputParser" );
+				let parser = new CW_InputParser( usefile, "./" );
 				parser.init(
 					function() // init callback
 					{
 						let config = this.parseJsonString();
 
+						if( config.preflight_commands && config.preflight_commands.length > 0 )
+						{
+							returnValue.command = config.preflight_commands;
+						}
 						if( config.commands && config.commands.length > 0 && config.commands[0] != "all" )
 						{
-							returnValue.command = config.commands;
+							returnValue.command = returnValue.command.concat( config.commands );
 						}
 						else
 						{
