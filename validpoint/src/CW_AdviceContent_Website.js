@@ -132,7 +132,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 	 */
 	contentForSeverity( { severity = null, extraInput = null } )
 	{
-		let strings = require( "../validpoint/strings/category.website.js" );
+		let strings = require( "../strings/category.website.js" );
 
 		switch( severity )
 		{

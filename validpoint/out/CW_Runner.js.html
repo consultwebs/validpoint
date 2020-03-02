@@ -37,7 +37,7 @@ const network = new CW_Network();
 let CW_Constants = require( "./CW_Constants.js" );
 let CW_Advice = require( "./CW_Advice.js" );
 
-const colors = require( "../validpoint/node_modules/colors" );
+const colors = require( "../node_modules/colors" );
 
 // TODO: Running "all" commands causes the headers to be printed first, then the results - get them (a)synced up
 
@@ -363,7 +363,7 @@ class CW_Runner
 								// });
 
 								// Parse the incoming HTML to find important elements
-								let HtmlParser = require( "../validpoint/node_modules/node-html-parser" );
+								let HtmlParser = require( "../node_modules/node-html-parser" );
 								let root = HtmlParser.parse( result );
 
 								// Stuff some nodes into an object for testing
@@ -691,7 +691,7 @@ class CW_Runner
 	  command_Domain( { configObject = null, adviceObject = null } )
 	 {
 
-		let async = require( "../validpoint/node_modules/async" );
+		let async = require( "../node_modules/async" );
 		let StringUtil = require( "./CW_StringUtil.js" );
 		let AdviceContent = require( "./CW_AdviceContent.js" );
 
@@ -1014,7 +1014,7 @@ class CW_Runner
 	 */
 	command_Website( { configObject = null, adviceObject =  null, port = 80 } )
 	{
-		let async = require( "../validpoint/node_modules/async" );
+		let async = require( "../node_modules/async" );
 		let AdviceContent = require( "./CW_AdviceContent.js" );
 
 		adviceObject.item_result.command = "website";
@@ -1180,7 +1180,7 @@ class CW_Runner
 
 	static getYargs()
 	{
-		let yargs = require( "../validpoint/node_modules/yargs" );
+		let yargs = require( "../node_modules/yargs" );
 		yargs.scriptName( "validpoint" )
 			.usage( "USAGE: $0 &lt;command> -d [domain1,[domain2,...]] [-f file] [-r] [-q] [-h]" )
 			.version( "0.0.1" )
@@ -1254,7 +1254,7 @@ class CW_Runner
 
 			if( yargs.argv.file )
 			{
-				const CW_InputParser =  require( "../classes/CW_InputParser.js" );
+				const CW_InputParser =  require( "./src/CW_InputParser.js" );
 				let parser = new CW_InputParser( yargs.argv.file, "./" );
 				parser.init(
 					function() // init callback

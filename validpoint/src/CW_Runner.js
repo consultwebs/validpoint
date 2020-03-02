@@ -9,7 +9,7 @@ const network = new CW_Network();
 let CW_Constants = require( "./CW_Constants.js" );
 let CW_Advice = require( "./CW_Advice.js" );
 
-const colors = require( "../validpoint/node_modules/colors" );
+const colors = require( "../node_modules/colors" );
 
 // TODO: Running "all" commands causes the headers to be printed first, then the results - get them (a)synced up
 
@@ -335,7 +335,7 @@ class CW_Runner
 								// });
 
 								// Parse the incoming HTML to find important elements
-								let HtmlParser = require( "../validpoint/node_modules/node-html-parser" );
+								let HtmlParser = require( "../node_modules/node-html-parser" );
 								let root = HtmlParser.parse( result );
 
 								// Stuff some nodes into an object for testing
@@ -663,7 +663,7 @@ class CW_Runner
 	  command_Domain( { configObject = null, adviceObject = null } )
 	 {
 
-		let async = require( "../validpoint/node_modules/async" );
+		let async = require( "../node_modules/async" );
 		let StringUtil = require( "./CW_StringUtil.js" );
 		let AdviceContent = require( "./CW_AdviceContent.js" );
 
@@ -986,7 +986,7 @@ class CW_Runner
 	 */
 	command_Website( { configObject = null, adviceObject =  null, port = 80 } )
 	{
-		let async = require( "../validpoint/node_modules/async" );
+		let async = require( "../node_modules/async" );
 		let AdviceContent = require( "./CW_AdviceContent.js" );
 
 		adviceObject.item_result.command = "website";
@@ -1152,7 +1152,7 @@ class CW_Runner
 
 	static getYargs()
 	{
-		let yargs = require( "../validpoint/node_modules/yargs" );
+		let yargs = require( "../node_modules/yargs" );
 		yargs.scriptName( "validpoint" )
 			.usage( "USAGE: $0 <command> -d [domain1,[domain2,...]] [-f file] [-r] [-q] [-h]" )
 			.version( "0.0.1" )
@@ -1232,9 +1232,9 @@ class CW_Runner
 				usefile = yargs.argv.file;
 			}
 			
-			if( usefile.length > 0 )
+			if( usefile && usefile.length > 0 )
 			{
-				const CW_InputParser =  require( "../classes/CW_InputParser.js" );
+				const CW_InputParser =  require( "./CW_InputParser.js" );
 				let parser = new CW_InputParser( usefile, "./" );
 				parser.init(
 					function() // init callback
@@ -1265,13 +1265,17 @@ class CW_Runner
 			else
 			{
 				// Receiver expects an array for command and domain
-				if( !yargs.argv._[0] || yargs.argv._[0].length < 1 || yargs.argv._[0] == "all" )
+				if( yargs.argv._[0] && yargs.argv._[0].length > 0 && yargs.argv._[0] !== "all" )
+				{
+					returnValue.command = [ yargs.argv._[0] ];
+				}
+				else if( !yargs.argv.command || yargs.argv.command == "all" )
 				{
 					returnValue.command = CW_Constants.DEFAULT_COMMANDS;
 				}
 				else
 				{
-					returnValue.command = [ yargs.argv._[0] ];
+					returnValue.command = [ yargs.argv.command ];
 				}
 				returnValue.domain = [ yargs.argv.domain ];
 				returnValue.directory = null;
