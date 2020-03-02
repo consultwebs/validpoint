@@ -637,7 +637,7 @@ class CW_PromiseResolver
 					items.forEach(
 						item =>
 						{
-							if( item.endsWith( ".json" ) && item !== "config.json" && !item.startsWith( "package" ) )
+							if( item.endsWith( ".json" ) && item !== "validpoint.json" && !item.startsWith( "package" ) )
 							{
 								let runObject = {
 									"domain": item.substring( 0, (item.length - 5) ),
