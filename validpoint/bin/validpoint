@@ -39,6 +39,19 @@ require( "strict-mode" )(
 						inputDirectory = inputOptions.directory;
 					}
 
+					if( !domains || 
+						(domains.length == 1 && domains[0] === undefined) )
+					{
+						// There were no input options and no config file input
+						console.log();
+						console.log( "You must specify a domain with '-d <domain>', supply an input configuration file, or have a validpoint.json file in the current directory." );
+						console.log();
+
+						let yargs = CW_Runner.getYargs();
+						yargs.showHelp();
+						process.exit();
+					}
+
 					// Foreach domain
 					Object.keys( domains ).forEach(
 						( domain ) =>

@@ -1211,23 +1211,31 @@ class CW_Runner
 		return new Promise(
 		( resolve, reject ) =>
 		{
-
 			let returnValue =
 			{
 				command: "",
 				domain: ""
 			};
 
-			// TODO: Request help from a module call
-
 			// parse the requested command from the command line arguments, then run the command
 			let yargs = CW_Runner.getYargs();
 			yargs.argv;
 
-			if( yargs.argv.file )
+			// Pull a file name from the command line or use the default "validpoint.json"
+			let usefile = "";
+			if( !yargs.argv.file && !yargs.argv.domain )
+			{
+				usefile = "validpoint.json";
+			}
+			else
+			{
+				usefile = yargs.argv.file;
+			}
+			
+			if( usefile.length > 0 )
 			{
 				const CW_InputParser =  require( "../classes/CW_InputParser.js" );
-				let parser = new CW_InputParser( yargs.argv.file, "./" );
+				let parser = new CW_InputParser( usefile, "./" );
 				parser.init(
 					function() // init callback
 					{
