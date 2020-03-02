@@ -27,7 +27,7 @@ require( "strict-mode" )(
 		let inputOptions = CW_Runner.processinputArguments()
 			.then(
 				( inputOptions ) =>
-				{
+				{	
 					let cmds = inputOptions.command;
 					let domains = inputOptions.domain;
 					let inputDirectory = null;
@@ -39,10 +39,47 @@ require( "strict-mode" )(
 						inputDirectory = inputOptions.directory;
 					}
 
+					if( !domains || 
+						(domains.length == 1 && domains[0] === undefined) )
+					{
+						// There were no input options and no config file input
+						console.log();
+						console.log( "You must specify a domain with '-d <domain>', supply an input configuration file, or have a validpoint.json file in the current directory." );
+						console.log();
+
+						let yargs = CW_Runner.getYargs();
+						yargs.showHelp();
+						process.exit();
+					}
+
 					// Foreach domain
-					domains.forEach(
+					Object.keys( domains ).forEach(
 						( domain ) =>
 						{
+							// Override commands from config/input
+
+							// override commands for each domain
+							if( inputOptions.domain[domain].preflight_commands && 
+								inputOptions.domain[domain].preflight_commands.length > 0 )
+							{
+								cmds = inputOptions.domain[domain].preflight_commands;
+							}
+
+							if( inputOptions.domain[domain].commands && 
+								inputOptions.domain[domain].commands.length > 0 )
+							{
+								// If there were no preflight commands, override any previously specified commands
+								if( !inputOptions.domain[domain].preflight_commands || 
+									inputOptions.domain[domain].preflight_commands.length < 1 )
+								{
+									cmds = inputOptions.domain[domain].commands;
+								}
+								else // or else add to the preflight commands
+								{
+									cmds = cmds.concat( inputOptions.domain[domain].commands );
+								}
+							}
+
 							// Foreach command
 							cmds.forEach(
 								(command, index) =>
@@ -76,13 +113,31 @@ require( "strict-mode" )(
 																	}
 																	else if( config.error && config.error.length > 0 )
 																	{
-																		throw new Error( config.error );
+																		// config.error happens when a json file does not exist for the domain...
+																		//   In the absence of a domain.json file, populate a config object with reasonable 
+																		//   parameters for the given domain
+																		config = 
+																		{	...config,
+																			name: domain,
+																			domain: domain,
+																			url: "www." + domain
+																		}
 																	}
 
 																	config = 
 																	{	...config,
 																		show_raw: inputOptions.show_raw,
 																		be_quiet: inputOptions.quiet
+																	}
+
+																	// override config options from input
+																	if( inputOptions.domain[domain].name && inputOptions.domain[domain].name.length > 0 )
+																	{
+																		config.name = inputOptions.domain[domain].name;
+																	}
+																	if( inputOptions.domain[domain].url && inputOptions.domain[domain].url.length > 0 )
+																	{
+																		config.url = inputOptions.domain[domain].url;
 																	}
 
 																	// 3. Setup advice
