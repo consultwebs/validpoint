@@ -5,8 +5,8 @@
  * @author costmo
  */
 
-let CW_Constants = require( "./CW_Constants" );
-const colors = require( "colors" );
+let CW_Constants = require( "./CW_Constants.js" );
+const colors = require( "../node_modules/colors" );
 colors.setTheme( CW_Constants.COLOR_THEME );
 
 class CW_AdviceContent

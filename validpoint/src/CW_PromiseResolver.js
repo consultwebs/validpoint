@@ -38,7 +38,7 @@ class CW_PromiseResolver
 		try
 		{
 			// Set the default status to "down"
-			let ping = require( "ping" );
+			let ping = require( "../node_modules/ping" );
 			let resolved = false;
 
 			PING_HOSTS.forEach(
@@ -130,7 +130,7 @@ class CW_PromiseResolver
 	{
 		// TODO: try/catch
 
-		let ssllabs = require( "node-ssllabs" );
+		let ssllabs = require( "../node_modules/node-ssllabs" );
 
 		let returnValue = {
 			grade: "",
@@ -204,7 +204,7 @@ class CW_PromiseResolver
 			message: ""
 		};
 
-		let expiration = require( "check-cert-expiration" );
+		let expiration = require( "../node_modules/check-cert-expiration" );
 
 		expiration( url,
 			(error, result) =>
@@ -240,7 +240,7 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			let puppeteer = require( "puppeteer" );
+			let puppeteer = require( "../node_modules/puppeteer" );
 
 			let browser = await puppeteer.launch( { ignoreHTTPSErrors: true } );
 			let page = await browser.newPage();
@@ -415,7 +415,7 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			let tcpPing = require( "tcp-ping" );
+			let tcpPing = require( "../node_modules/tcp-ping" );
 			let returnValue;
 
 			// Ping configuration parameters
@@ -506,8 +506,8 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			const whois = require( "whois" );
-			const whoisParser = require( "parser-whoisv2" );
+			const whois = require( "../node_modules/whois" );
+			const whoisParser = require( "../node_modules/parser-whoisv2" );
 
 			whois.lookup(
 				domain,
@@ -557,7 +557,7 @@ class CW_PromiseResolver
 	{
 		try
 		{
-			let dig = require( "node-dig-dns" );
+			let dig = require( "../node_modules/node-dig-dns" );
 			dig( [ domain, recordType ] )
 				.then(
 					( result ) =>

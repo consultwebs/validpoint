@@ -54,7 +54,7 @@ require( "strict-mode" )(
 
 					// Foreach domain
 					Object.keys( domains ).forEach(
-						( domain ) =>
+						( domain, index ) =>
 						{
 							// Override commands from config/input
 
@@ -78,6 +78,13 @@ require( "strict-mode" )(
 								{
 									cmds = cmds.concat( inputOptions.domain[domain].commands );
 								}
+							}
+
+							// If the CLI input is for a particular domain, the input will have "0" as the "somain" index - convert it to something useful
+							if( domain == 0 )
+							{
+								domain = domains[index];
+								inputOptions.domain[domain] = {};
 							}
 
 							// Foreach command
