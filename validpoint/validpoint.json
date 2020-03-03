@@ -3,6 +3,7 @@
 	{
 		"consultwebs.com":
 		{
+			"domain": "consultwebs.com",
 			"name": "Consultwebs",
 			"url": "www.consultwebs.com",
 			"preflight_commands":
@@ -15,8 +16,12 @@
 				"secure-website",  "website-content"
 			]
 		},
-		"appideas.com": {},
+		"appideas.com":
+		{
+			"domain": "appideas.com"
+		},
 		"bravoreviews.com": {
+			"domain": "meta.bravoreviews.com",
 			"url": "meta.bravoreviews.com",
 			"commands":
 			[

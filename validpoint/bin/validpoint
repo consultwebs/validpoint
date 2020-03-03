@@ -20,9 +20,13 @@ require( "strict-mode" )(
 		const CW_InputParser =  require( "../src/CW_InputParser.js" );
 		let config = null;
 
+		let async = require("../node_modules/async");
+
 		const CW_Constants =  require( "../src/CW_Constants.js" );
 		const colors = require( "../node_modules/colors" );
 		colors.setTheme( CW_Constants.COLOR_THEME );
+
+		let domainCounter = 0;
 
 		let inputOptions = CW_Runner.processinputArguments()
 			.then(
@@ -53,38 +57,91 @@ require( "strict-mode" )(
 					}
 
 					// Foreach domain
-					Object.keys( domains ).forEach(
-						( domain, index ) =>
+					// Object.keys( domains ).forEach(
+					// 	( domain, index ) =>
+					async.eachSeries(
+						domains,
+						( domain, callback ) =>
 						{
 							// Override commands from config/input
 
 							// override commands for each domain
-							if( inputOptions.domain[domain].preflight_commands && 
-								inputOptions.domain[domain].preflight_commands.length > 0 )
+							if( Array.isArray( inputOptions.domain ) )
 							{
-								cmds = inputOptions.domain[domain].preflight_commands;
+								if( inputOptions.domain[domainCounter].preflight_commands && 
+									inputOptions.domain[domainCounter].preflight_commands.length > 0 )
+								{
+									cmds = inputOptions.domain[domainCounter].preflight_commands;
+								}
+
+								if( inputOptions.domain[domainCounter].commands && 
+									inputOptions.domain[domainCounter].commands.length > 0 )
+								{
+									// If there were no preflight commands, override any previously specified commands
+									if( !inputOptions.domain[domainCounter].preflight_commands || 
+										inputOptions.domain[domainCounter].preflight_commands.length < 1 )
+									{
+										cmds = inputOptions.domain[domainCounter].commands;
+									}
+									else // or else add to the preflight commands
+									{
+										cmds = cmds.concat( inputOptions.domain[domainCounter].commands );
+									}
+								}
+							}
+							else if( inputOptions.domain[domain.domain] && inputOptions.domain[domain.domain].length > 0 )
+							{
+								if( inputOptions.domain[domain.domain].preflight_commands && 
+									inputOptions.domain[domain.domain].preflight_commands.length > 0 )
+								{
+									cmds = inputOptions.domain[domain.domain].preflight_commands;
+								}
+
+								if( inputOptions.domain[domain.domain].commands && 
+									inputOptions.domain[domain.domain].commands.length > 0 )
+								{
+									// If there were no preflight commands, override any previously specified commands
+									if( !inputOptions.domain[domain.domain].preflight_commands || 
+										inputOptions.domain[domain.domain].preflight_commands.length < 1 )
+									{
+										cmds = inputOptions.domain[domain.domain].commands;
+									}
+									else // or else add to the preflight commands
+									{
+										cmds = cmds.concat( inputOptions.domain[domain.domain].commands );
+									}
+								}
 							}
 
-							if( inputOptions.domain[domain].commands && 
-								inputOptions.domain[domain].commands.length > 0 )
-							{
-								// If there were no preflight commands, override any previously specified commands
-								if( !inputOptions.domain[domain].preflight_commands || 
-									inputOptions.domain[domain].preflight_commands.length < 1 )
-								{
-									cmds = inputOptions.domain[domain].commands;
-								}
-								else // or else add to the preflight commands
-								{
-									cmds = cmds.concat( inputOptions.domain[domain].commands );
-								}
-							}
-
-							// If the CLI input is for a particular domain, the input will have "0" as the "somain" index - convert it to something useful
+							// If the CLI input is for a particular domain, the input will have "0" as the "domain" index - convert it to something useful
 							if( domain == 0 )
 							{
-								domain = domains[index];
+								domain = domains[0];
 								inputOptions.domain[domain] = {};
+							}
+
+							let returnValue = 
+							{
+								domain: domain,
+								commands: cmds,
+								inputOptions: inputOptions,
+								optionIndex: domainCounter
+							}
+
+							domainCounter++;
+							
+							callback( returnValue );
+
+						},
+						( input ) =>
+						{
+							let cmds = input.commands;
+							let domainIndex = input.optionIndex;
+							let domain = input.domain;
+
+							if( typeof domain === "object" )
+							{
+								domain = input.domain.domain;
 							}
 
 							// Foreach command
@@ -102,12 +159,12 @@ require( "strict-mode" )(
 												}
 												
 												runObjects.forEach(
-													runObject =>
+													async( runObject ) =>
 													{
 														// 2. parse the input config file
 														let parser = new CW_InputParser( runObject.file, runObject.directory );
 
-														parser.init(
+														await parser.init(
 															function() // init callback
 															{
 																try
@@ -133,18 +190,21 @@ require( "strict-mode" )(
 
 																	config = 
 																	{	...config,
-																		show_raw: inputOptions.show_raw,
-																		be_quiet: inputOptions.quiet
+																		show_raw: input.inputOptions.show_raw,
+																		be_quiet: input.inputOptions.quiet
 																	}
 
 																	// override config options from input
-																	if( inputOptions.domain[domain].name && inputOptions.domain[domain].name.length > 0 )
+																	if( Array.isArray( input.inputOptions.domain ) )
 																	{
-																		config.name = inputOptions.domain[domain].name;
-																	}
-																	if( inputOptions.domain[domain].url && inputOptions.domain[domain].url.length > 0 )
-																	{
-																		config.url = inputOptions.domain[domain].url;
+																		if( input.inputOptions.domain[domainIndex].name && input.inputOptions.domain[domainIndex].name.length > 0 )
+																		{
+																			config.name = input.inputOptions.domain[domainIndex].name;
+																		}
+																		if( input.inputOptions.domain[domainIndex].url && input.inputOptions.domain[domainIndex].url.length > 0 )
+																		{
+																			config.url = input.inputOptions.domain[domainIndex].url;
+																		}
 																	}
 
 																	// 3. Setup advice
@@ -187,7 +247,7 @@ require( "strict-mode" )(
 											}
 										);
 								}); // cmds.forEach
-						}); // domains.forEach
+						} ); // domains.forEach
 				});// processinputArguments then
 	}
 );
