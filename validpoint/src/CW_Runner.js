@@ -55,7 +55,7 @@ class CW_Runner
 	runCommand( { command = "", configObject = null, adviceObject = null } )
     {
         // sanity check the requested command
-		command = this.sanitizeCommand( command );
+		// command = this.sanitizeCommand( command );
 
 		if( !adviceObject )
 		{
@@ -195,7 +195,22 @@ class CW_Runner
 						);
 					}
 				);
-			default:
+			default: // Command not found, look in the registry
+				return new Promise(
+					(resolve, reject) =>
+					{
+						let registry = require( "./registry.js" );
+						if( registry[command] && registry[command].handler )
+						{
+							resolve( registry[command].handler() );
+						}
+						else
+						{
+							resolve( JSON.stringify( { "error": "Could not find command: " + command} ) );
+						}
+					}
+				);
+				
 				// There's actually no way to get here unless the validCommands array is incorrect
 				break;
 		}
