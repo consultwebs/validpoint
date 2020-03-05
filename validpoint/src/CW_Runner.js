@@ -199,15 +199,56 @@ class CW_Runner
 				return new Promise(
 					(resolve, reject) =>
 					{
-						let registry = require( "./registry.js" );
-						if( registry[command] && registry[command].handler )
-						{
-							resolve( registry[command].handler() );
-						}
-						else
-						{
-							resolve( JSON.stringify( { "error": "Could not find command: " + command} ) );
-						}
+						let currentDir = process.cwd();
+						let packageJsonPath =  currentDir+ "/package.json";
+
+						var readJson = require( "read-package-json" );
+						readJson( packageJsonPath, console.error, false,
+							async ( error, data ) =>
+							{
+								if( error )
+								{
+									// There's no package.json? Weird, but it just means we don't have any addons to consider
+								}
+								else
+								{
+									const fs = require( "fs" );
+									
+									if( data && data.validpoint && data.validpoint.addons && data.validpoint.addons.length > 0 )
+									{
+										let foundCommand = false;
+										await data.validpoint.addons.forEach(
+											( addon ) =>
+											{
+												let registryFilePath = currentDir + "/node_modules/" + addon + "/validpoint.registry.js";
+
+												// TODO: Need to try/catch
+												try
+												{
+													if( fs.existsSync( registryFilePath ) )
+													{
+														let addonRegistry = require( registryFilePath );
+														if( addonRegistry[command] && addonRegistry[command].handler )
+														{
+															foundCommand = true;
+															resolve( addonRegistry[command].handler() );
+														}
+													}
+												}
+												catch( error )
+												{
+													// File doesn't exists - this means there's no registry, not a system error that requires error handling
+												}
+											}
+										);
+
+										if( !foundCommand )
+										{
+											resolve( JSON.stringify( { "error": "Could not find command: " + command} ) );
+										}
+									}
+								}
+							} );
 					}
 				);
 				
