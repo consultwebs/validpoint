@@ -151,6 +151,15 @@ require( "strict-mode" )(
 																	let CW_Advice = require( "../src/CW_Advice.js" );
 																	let advice = new CW_Advice();
 
+																	if( inputOptions.input )
+																	{
+																		config.input = inputOptions.input;
+																	}
+																	else
+																	{
+																		config.input = "";
+																	}
+
 																	// 4. runCommand
 																	runner.runCommand( { command: command, configObject: config, adviceObject: advice } )
 																		.then(

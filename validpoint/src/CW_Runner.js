@@ -231,12 +231,20 @@ class CW_Runner
 														if( addonRegistry[command] && addonRegistry[command].handler )
 														{
 															foundCommand = true;
-															resolve( addonRegistry[command].handler() );
+															let handlerInput = 
+															{
+																"domain":  configObject.domain,
+																"url": configObject.url,
+																"input": configObject.input
+															};
+															resolve( addonRegistry[command].handler( {input: handlerInput} ) );
 														}
 													}
 												}
 												catch( error )
 												{
+													console.log( "ERROR:" );
+													console.log( error );
 													// File doesn't exists - this means there's no registry, not a system error that requires error handling
 												}
 											}
@@ -1246,6 +1254,12 @@ class CW_Runner
 				describe: "Suppress in-progress output and only show the result",
 				demand: false
 			} )
+			.option( "i",
+			{
+				alias: "input",
+				describe: "Input to send to the test",
+				demand: false
+			} )
 			.command( "local-network", "Test local network connectivity" )
 			.command( "local-dns", "Test local DNS resolution" )
 			.command( "http-port", "Test response time of web server port 80" )
@@ -1286,6 +1300,15 @@ class CW_Runner
 			else
 			{
 				usefile = yargs.argv.file;
+			}
+
+			if( yargs.argv.input && yargs.argv.input.length > 0 )
+			{
+				returnValue.input = yargs.argv.input;
+			}
+			else
+			{
+				returnValue.input = null;
 			}
 			
 			if( usefile && usefile.length > 0 )
