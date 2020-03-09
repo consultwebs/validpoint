@@ -31,11 +31,11 @@
  * 
  * @author costmo
  */
-const CW_Network = require( "./CW_Network.js" );
+const CW_Network = require( "./CW_Network" );
 const network = new CW_Network();
 
-let CW_Constants = require( "./CW_Constants.js" );
-let CW_Advice = require( "./CW_Advice.js" );
+let CW_Constants = require( "./CW_Constants" );
+let CW_Advice = require( "./CW_Advice" );
 
 const colors = require( "../node_modules/colors" );
 
@@ -83,7 +83,7 @@ class CW_Runner
 	runCommand( { command = "", configObject = null, adviceObject = null } )
     {
         // sanity check the requested command
-		command = this.sanitizeCommand( command );
+		// command = this.sanitizeCommand( command );
 
 		if( !adviceObject )
 		{
@@ -223,7 +223,71 @@ class CW_Runner
 						);
 					}
 				);
-			default:
+			default: // Command not found, look in the registry
+				return new Promise(
+					(resolve, reject) =>
+					{
+						let currentDir = process.cwd();
+						let packageJsonPath =  currentDir+ "/package.json";
+
+						var readJson = require( "read-package-json" );
+						readJson( packageJsonPath, console.error, false,
+							async ( error, data ) =>
+							{
+								if( error )
+								{
+									// There's no package.json? Weird, but it just means we don't have any addons to consider
+								}
+								else
+								{
+									const fs = require( "fs" );
+									
+									if( data &amp;&amp; data.validpoint &amp;&amp; data.validpoint.addons &amp;&amp; data.validpoint.addons.length > 0 )
+									{
+										let foundCommand = false;
+										await data.validpoint.addons.forEach(
+											( addon ) =>
+											{
+												let registryFilePath = currentDir + "/node_modules/" + addon + "/validpoint.registry.js";
+
+												// TODO: Need to try/catch
+												try
+												{
+													if( fs.existsSync( registryFilePath ) )
+													{
+														let addonRegistry = require( registryFilePath );
+														if( addonRegistry[command] &amp;&amp; addonRegistry[command].handler )
+														{
+															foundCommand = true;
+															let handlerInput = 
+															{
+																"domain":  configObject.domain,
+																"url": configObject.url,
+																"input": configObject.input
+															};
+															resolve( addonRegistry[command].handler( {input: handlerInput} ) );
+														}
+													}
+												}
+												catch( error )
+												{
+													console.log( "ERROR:" );
+													console.log( error );
+													// File doesn't exists - this means there's no registry, not a system error that requires error handling
+												}
+											}
+										);
+
+										if( !foundCommand )
+										{
+											resolve( JSON.stringify( { "error": "Could not find command: " + command} ) );
+										}
+									}
+								}
+							} );
+					}
+				);
+				
 				// There's actually no way to get here unless the validCommands array is incorrect
 				break;
 		}
@@ -246,7 +310,7 @@ class CW_Runner
 		return new Promise(
 			( resolve, reject ) =>
 			{
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 				// AdviceContent.progressContent( { configObject: configObject,
 				// 	input: "Retrieving SSL certificate information for ".header + configObject.url.subject + "...   ".header 
@@ -346,7 +410,7 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 				// AdviceContent.progressContent( { configObject: configObject,
 				// 	input: "Downloading content for  ".header + configObject.url.subject + "...   ".header 
@@ -441,7 +505,7 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 				// AdviceContent.progressContent( { configObject: configObject,
 				// 	input: "Checking port " + port.toString().subject + " response code for ".header + configObject.url.subject + "...   ".header 
@@ -500,7 +564,7 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 				// AdviceContent.progressContent( { configObject: configObject,
 				// 	input: "Checking port " + port.toString().subject + " availability for ".header + configObject.url.subject + "...   ".header 
@@ -565,7 +629,7 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{	
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 				CW_Runner.network.checkLocalDns()
 					.then(
@@ -619,7 +683,7 @@ class CW_Runner
 		return new Promise(
 			(resolve, reject) =>
 			{
-				let AdviceContent = require( "./CW_AdviceContent.js" );
+				let AdviceContent = require( "./CW_AdviceContent" );
 
 
 				CW_Runner.network.checkLocalNetwork()
@@ -1218,6 +1282,12 @@ class CW_Runner
 				describe: "Suppress in-progress output and only show the result",
 				demand: false
 			} )
+			.option( "i",
+			{
+				alias: "input",
+				describe: "Input to send to the test",
+				demand: false
+			} )
 			.command( "local-network", "Test local network connectivity" )
 			.command( "local-dns", "Test local DNS resolution" )
 			.command( "http-port", "Test response time of web server port 80" )
@@ -1239,31 +1309,52 @@ class CW_Runner
 		return new Promise(
 		( resolve, reject ) =>
 		{
-
 			let returnValue =
 			{
 				command: "",
 				domain: ""
 			};
 
-			// TODO: Request help from a module call
-
 			// parse the requested command from the command line arguments, then run the command
 			let yargs = CW_Runner.getYargs();
 			yargs.argv;
 
-			if( yargs.argv.file )
+			// Pull a file name from the command line or use the default "validpoint.json"
+			let usefile = "";
+			if( !yargs.argv.file &amp;&amp; !yargs.argv.domain )
 			{
-				const CW_InputParser =  require( "./src/CW_InputParser.js" );
-				let parser = new CW_InputParser( yargs.argv.file, "./" );
+				usefile = "validpoint.json";
+			}
+			else
+			{
+				usefile = yargs.argv.file;
+			}
+
+			if( yargs.argv.input &amp;&amp; yargs.argv.input.length > 0 )
+			{
+				returnValue.input = yargs.argv.input;
+			}
+			else
+			{
+				returnValue.input = null;
+			}
+			
+			if( usefile &amp;&amp; usefile.length > 0 )
+			{
+				const CW_InputParser =  require( "./CW_InputParser.js" );
+				let parser = new CW_InputParser( usefile, "./" );
 				parser.init(
 					function() // init callback
 					{
 						let config = this.parseJsonString();
 
+						if( config.preflight_commands &amp;&amp; config.preflight_commands.length > 0 )
+						{
+							returnValue.command = config.preflight_commands;
+						}
 						if( config.commands &amp;&amp; config.commands.length > 0 &amp;&amp; config.commands[0] != "all" )
 						{
-							returnValue.command = config.commands;
+							returnValue.command = returnValue.command.concat( config.commands );
 						}
 						else
 						{
@@ -1281,13 +1372,17 @@ class CW_Runner
 			else
 			{
 				// Receiver expects an array for command and domain
-				if( !yargs.argv._[0] || yargs.argv._[0].length &lt; 1 || yargs.argv._[0] == "all" )
+				if( yargs.argv._[0] &amp;&amp; yargs.argv._[0].length > 0 &amp;&amp; yargs.argv._[0] !== "all" )
+				{
+					returnValue.command = [ yargs.argv._[0] ];
+				}
+				else if( !yargs.argv.command || yargs.argv.command == "all" )
 				{
 					returnValue.command = CW_Constants.DEFAULT_COMMANDS;
 				}
 				else
 				{
-					returnValue.command = [ yargs.argv._[0] ];
+					returnValue.command = [ yargs.argv.command ];
 				}
 				returnValue.domain = [ yargs.argv.domain ];
 				returnValue.directory = null;
@@ -1317,7 +1412,7 @@ module.exports = CW_Runner;</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Feb 26 2020 21:46:38 GMT-0800 (Pacific Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Mar 09 2020 11:39:20 GMT-0700 (Pacific Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -14,14 +14,16 @@
   "scripts": {
     "start": "./bin/validpoint help",
     "help": "./bin/validpoint help",
-    "test": "jest --coverage",
+    "test": "jest --coverage --coverage-directory docs/coverage",
     "build": "webpack --mode production",
-    "transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs src --out-dir lib"
+	"transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs src --out-dir lib",
+	"docs": "jsdoc -d docs/ -r src/*"
   },
   "babel": {
     "presets": [],
     "plugins": [
-      "@babel/plugin-transform-modules-commonjs"
+	  "@babel/plugin-transform-modules-commonjs",
+	  "transform-dynamic-import"
     ]
   },
   "dependencies": {
@@ -49,6 +51,7 @@
     "@babel/preset-env": "^7.8.6",
     "babel-jest": "^25.1.0",
     "babel-loader": "^8.0.6",
+    "babel-plugin-transform-dynamic-import": "^2.1.0",
     "jest": "^25.1.0",
     "jsdoc": "^3.6.3",
     "module-structure": "^2.0.1",

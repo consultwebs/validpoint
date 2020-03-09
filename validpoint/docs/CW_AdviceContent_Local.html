@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: CW_AdviceContent_Website</title>
+    <title>JSDoc: Class: CW_AdviceContent_Local</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: CW_AdviceContent_Website</h1>
+    <h1 class="page-title">Class: CW_AdviceContent_Local</h1>
 
     
 
@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>CW_AdviceContent_Website<span class="signature">(command, testResult, configObject)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>CW_AdviceContent_Local<span class="signature">(command, testResult, configObject)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,7 +41,7 @@
     
 
     
-    <h4 class="name" id="CW_AdviceContent_Website"><span class="type-signature"></span>new CW_AdviceContent_Website<span class="signature">(command, testResult, configObject)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="CW_AdviceContent_Local"><span class="type-signature"></span>new CW_AdviceContent_Local<span class="signature">(command, testResult, configObject)</span><span class="type-signature"></span></h4>
     
 
     
@@ -188,7 +188,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Website.js.html">CW_AdviceContent_Website.js</a>, <a href="CW_AdviceContent_Website.js.html#line22">line 22</a>
+        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -252,7 +252,7 @@
 
 
 <div class="description">
-    Advice content hub for "website" requests.
+    Advice content hub for "local" requests.
 
 Once an Advice object has its test results, the parser runs this category-specific method to 
   produce an action object
@@ -306,7 +306,7 @@ Once an Advice object has its test results, the parser runs this category-specif
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Website.js.html">CW_AdviceContent_Website.js</a>, <a href="CW_AdviceContent_Website.js.html#line43">line 43</a>
+        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line102">line 102</a>
     </li></ul></dd>
     
 
@@ -342,7 +342,7 @@ Once an Advice object has its test results, the parser runs this category-specif
     
 
     
-    <h4 class="name" id="contentForSeverity"><span class="type-signature"></span>contentForSeverity<span class="signature">(severity, extraInput)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="contentForSeverity"><span class="type-signature"></span>contentForSeverity<span class="signature">(severity)</span><span class="type-signature"></span></h4>
     
 
     
@@ -352,7 +352,7 @@ Once an Advice object has its test results, the parser runs this category-specif
 <div class="description">
     Provide the content for the discovered severity on the current instance's command.
 
-Commands in the "local" category only need content for ESSENTIAL and URGENTt
+Commands in the "local" category only need content for ESSENTIAL and URGENT
 </div>
 
 
@@ -408,29 +408,6 @@ Commands in the "local" category only need content for ESSENTIAL and URGENTt
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>extraInput</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Extra input needed to form a more precise response</td>
-        </tr>
-
-    
     </tbody>
 </table>
 
@@ -475,7 +452,7 @@ Commands in the "local" category only need content for ESSENTIAL and URGENTt
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Website.js.html">CW_AdviceContent_Website.js</a>, <a href="CW_AdviceContent_Website.js.html#line133">line 133</a>
+        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line127">line 127</a>
     </li></ul></dd>
     
 
@@ -665,7 +642,7 @@ Commands in the "local" category only need content for ESSENTIAL and URGENTt
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Website.js.html">CW_AdviceContent_Website.js</a>, <a href="CW_AdviceContent_Website.js.html#line313">line 313</a>
+        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line43">line 43</a>
     </li></ul></dd>
     
 
@@ -711,161 +688,7 @@ Commands in the "local" category only need content for ESSENTIAL and URGENTt
     
 
     
-    <h4 class="name" id="resultTagsForContent"><span class="type-signature"></span>resultTagsForContent<span class="signature">(inputObject)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    A string of tests to run gathered test info to look for problems.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>inputObject</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The raw_response from the runner</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>costmo</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Website.js.html">CW_AdviceContent_Website.js</a>, <a href="CW_AdviceContent_Website.js.html#line213">line 213</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    Array
-</div>
-
-
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="resultTagToSeverity"><span class="type-signature"></span>resultTagToSeverity<span class="signature">(resultTag, extraKey)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="resultTagToSeverity"><span class="type-signature"></span>resultTagToSeverity<span class="signature">(resultTag)</span><span class="type-signature"></span></h4>
     
 
     
@@ -934,29 +757,6 @@ TODO: Get this setting from client configuration and override the system config 
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>extraKey</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">An optional extra key to help refine the lookup</td>
-        </tr>
-
-    
     </tbody>
 </table>
 
@@ -994,7 +794,7 @@ TODO: Get this setting from client configuration and override the system config 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Website.js.html">CW_AdviceContent_Website.js</a>, <a href="CW_AdviceContent_Website.js.html#line176">line 176</a>
+        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line152">line 152</a>
     </li></ul></dd>
     
 
@@ -1046,7 +846,7 @@ TODO: Get this setting from client configuration and override the system config 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Feb 26 2020 21:46:38 GMT-0800 (Pacific Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Mar 09 2020 11:39:20 GMT-0700 (Pacific Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
