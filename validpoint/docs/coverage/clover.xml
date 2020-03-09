@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1583779415771" clover="3.2.0">
+  <project timestamp="1583779415771" name="All files">
+    <metrics statements="31" coveredstatements="10" conditionals="9" coveredconditionals="4" methods="8" coveredmethods="3" elements="48" coveredelements="17" complexity="0" loc="31" ncloc="31" packages="1" files="2" classes="2"/>
+    <file name="CW_InputParser.js" path="/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_InputParser.js">
+      <metrics statements="27" coveredstatements="6" conditionals="7" coveredconditionals="2" methods="6" coveredmethods="1"/>
+      <line num="18" count="2" type="stmt"/>
+      <line num="19" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="21" count="1" type="stmt"/>
+      <line num="25" count="1" type="stmt"/>
+      <line num="27" count="2" type="stmt"/>
+      <line num="37" count="0" type="stmt"/>
+      <line num="39" count="0" type="stmt"/>
+      <line num="42" count="0" type="stmt"/>
+      <line num="43" count="0" type="stmt"/>
+      <line num="46" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="49" count="0" type="stmt"/>
+      <line num="50" count="0" type="stmt"/>
+      <line num="54" count="0" type="stmt"/>
+      <line num="55" count="0" type="stmt"/>
+      <line num="63" count="0" type="stmt"/>
+      <line num="64" count="0" type="stmt"/>
+      <line num="76" count="0" type="stmt"/>
+      <line num="78" count="0" type="stmt"/>
+      <line num="80" count="0" type="stmt"/>
+      <line num="84" count="0" type="stmt"/>
+      <line num="85" count="0" type="stmt"/>
+      <line num="88" count="0" type="stmt"/>
+      <line num="102" count="0" type="stmt"/>
+      <line num="103" count="0" type="stmt"/>
+      <line num="105" count="0" type="stmt"/>
+      <line num="108" count="0" type="stmt"/>
+      <line num="116" count="1" type="stmt"/>
+    </file>
+    <file name="CW_StringUtil.js" path="/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_StringUtil.js">
+      <metrics statements="4" coveredstatements="4" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
+      <line num="17" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="19" count="1" type="stmt"/>
+      <line num="21" count="2" type="stmt"/>
+      <line num="25" count="1" type="stmt"/>
+    </file>
+  </project>
+</coverage>
