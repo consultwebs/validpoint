@@ -57,8 +57,7 @@ class CW_Runner {
     adviceObject = null
   }) {
     // sanity check the requested command
-    command = this.sanitizeCommand(command);
-
+    // command = this.sanitizeCommand( command );
     if (!adviceObject) {
       adviceObject = new CW_Advice();
     }
@@ -171,7 +170,55 @@ class CW_Runner {
         });
 
       default:
-        // There's actually no way to get here unless the validCommands array is incorrect
+        // Command not found, look in the registry
+        return new Promise((resolve, reject) => {
+          let currentDir = process.cwd();
+          let packageJsonPath = currentDir + "/package.json";
+
+          var readJson = require("read-package-json");
+
+          readJson(packageJsonPath, console.error, false, async (error, data) => {
+            if (error) {// There's no package.json? Weird, but it just means we don't have any addons to consider
+            } else {
+              const fs = require("fs");
+
+              if (data && data.validpoint && data.validpoint.addons && data.validpoint.addons.length > 0) {
+                let foundCommand = false;
+                await data.validpoint.addons.forEach(addon => {
+                  let registryFilePath = currentDir + "/node_modules/" + addon + "/validpoint.registry.js"; // TODO: Need to try/catch
+
+                  try {
+                    if (fs.existsSync(registryFilePath)) {
+                      let addonRegistry = require(registryFilePath);
+
+                      if (addonRegistry[command] && addonRegistry[command].handler) {
+                        foundCommand = true;
+                        let handlerInput = {
+                          "domain": configObject.domain,
+                          "url": configObject.url,
+                          "input": configObject.input
+                        };
+                        resolve(addonRegistry[command].handler({
+                          input: handlerInput
+                        }));
+                      }
+                    }
+                  } catch (error) {
+                    console.log("ERROR:");
+                    console.log(error); // File doesn't exists - this means there's no registry, not a system error that requires error handling
+                  }
+                });
+
+                if (!foundCommand) {
+                  resolve(JSON.stringify({
+                    "error": "Could not find command: " + command
+                  }));
+                }
+              }
+            }
+          });
+        }); // There's actually no way to get here unless the validCommands array is incorrect
+
         break;
     }
   } // runCommand()
@@ -1096,6 +1143,10 @@ class CW_Runner {
       alias: "quiet",
       describe: "Suppress in-progress output and only show the result",
       demand: false
+    }).option("i", {
+      alias: "input",
+      describe: "Input to send to the test",
+      demand: false
     }).command("local-network", "Test local network connectivity").command("local-dns", "Test local DNS resolution").command("http-port", "Test response time of web server port 80").command("https-port", "Test response time of web server port 443").command("domain", "Test domain registrar configuration").command("http-response", "Test response code and redirection for http").command("https-response", "Test response code and redirection for https").command("website", "Combined test of http-port and http-response").command("secure-website", "Combined test of https-port and https-response").command("website-content", "Test website content for essential content").command("ssl", "Test website SSL certificate").help("help", "Show this help screen");
     return yargs;
   }
@@ -1116,6 +1167,12 @@ class CW_Runner {
         usefile = "validpoint.json";
       } else {
         usefile = yargs.argv.file;
+      }
+
+      if (yargs.argv.input && yargs.argv.input.length > 0) {
+        returnValue.input = yargs.argv.input;
+      } else {
+        returnValue.input = null;
       }
 
       if (usefile && usefile.length > 0) {
