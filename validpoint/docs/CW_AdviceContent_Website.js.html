@@ -1,4 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: CW_AdviceContent_Website.js</title>
 
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: CW_AdviceContent_Website.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
 /**
  * Offering advice for "website" tests
  * 
@@ -53,8 +81,8 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 		}
 
 		// Got a direct message back from a system error
-		if( this.test_result.result == CW_Constants.RESULT_FAIL &&
-			this.test_result.raw_response.message && this.test_result.raw_response.message.length > 0 )
+		if( this.test_result.result == CW_Constants.RESULT_FAIL &amp;&amp;
+			this.test_result.raw_response.message &amp;&amp; this.test_result.raw_response.message.length > 0 )
 		{
 			this.severity = CW_Constants.SEVERITY_DIRECT_MESSAGE;
 			this.content = this.test_result.raw_response.message;
@@ -66,7 +94,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 				let tags = this.resultTagsForContent( { inputObject: this.test_result.raw_response } );
 
 				// Nothing was wrong
-				if( tags.length < 1 )
+				if( tags.length &lt; 1 )
 				{
 					this.severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PASS } );
 					this.content = this.contentForSeverity( { severity: this.severity } );
@@ -93,7 +121,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 			}
 			else if(	(this.command == "http-response" || this.command == "https-response" || 
 						this.command == "website" || this.command == "secure-website" ) 
-						&&  
+						&amp;&amp;  
 						(this.test_result.raw_response.raw_response == "NO_RESPONSE" || // raw_response for http(s)-response generated objects is an object containing a raw_response
 						this.test_result.raw_response == "NOT_FOUND" || 
 						this.test_result.raw_response == "TIMED_OUT" ) )
@@ -137,7 +165,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 		switch( severity )
 		{
 			case CW_Constants.SEVERITY_NOTICE:
-				if( extraInput && 
+				if( extraInput &amp;&amp; 
 					undefined != (strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_NOTICE ]) )
 				{
 					return strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_NOTICE ];
@@ -148,7 +176,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 				}
 			case CW_Constants.SEVERITY_ESSENTIAL:
 			case CW_Constants.SEVERITY_URGENT:
-				if( extraInput && 
+				if( extraInput &amp;&amp; 
 					undefined != (strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_URGENT ]) )
 				{
 					return strings[ this.command ][ extraInput ][ CW_Constants.NAME_SEVERITY_URGENT ]
@@ -181,7 +209,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 			case "PUNT":
 				return CW_Constants.SEVERITY_NOTICE;
 			case "FAIL":
-				if( extraKey && extraKey.length > 0 )
+				if( extraKey &amp;&amp; extraKey.length > 0 )
 				{
 					switch( extraKey )
 					{
@@ -194,7 +222,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 							return CW_Constants.SEVERITY_URGENT;
 					}
 				}
-				else // end if( extraKey && extraKey.length > 0 ) for case: FAIL
+				else // end if( extraKey &amp;&amp; extraKey.length > 0 ) for case: FAIL
 				{
 					return CW_Constants.SEVERITY_URGENT;
 				}
@@ -229,7 +257,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 
 		// A series of things that should be present in the HTML
 		if( (!inputObject.headNode.childNodes) || 
-			(inputObject.headNode.childNodes.length < 1) )
+			(inputObject.headNode.childNodes.length &lt; 1) )
 		{
 			returnValue.push(
 				{
@@ -240,8 +268,8 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 		}
 
 		if( (!inputObject.titleNode.childNodes) || 
-			(inputObject.titleNode.childNodes.length < 1) ||
-			(inputObject.titleNode.rawText.length < 1) )
+			(inputObject.titleNode.childNodes.length &lt; 1) ||
+			(inputObject.titleNode.rawText.length &lt; 1) )
 		{
 			returnValue.push(
 				{
@@ -252,8 +280,8 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 		}
 
 		if( (!inputObject.bodyNode.childNodes) || 
-			(inputObject.bodyNode.childNodes.length < 1) ||
-			(inputObject.bodyNode.rawText.length < 1) )
+			(inputObject.bodyNode.childNodes.length &lt; 1) ||
+			(inputObject.bodyNode.rawText.length &lt; 1) )
 		{
 			returnValue.push(
 				{
@@ -265,8 +293,8 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 
 		// We're only checking for 1
 		if( (!inputObject.h1Node.childNodes) || 
-			(inputObject.h1Node.childNodes.length < 1) /*|| // requires separate parsing if there's more than one
-			(inputObject.h1Node.rawText.length < 1)*/ )
+			(inputObject.h1Node.childNodes.length &lt; 1) /*|| // requires separate parsing if there's more than one
+			(inputObject.h1Node.rawText.length &lt; 1)*/ )
 		{
 			returnValue.push(
 				{
@@ -277,7 +305,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 		}
 
 		// walk through meta tags to find a "noindex"
-		if(  inputObject.metaNodes &&
+		if(  inputObject.metaNodes &amp;&amp;
 			inputObject.metaNodes.length > 0 )
 		{
 			inputObject.metaNodes.forEach(
@@ -402,7 +430,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 						// These can all be done at once, but are separated here to show "progress"
 						process.stdout.write( "Looking for HTML \"HEAD\" tag...   ".header );
 						if( (!this.test_result.raw_response.headNode.childNodes) || 
-							(this.test_result.raw_response.headNode.childNodes.length < 1) )
+							(this.test_result.raw_response.headNode.childNodes.length &lt; 1) )
 						{
 							process.stdout.write( "failed\n".error );
 							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_FAIL } );
@@ -416,8 +444,8 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 
 						process.stdout.write( "Looking for HTML \"BODY\" tag...   ".header );
 						if( (!this.test_result.raw_response.bodyNode.childNodes) || 
-							(this.test_result.raw_response.bodyNode.childNodes.length < 1) ||
-							(this.test_result.raw_response.bodyNode.rawText.length < 1) )
+							(this.test_result.raw_response.bodyNode.childNodes.length &lt; 1) ||
+							(this.test_result.raw_response.bodyNode.rawText.length &lt; 1) )
 						{
 							process.stdout.write( "failed\n".error );
 							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_FAIL } );
@@ -431,8 +459,8 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 
 						process.stdout.write( "Looking for HTML \"TITLE\" tag...   ".header );
 						if( (!this.test_result.raw_response.titleNode.childNodes) || 
-							(this.test_result.raw_response.titleNode.childNodes.length < 1) ||
-							(this.test_result.raw_response.titleNode.rawText.length < 1) )
+							(this.test_result.raw_response.titleNode.childNodes.length &lt; 1) ||
+							(this.test_result.raw_response.titleNode.rawText.length &lt; 1) )
 						{
 							process.stdout.write( "failed\n".error );
 							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_FAIL } );
@@ -447,7 +475,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 
 						process.stdout.write( "Looking for HTML \"H1\" tag...   ".header );
 						if( (!this.test_result.raw_response.h1Node.childNodes) || 
-							(this.test_result.raw_response.h1Node.childNodes.length < 1) )
+							(this.test_result.raw_response.h1Node.childNodes.length &lt; 1) )
 						{
 							process.stdout.write( "warning\n".warn );
 							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PUNT } );
@@ -462,7 +490,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 
 						let foundNoindex = false;
 						process.stdout.write( "Looking for HTML \"NOINDEX\" tag...   ".header );
-						if( this.test_result.raw_response.metaNodes &&
+						if( this.test_result.raw_response.metaNodes &amp;&amp;
 							this.test_result.raw_response.metaNodes.length > 0 )
 						{
 							this.test_result.raw_response.metaNodes.forEach(
@@ -567,4 +595,26 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 
 }
 
-module.exports =  CW_AdviceContent_Website;
+module.exports =  CW_AdviceContent_Website;</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CW_Advice.html">CW_Advice</a></li><li><a href="CW_AdviceContent_Local.html">CW_AdviceContent_Local</a></li><li><a href="CW_AdviceContent_Website.html">CW_AdviceContent_Website</a></li><li><a href="CW_AdviceContent_WebsiteAdmin.html">CW_AdviceContent_WebsiteAdmin</a></li><li><a href="CW_InputParser.html">CW_InputParser</a></li><li><a href="global.html#CW_Network">CW_Network</a></li><li><a href="CW_PromiseResolver.html">CW_PromiseResolver</a></li><li><a href="CW_Runner.html">CW_Runner</a></li><li><a href="CW_StringUtil.html">CW_StringUtil</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CW_Constants">CW_Constants</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Mar 09 2020 14:59:10 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

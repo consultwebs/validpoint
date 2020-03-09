@@ -1,4 +1,4 @@
-const CW_InputParser = require( "../src/CW_InputParser.js" );
+const CW_InputParser = require( "../dist/CW_InputParser.js" );
 
 test( "InputParser is an object",
 () =>

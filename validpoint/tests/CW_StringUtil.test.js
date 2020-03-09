@@ -1,4 +1,4 @@
-const CW_StringUtil = require( "../src/CW_StringUtil.js" );
+const CW_StringUtil = require( "../dist/CW_StringUtil.js" );
 
 // Run the empty constructor through the test for coverage reporting
 test( "Empty constructor",
