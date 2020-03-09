@@ -16,7 +16,7 @@
     "help": "./bin/validpoint help",
     "test": "jest --coverage --coverage-directory docs/coverage",
     "build": "webpack --mode production",
-	"transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs src --out-dir lib",
+	"transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs src --out-dir dist --copy-files",
 	"docs": "jsdoc -d docs/ -r src/*"
   },
   "babel": {
