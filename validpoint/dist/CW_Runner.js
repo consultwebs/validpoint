@@ -240,17 +240,19 @@ class CW_Runner {
     adviceObject.item_result.command = "ssl";
     adviceObject.item_result.category = "website";
     return new Promise((resolve, reject) => {
-      let AdviceContent = require("./CW_AdviceContent"); // AdviceContent.progressContent( { configObject: configObject,
-      // 	input: "Retrieving SSL certificate information for ".header + configObject.url.subject + "...   ".header 
-      // });
+      let AdviceContent = require("./CW_AdviceContent");
 
-
+      AdviceContent.progressContent({
+        configObject: configObject,
+        input: "Retrieving SSL certificate information for ".header + configObject.url.subject + "...   ".header
+      });
       CW_Runner.network.checkSSL({
         url: configObject.url
       }).then(result => {
-        // AdviceContent.progressContent( { configObject: configObject,
-        // 	input: "done\n".ok 
-        // });
+        AdviceContent.progressContent({
+          configObject: configObject,
+          input: "done\n".ok
+        });
         adviceObject.item_result.result = result.status;
         adviceObject.item_result.result_tags.push(result.status);
         adviceObject.item_result.raw_response = result;
@@ -332,19 +334,22 @@ class CW_Runner {
     adviceObject.item_result.command = "website-content";
     adviceObject.item_result.category = "website";
     return new Promise((resolve, reject) => {
-      let AdviceContent = require("./CW_AdviceContent"); // AdviceContent.progressContent( { configObject: configObject,
-      // 	input: "Downloading content for  ".header + configObject.url.subject + "...   ".header 
-      // });
+      let AdviceContent = require("./CW_AdviceContent");
 
+      AdviceContent.progressContent({
+        configObject: configObject,
+        input: "Downloading content for  ".header + configObject.url.subject + "...   ".header
+      });
 
       try {
         CW_Runner.network.checkWebsiteContent({
           url: configObject.url
         }).then(result => {
-          // AdviceContent.progressContent( { configObject: configObject,
-          // 	input: "done\n".ok 
-          // });
-          // Parse the incoming HTML to find important elements
+          AdviceContent.progressContent({
+            configObject: configObject,
+            input: "done\n".ok
+          }); // Parse the incoming HTML to find important elements
+
           let HtmlParser = require("../node_modules/node-html-parser");
 
           let root = HtmlParser.parse(result); // Stuff some nodes into an object for testing
@@ -419,18 +424,20 @@ class CW_Runner {
     }
 
     return new Promise((resolve, reject) => {
-      let AdviceContent = require("./CW_AdviceContent"); // AdviceContent.progressContent( { configObject: configObject,
-      // 	input: "Checking port " + port.toString().subject + " response code for ".header + configObject.url.subject + "...   ".header 
-      // });
+      let AdviceContent = require("./CW_AdviceContent");
 
-
+      AdviceContent.progressContent({
+        configObject: configObject,
+        input: "Checking port " + port.toString().subject + " response code for ".header + configObject.url.subject + "...   ".header
+      });
       CW_Runner.network.checkWebsiteAvailability({
         domain: configObject.url,
         port: port
       }).then(result => {
-        // AdviceContent.progressContent( { configObject: configObject,
-        // 	input: "done\n".ok 
-        // });
+        AdviceContent.progressContent({
+          configObject: configObject,
+          input: "done\n".ok
+        });
         adviceObject.item_result.result = result.result;
         adviceObject.item_result.result_tags.push(result.result);
         adviceObject.item_result.raw_response = result;
@@ -478,19 +485,22 @@ class CW_Runner {
     }
 
     return new Promise((resolve, reject) => {
-      let AdviceContent = require("./CW_AdviceContent"); // AdviceContent.progressContent( { configObject: configObject,
-      // 	input: "Checking port " + port.toString().subject + " availability for ".header + configObject.url.subject + "...   ".header 
-      // });
+      let AdviceContent = require("./CW_AdviceContent");
 
+      AdviceContent.progressContent({
+        configObject: configObject,
+        input: "Checking port " + port.toString().subject + " availability for ".header + configObject.url.subject + "...   ".header
+      });
 
       try {
         CW_Runner.network.checkWebsiteAvailability({
           domain: configObject.domain,
           port: port
         }).then(result => {
-          // AdviceContent.progressContent( { configObject: configObject,
-          // 	input: "done".ok 
-          // });
+          AdviceContent.progressContent({
+            configObject: configObject,
+            input: "done".ok
+          });
           adviceObject.item_result.result = result.result;
           adviceObject.item_result.result_tags.push(result.result);
           adviceObject.item_result.raw_response = result;
@@ -673,9 +683,12 @@ class CW_Runner {
 
     let StringUtil = require("./CW_StringUtil.js");
 
-    let AdviceContent = require("./CW_AdviceContent.js"); // AdviceContent.progressTitle( { configObject: configObject, input: "Beginning Domain tests...   \n" } );
+    let AdviceContent = require("./CW_AdviceContent.js");
 
-
+    AdviceContent.progressTitle({
+      configObject: configObject,
+      input: "Beginning Domain tests for " + configObject.domain + "...   \n"
+    });
     adviceObject.item_result.command = "domain";
     adviceObject.item_result.category = "website-admin"; // Add a custom structure to the adviceObject for domain responses since they hold a lot of info
 
@@ -702,10 +715,11 @@ class CW_Runner {
         // Using ANY as the argument to dig is remarkably unreliable in retrieving complete records. 
         // The only way to get complete records reliably is to perform individual TYPE queries against an authoritative name server.
         async.waterfall([completion => {
-          // AdviceContent.progressContent( { configObject: configObject,
-          // 	input: "Testing name server records for ".header + configObject.domain.subject + "...   ".header 
-          // });
-          // get nameserver records first so that we can get all the other data from an authority because non-authorities don't always answer completely
+          AdviceContent.progressContent({
+            configObject: configObject,
+            input: "Testing name server records for ".header + configObject.domain.subject + "...   ".header
+          }); // get nameserver records first so that we can get all the other data from an authority because non-authorities don't always answer completely
+
           CW_Runner.network.checkDomain({
             domain: configObject.domain,
             recordType: "NS",
@@ -729,9 +743,10 @@ class CW_Runner {
           });
         }, (result, completion) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
         {
-          // AdviceContent.progressContent( { configObject: configObject,
-          // 	input: "Testing mail server records for ".header + configObject.domain.subject + "...   ".header
-          // });
+          AdviceContent.progressContent({
+            configObject: configObject,
+            input: "Testing mail server records for ".header + configObject.domain.subject + "...   ".header
+          });
           CW_Runner.network.checkDomain({
             domain: configObject.domain,
             recordType: "MX"
@@ -903,9 +918,10 @@ class CW_Runner {
           });
         }, (result, completion) => // Step 7. Perform a whois lookup to get the domain expiration
         {
-          // AdviceContent.progressContent( { configObject: configObject,
-          // 	input: "Testing domain registration details for ".header + configObject.domain.subject + "...   ".header
-          // });
+          AdviceContent.progressContent({
+            configObject: configObject,
+            input: "Testing domain registration details for ".header + configObject.domain.subject + "...   ".header
+          });
           CW_Runner.network.getWhoisInfo({
             domain: configObject.domain
           }).then(result => {
@@ -973,11 +989,12 @@ class CW_Runner {
 
     if (port == 443) {
       adviceObject.item_result.command = "secure-website";
-    } // AdviceContent.progressContent( { configObject: configObject,
-    // 	input: "Checking website availability for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
-    // });
-    // wrap the entire waterfall in a promise
+    }
 
+    AdviceContent.progressContent({
+      configObject: configObject,
+      input: "Checking website availability for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header
+    }); // wrap the entire waterfall in a promise
 
     return new Promise((resolve, reject) => {
       // TODO: This needs to be abstracted from the input of Promise(). That there's way too much code to be an input
@@ -986,9 +1003,11 @@ class CW_Runner {
           domain: configObject.url,
           port: port
         }).then(result => {
-          // AdviceContent.progressContent( { configObject: configObject,
-          // 	input: "done\n".ok 
-          // });
+          AdviceContent.progressContent({
+            configObject: configObject,
+            input: "done\n".ok
+          });
+
           try {
             adviceObject.item_result.result = result.result;
             adviceObject.item_result.result_tags.push(result.result);
@@ -1042,16 +1061,18 @@ class CW_Runner {
           })));
         });
       }, (result, completion) => {
-        // AdviceContent.progressContent( { configObject: configObject,
-        // 	input: "Checking website response for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
-        // });
+        AdviceContent.progressContent({
+          configObject: configObject,
+          input: "Checking website response for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header
+        });
         CW_Runner.network.checkWebsiteResponse({
           url: configObject.url,
           port: port
         }).then(result => {
-          // AdviceContent.progressContent( { configObject: configObject,
-          // 	input: "done\n".ok 
-          // });
+          AdviceContent.progressContent({
+            configObject: configObject,
+            input: "done\n".ok
+          });
           adviceObject.item_result.result = result.result;
           adviceObject.item_result.result_tags.push(result.result);
           adviceObject.item_result.raw_response = result;
@@ -1068,10 +1089,11 @@ class CW_Runner {
           });
           completion(null, JSON.stringify(adviceObject));
         }).catch(error => {
-          // AdviceContent.progressContent( { configObject: configObject,
-          // 	input: "done\n".ok 
-          // });
-          // Resolve a throw from a system error...
+          AdviceContent.progressContent({
+            configObject: configObject,
+            input: "done\n".ok
+          }); // Resolve a throw from a system error...
+
           if (error.raw_response && error.raw_response.message && error.raw_response.message.length > 0) {
             resolve(JSON.stringify(this.constructErroredAdviceObject({
               adviceObject: adviceObject,
@@ -1185,6 +1207,8 @@ class CW_Runner {
 
           if (config.preflight_commands && config.preflight_commands.length > 0) {
             returnValue.command = config.preflight_commands;
+          } else {
+            returnValue.preflight_commands = [];
           }
 
           if (config.commands && config.commands.length > 0 && config.commands[0] != "all") {
@@ -1209,6 +1233,7 @@ class CW_Runner {
           returnValue.command = [yargs.argv.command];
         }
 
+        returnValue.preflight_commands = [];
         returnValue.domain = [yargs.argv.domain];
         returnValue.directory = null;
         returnValue.show_raw = yargs.argv.raw ? true : false;
