@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Consultwebs service validator",
   "license": "MIT",
-  "main": "index.mjs",
+  "main": "./dist/index.js",
   "bin": {
     "validpoint": "./bin/validpoint"
   },
@@ -15,9 +15,10 @@
     "start": "./bin/validpoint help",
     "help": "./bin/validpoint help",
     "test": "jest --coverage --coverage-directory docs/coverage",
-    "build": "webpack --mode production",
-	"transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs src --out-dir dist --copy-files",
-	"docs": "jsdoc -d docs/ -r src/*"
+	"transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs,transform-dynamic-import src --out-dir dist --copy-files",
+	"docs": "jsdoc -d docs/ -r src/*",
+	"webpack": "webpack --mode production --display verbose",
+	"build": "npm run transpile && npm run docs && npm run test && npm run webpack"
   },
   "babel": {
     "presets": [],

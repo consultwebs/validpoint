@@ -126,7 +126,7 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	 */
 	contentForSeverity( { severity = null } )
 	{
-		let strings = require( "../strings/category.local.js" );
+		let strings = require( "./strings/category.local.js" );
 		
 		switch( severity )
 		{

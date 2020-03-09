@@ -136,7 +136,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent {
     severity = null,
     extraInput = null
   }) {
-    let strings = require("../strings/category.website.js");
+    let strings = require("./strings/category.website.js");
 
     switch (severity) {
       case CW_Constants.SEVERITY_NOTICE:

@@ -430,7 +430,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent {
     severity = null,
     extraInput = null
   }) {
-    let strings = require("../strings/category.website-admin.js");
+    let strings = require("./strings/category.website-admin.js");
 
     switch (severity) {
       case CW_Constants.SEVERITY_OK:
