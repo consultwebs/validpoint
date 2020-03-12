@@ -26,6 +26,8 @@ require( "strict-mode" )(
 		const colors = require( "../node_modules/colors" );
 		colors.setTheme( CW_Constants.COLOR_THEME );
 
+		let AdviceContent = require( "../dist/CW_AdviceContent" );
+
 		let domainCounter = 0;
 
 		let inputOptions = CW_Runner.processinputArguments()
@@ -56,14 +58,26 @@ require( "strict-mode" )(
 						process.exit();
 					}
 
+					// if( !Array.isArray( domains ) )
+					// {
+					// 	let tmpOutput = [];
+					// 	Object.keys( domains ).forEach(
+					// 		(domain, index) =>
+					// 		{
+					// 			tmpOutput.push( domain );
+					// 		}
+					// 	);
+					// 	domains = tmpOutput;
+					// }
+
 					// Foreach domain
 					// Object.keys( domains ).forEach(
 					// 	( domain, index ) =>
 					async.eachSeries(
 						domains,
-						( domain, callback ) =>
+						( domain, domainCallback ) =>
 						{
-							// Override commands from config/input
+							// Override commands from config/input							
 
 							// override commands for each domain
 							if( Array.isArray( inputOptions.domain ) )
@@ -114,15 +128,21 @@ require( "strict-mode" )(
 							}
 
 							// If the CLI input is for a particular domain, the input will have "0" as the "domain" index - convert it to something useful
+							let domainOut = domain;
 							if( domain == 0 )
 							{
-								domain = domains[0];
+								domainOut = domains[0];
 								inputOptions.domain[domain] = {};
+							}
+
+							if( typeof domain === "object" )
+							{
+								domainOut = domain.domain;
 							}
 
 							let returnValue = 
 							{
-								domain: domain,
+								domain: domainOut,
 								commands: cmds,
 								inputOptions: inputOptions,
 								optionIndex: domainCounter
@@ -130,7 +150,9 @@ require( "strict-mode" )(
 
 							domainCounter++;
 							
-							callback( returnValue );
+							AdviceContent.progressTitle( { configObject: inputOptions, input: { title: "\nBeginning tests for " + domainOut + "...   \n" } } );
+							
+							domainCallback( returnValue );
 
 						},
 						( input ) =>
@@ -145,8 +167,10 @@ require( "strict-mode" )(
 							}
 
 							// Foreach command
-							cmds.forEach(
-								(command, index) =>
+
+							async.eachSeries(
+								cmds,
+								( command, commandCallback ) =>
 								{
 									// 1. make runner object(s)
 									CW_InputParser.makeRunnerObjects( { domain: domain, directory: inputDirectory } )
@@ -159,12 +183,12 @@ require( "strict-mode" )(
 												}
 												
 												runObjects.forEach(
-													async( runObject ) =>
+													( runObject ) =>
 													{
 														// 2. parse the input config file
 														let parser = new CW_InputParser( runObject.file, runObject.directory );
 
-														await parser.init(
+														parser.init(
 															function() // init callback
 															{
 																try
@@ -226,21 +250,7 @@ require( "strict-mode" )(
 																			(response) =>
 																			{
 																				// 5. Display results
-																				if( config.show_raw || config.be_quiet ) // will probably remove the be_quiet allowance here
-																				{
-																					console.log();
-																					console.log( response );
-																					console.log(); // Make a blank line for separation until we have nicer progressive output
-																				}
-
-																				if( (index + 1) == cmds.length )
-																				{
-																					if( objectsToRun < 1 )
-																					{
-																						console.log( "There were no commands to run. Try `validpoint --help`".warn );
-																					}
-																				}
-
+																				commandCallback( null, response );
 																			}
 																		);
 																}
@@ -255,8 +265,20 @@ require( "strict-mode" )(
 													});
 											}
 										);
-								}); // cmds.forEach
-						} ); // domains.forEach
+								},
+								(error, input) =>
+								{
+
+									// We won't receive an error here
+									if( config.show_raw || config.be_quiet ) // will probably remove the be_quiet allowance here
+									{
+										console.log();
+										console.log( input );
+										console.log();
+									}
+								}
+								); // cmds.forEach
+						}); // domains.forEach
 				});// processinputArguments then
 	}
 );

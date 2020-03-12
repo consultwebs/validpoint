@@ -937,13 +937,9 @@ class CW_Runner {
               adviceObject: adviceObject,
               testKey: "WHOIS"
             });
-            console.log("OK");
             completion(null, adviceObject);
           }).catch( // resolve received rejections
           error => {
-            console.log("ERROR 0");
-            console.log(error);
-            console.log("ERROR 1");
             resolve(JSON.stringify(this.constructErroredAdviceObject({
               adviceObject: adviceObject,
               input: error

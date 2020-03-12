@@ -1,6 +1,14 @@
 {
 	"domains": 
 	{
+		"appideas.com":
+		{
+			"domain": "appideas.com",
+			"commands": 
+			[
+				"domain"
+			]
+		},
 		"consultwebs.com":
 		{
 			"domain": "consultwebs.com",
@@ -15,10 +23,6 @@
 				"https-port", "domain", "https-response", 
 				"secure-website",  "website-content"
 			]
-		},
-		"appideas.com":
-		{
-			"domain": "appideas.com"
 		},
 		"bravoreviews.com": {
 			"domain": "meta.bravoreviews.com",
