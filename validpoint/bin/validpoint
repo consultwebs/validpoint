@@ -10,275 +10,69 @@
  */
 
 require( "strict-mode" )(
-    () =>
-    {
-		// Get an instance of the runner
-		const CW_Runner = require( "../dist/CW_Runner.js" );
-		const runner = new CW_Runner();
+() =>
+{
+	// Get an instance of the runner
+	const CW_Runner = require( "../dist/CW_Runner.js" );
+	const runner = new CW_Runner();
 
-		// And an instance of the parser
-		const CW_InputParser =  require( "../dist/CW_InputParser.js" );
-		let config = null;
+	// And an instance of the parser
+	// const CW_InputParser =  require( "../dist/CW_InputParser.js" );
+	// let config = null;
 
-		let async = require("../node_modules/async");
+	let async = require("../node_modules/async");
 
-		const CW_Constants =  require( "../dist/CW_Constants.js" );
-		const colors = require( "../node_modules/colors" );
-		colors.setTheme( CW_Constants.COLOR_THEME );
+	const CW_Constants =  require( "../dist/CW_Constants.js" );
+	const colors = require( "../node_modules/colors" );
+	colors.setTheme( CW_Constants.COLOR_THEME );
 
-		let AdviceContent = require( "../dist/CW_AdviceContent" );
+	let AdviceContent = require( "../dist/CW_AdviceContent" );
 
-		let domainCounter = 0;
+	let domainCounter = 0;
 
-		let inputOptions = CW_Runner.processinputArguments()
-			.then(
-				( inputOptions ) =>
-				{	
-					let cmds = inputOptions.command;
-					let domains = inputOptions.domain;
-					let inputDirectory = null;
+	CW_Runner.processinputArguments()
+		.then(
+			( inputOptions ) =>
+			{	
+				let cmds = inputOptions.command;
+				let domains = CW_Runner.parseInputForDomains( { input: inputOptions } );
 
-					let objectsToRun = 0;
-
-					if( inputOptions.directory && inputOptions.directory.length > 0 )
+				async.eachSeries(
+					domains,
+					async ( domain ) =>
 					{
-						inputDirectory = inputOptions.directory;
-					}
+						cmds = CW_Runner.parseInputForCommands( {domain: domain, input: inputOptions, arrayIndex: domainCounter} )
+						let normalizedInput = CW_Runner.normalizeInput( {domain: domain, domains: domains, input: inputOptions} )
 
-					if( !domains || 
-						(domains.length == 1 && domains[0] === undefined) )
-					{
-						// There were no input options and no config file input
-						console.log();
-						console.log( "You must specify a domain with '-d <domain>', supply an input configuration file, or have a validpoint.json file in the current directory." );
-						console.log();
-
-						let yargs = CW_Runner.getYargs();
-						yargs.showHelp();
-						process.exit();
-					}
-
-					// if( !Array.isArray( domains ) )
-					// {
-					// 	let tmpOutput = [];
-					// 	Object.keys( domains ).forEach(
-					// 		(domain, index) =>
-					// 		{
-					// 			tmpOutput.push( domain );
-					// 		}
-					// 	);
-					// 	domains = tmpOutput;
-					// }
-
-					// Foreach domain
-					// Object.keys( domains ).forEach(
-					// 	( domain, index ) =>
-					async.eachSeries(
-						domains,
-						( domain, domainCallback ) =>
+						let runParameters = 
 						{
-							// Override commands from config/input							
+							domain: normalizedInput.domain,
+							commands: cmds,
+							inputOptions: normalizedInput.input,
+							optionIndex: domainCounter
+						}
+						domainCounter++;
 
-							// override commands for each domain
-							if( Array.isArray( inputOptions.domain ) )
-							{
-								if( inputOptions.domain[domainCounter].preflight_commands && 
-									inputOptions.domain[domainCounter].preflight_commands.length > 0 )
+						await CW_Runner.printDomainHeadline( {config: runParameters.inputOptions, domain: runParameters.domain} )
+							.then(
+								(response) =>
 								{
-									cmds = inputOptions.domain[domainCounter].preflight_commands;
-								}
-
-								if( inputOptions.domain[domainCounter].commands && 
-									inputOptions.domain[domainCounter].commands.length > 0 )
-								{
-									// If there were no preflight commands, override any previously specified commands
-									if( !inputOptions.domain[domainCounter].preflight_commands || 
-										inputOptions.domain[domainCounter].preflight_commands.length < 1 )
-									{
-										cmds = inputOptions.domain[domainCounter].commands;
-									}
-									else // or else add to the preflight commands
-									{
-										cmds = cmds.concat( inputOptions.domain[domainCounter].commands );
-									}
-								}
-							}
-							else if( inputOptions.domain[domain.domain] && inputOptions.domain[domain.domain].length > 0 )
-							{
-								if( inputOptions.domain[domain.domain].preflight_commands && 
-									inputOptions.domain[domain.domain].preflight_commands.length > 0 )
-								{
-									cmds = inputOptions.domain[domain.domain].preflight_commands;
-								}
-
-								if( inputOptions.domain[domain.domain].commands && 
-									inputOptions.domain[domain.domain].commands.length > 0 )
-								{
-									// If there were no preflight commands, override any previously specified commands
-									if( !inputOptions.domain[domain.domain].preflight_commands || 
-										inputOptions.domain[domain.domain].preflight_commands.length < 1 )
-									{
-										cmds = inputOptions.domain[domain.domain].commands;
-									}
-									else // or else add to the preflight commands
-									{
-										cmds = cmds.concat( inputOptions.domain[domain.domain].commands );
-									}
-								}
-							}
-
-							// If the CLI input is for a particular domain, the input will have "0" as the "domain" index - convert it to something useful
-							let domainOut = domain;
-							if( domain == 0 )
-							{
-								domainOut = domains[0];
-								inputOptions.domain[domain] = {};
-							}
-
-							if( typeof domain === "object" )
-							{
-								domainOut = domain.domain;
-							}
-
-							let returnValue = 
-							{
-								domain: domainOut,
-								commands: cmds,
-								inputOptions: inputOptions,
-								optionIndex: domainCounter
-							}
-
-							domainCounter++;
-							
-							AdviceContent.progressTitle( { configObject: inputOptions, input: { title: "\nBeginning tests for " + domainOut + "...   \n" } } );
-							
-							domainCallback( returnValue );
-
-						},
-						( input ) =>
-						{
-							let cmds = input.commands;
-							let domainIndex = input.optionIndex;
-							let domain = input.domain;
-
-							if( typeof domain === "object" )
-							{
-								domain = input.domain.domain;
-							}
-
-							// Foreach command
-
-							async.eachSeries(
-								cmds,
-								( command, commandCallback ) =>
-								{
-									// 1. make runner object(s)
-									CW_InputParser.makeRunnerObjects( { domain: domain, directory: inputDirectory } )
+									CW_Runner.domainCommandRunner( {input: runParameters } )
 										.then(
-											( runObjects ) =>
+											(response) =>
 											{
-												if( runObjects.length > 0 )
-												{
-													objectsToRun += runObjects.length;
-												}
-												
-												runObjects.forEach(
-													( runObject ) =>
-													{
-														// 2. parse the input config file
-														let parser = new CW_InputParser( runObject.file, runObject.directory );
-
-														parser.init(
-															function() // init callback
-															{
-																try
-																{
-																	config = this.parseJsonString();
-
-																	if( config == null )
-																	{
-																		throw new Error( "COULD NOT READ INPUT CONFIGURATION FILE. EXITING." );
-																	}
-																	else if( config.error && config.error.length > 0 )
-																	{
-																		// config.error happens when a json file does not exist for the domain...
-																		//   In the absence of a domain.json file, populate a config object with reasonable 
-																		//   parameters for the given domain
-																		config = 
-																		{	...config,
-																			name: domain,
-																			domain: domain,
-																			url: "www." + domain
-																		}
-																	}
-
-																	config = 
-																	{	...config,
-																		show_raw: input.inputOptions.show_raw,
-																		be_quiet: input.inputOptions.quiet
-																	}
-
-																	// override config options from input
-																	if( Array.isArray( input.inputOptions.domain ) )
-																	{
-																		if( input.inputOptions.domain[domainIndex].name && input.inputOptions.domain[domainIndex].name.length > 0 )
-																		{
-																			config.name = input.inputOptions.domain[domainIndex].name;
-																		}
-																		if( input.inputOptions.domain[domainIndex].url && input.inputOptions.domain[domainIndex].url.length > 0 )
-																		{
-																			config.url = input.inputOptions.domain[domainIndex].url;
-																		}
-																	}
-
-																	// 3. Setup advice
-																	let CW_Advice = require( "../dist/CW_Advice.js" );
-																	let advice = new CW_Advice();
-
-																	if( inputOptions.input )
-																	{
-																		config.input = inputOptions.input;
-																	}
-																	else
-																	{
-																		config.input = "";
-																	}
-
-																	// 4. runCommand
-																	runner.runCommand( { command: command, configObject: config, adviceObject: advice } )
-																		.then(
-																			(response) =>
-																			{
-																				// 5. Display results
-																				commandCallback( null, response );
-																			}
-																		);
-																}
-																catch( error ) // runCommand never receives rejections, so this will only be code or system errors - never test failures
-																{
-																	console.log( "There was a problem running your command. The error reported was:" );
-																	console.log( error );
-																	console.log( "Exiting now." );
-																	process.exit( 1 );
-																}
-															}); // parser.init()
-													});
+												console.log( "domainRunner then" );
+												console.log( response ); // TODO: Print response only if not quiet
 											}
 										);
-								},
-								(error, input) =>
-								{
-
-									// We won't receive an error here
-									if( config.show_raw || config.be_quiet ) // will probably remove the be_quiet allowance here
-									{
-										console.log();
-										console.log( input );
-										console.log();
-									}
 								}
-								); // cmds.forEach
-						}); // domains.forEach
-				});// processinputArguments then
-	}
-);
+							);
+
+					}, // each series domains
+					(error) =>
+					{
+						// There are no errors received here, so this is only reached on completion
+					});// processinputArguments then
+			}
+		);
+});

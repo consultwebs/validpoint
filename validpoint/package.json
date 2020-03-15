@@ -18,7 +18,8 @@
     "transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs,transform-dynamic-import,search-and-replace src --out-dir dist --copy-files",
     "docs": "jsdoc -d docs/ -r src/*",
     "webpack": "webpack --mode production --display verbose",
-    "build": "npm run transpile && npm run docs && npm run test && npm run webpack"
+	"build": "npm run transpile && npm run docs && npm run test && npm run webpack",
+	"dev": "npm run transpile && ./bin/validpoint -r"
   },
   "babel": {
     "presets": [],

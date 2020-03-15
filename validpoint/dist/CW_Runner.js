@@ -13,6 +13,8 @@ let CW_Constants = require("./CW_Constants");
 
 let CW_Advice = require("./CW_Advice");
 
+let AdviceContent = require("../dist/CW_AdviceContent");
+
 const colors = require("../node_modules/colors"); // TODO: Running "all" commands causes the headers to be printed first, then the results - get them (a)synced up
 
 
@@ -39,6 +41,142 @@ class CW_Runner {
     }
 
     return returnValue;
+  }
+  /**
+   * Parse input for this domain to get an array of commands to run
+   */
+
+
+  static parseInputForCommands({
+    domain = null,
+    input = null,
+    arrayIndex = -1
+  }) {
+    let cmds = []; // TODO: insert the default commands and use those if there are not overrides
+    // Override commands from config/input
+
+    if (Array.isArray(input.domain)) {
+      if (input.domain[arrayIndex].preflight_commands && input.domain[arrayIndex].preflight_commands.length > 0) {
+        cmds = input.domain[arrayIndex].preflight_commands;
+      }
+
+      if (input.domain[arrayIndex].commands && input.domain[arrayIndex].commands.length > 0) {
+        // If there were no preflight commands, override any previously specified commands
+        if (!input.domain[arrayIndex].preflight_commands || input.domain[arrayIndex].preflight_commands.length < 1) {
+          cmds = input.domain[arrayIndex].commands;
+        } else // or else add to the preflight commands
+          {
+            cmds = cmds.concat(input.domain[arrayIndex].commands);
+          }
+      }
+    } else if (input.domain[domain] && Object.keys(input.domain[domain]).length > 0) {
+      if (input.domain[domain].preflight_commands && input.domain[domain].preflight_commands.length > 0) {
+        cmds = input.domain[domain].preflight_commands;
+      }
+
+      if (input.domain[domain].commands && input.domain[domain].commands.length > 0) {
+        // If there were no preflight commands, override any previously specified commands
+        if (!input.domain[domain].preflight_commands || input.domain[domain].preflight_commands.length < 1) {
+          cmds = input.domain[domain].commands;
+        } else // or else add to the preflight commands
+          {
+            cmds = cmds.concat(input.domain[domain].commands);
+          }
+      }
+    }
+
+    return cmds;
+  }
+  /**
+   * Final normaliztion of domain and other input for processing
+   * @param {*} param0 
+   */
+
+
+  static normalizeInput({
+    domain = null,
+    domains = null,
+    input = null
+  }) {
+    let domainOut = domain;
+
+    if (domain == 0) {
+      domainOut = domains[0];
+      input.domain[domain] = {};
+    }
+
+    if (typeof domain === "object") {
+      domainOut = domain.domain;
+    }
+
+    let returnValue = {
+      domain: domainOut,
+      input: input
+    };
+    return returnValue;
+  }
+  /**
+   * Parse input for this run to get an array of domain names or domain objects
+   */
+
+
+  static parseInputForDomains({
+    input = null
+  }) {
+    let domains = input.domain;
+    let inputDirectory = null; // normalize the input directory
+
+    if (input.directory && input.directory.length > 0) {
+      inputDirectory = input.directory;
+    }
+
+    input.inputDirectory = inputDirectory; // There were no input options and no config file input
+    // Show the help screen and stop
+
+    if (!domains || domains.length == 1 && domains[0] === undefined) {
+      console.log();
+      console.log("You must specify a domain with '-d <domain>', supply an input configuration file, or have a validpoint.json file in the current directory.");
+      console.log();
+      let yargs = CW_Runner.getYargs();
+      yargs.showHelp();
+      process.exit();
+    } // Convert Object input to an array of objects
+
+
+    if (!Array.isArray(domains)) {
+      let tmpOutput = [];
+      Object.keys(domains).forEach((domain, index) => {
+        tmpOutput.push(domain);
+      });
+      domains = tmpOutput;
+    }
+
+    return domains;
+  }
+
+  static printDomainHeadline({
+    config = null,
+    domain = null
+  }) {
+    return new Promise((resolve, reject) => {
+      AdviceContent.progressTitle({
+        configObject: config,
+        input: {
+          title: "\nBeginning tests for " + domain + "...   \n"
+        }
+      });
+      resolve("RESOLVING");
+    });
+  }
+
+  static domainCommandRunner({
+    input = null
+  }) {
+    // console.log( input );
+    return new Promise((resolve, reject) => {
+      // AdviceContent.progressTitle( { configObject: input.inputOptions, input: { title: "\nBeginning tests for " + input.domain + "...   \n" } } );
+      resolve("RESOLVING");
+    });
   }
   /**
    * Run a command
