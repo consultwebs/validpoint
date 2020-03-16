@@ -60,7 +60,7 @@ class CW_AdviceContent
 
 	static progressTitle( {configObject = null, input = null} )
 	{
-		if( configObject.be_quiet === false || configObject.quiet === false )
+		// if( configObject.be_quiet === false || configObject.quiet === false )
 		{
 			process.stdout.write( input.title + "\n" );
 		}
@@ -68,7 +68,7 @@ class CW_AdviceContent
 
 	static progressContent( {configObject = null, input = null} )
 	{
-		if( configObject.be_quiet === false )
+		// if( configObject.be_quiet === false )
 		{
 			process.stdout.write( input );
 		}
@@ -76,7 +76,7 @@ class CW_AdviceContent
 
 	static progressResult( {configObject = null, input = null} )
 	{
-		if( configObject.be_quiet === false )
+		// if( configObject.be_quiet === false )
 		{
 			process.stdout.write( input.ok + "\n" );
 		}
@@ -85,7 +85,7 @@ class CW_AdviceContent
 	static progressAdvice( {configObject = null, adviceObject = null, testKey = null} )
 	{	
 		// Don't go further if we aren't going to show output
-		if( configObject.be_quiet === false )
+		// if( configObject.be_quiet === false )
 		{
 			// Create an instance of one of this class' children to get in-progress advice
 			let ChildClass = null;

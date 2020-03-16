@@ -10,6 +10,8 @@ let CW_Constants = require( "./CW_Constants" );
 let CW_Advice = require( "./CW_Advice" );
 let AdviceContent = require( "../dist/CW_AdviceContent" );
 
+let async = require( "../node_modules/async" );
+
 const colors = require( "../node_modules/colors" );
 
 // TODO: Running "all" commands causes the headers to be printed first, then the results - get them (a)synced up
@@ -116,15 +118,35 @@ class CW_Runner
 			domainOut = domains[0];
 			input.domain[domain] = {};
 		}
-
-		if( typeof domain === "object" )
+		else if( typeof domain === "object" )
 		{
 			domainOut = domain.domain;
 		}
 
+		let configUrl = (input.domain[domainOut].url) ? input.domain[domainOut].url : "www." + domainOut;
+		let configName = (input.domain[domainOut].name) ? input.domain[domainOut].name : domainOut;
+
+		if( !input.domain[domainOut].commands )
+		{
+			input.domain[domainOut].commands = input.command;
+		}
+
+		if( input.domain[domainOut].preflight_commands && input.domain[domainOut].preflight_commands.length > 0 )
+		{
+			input.domain[domainOut].commands = input.domain[domainOut].preflight_commands.concat( input.domain[domainOut].commands );
+		}
+
+		input.domain[domainOut] = 
+		{ ...input.domain[domainOut],
+			url: configUrl,
+			name: configName
+		};
+
 		let returnValue = 
 		{
 			domain: domainOut,
+			url: configUrl,
+			name: configName,
 			input: input
 		};
 
@@ -181,22 +203,80 @@ class CW_Runner
 			(resolve, reject) =>
 			{
 				AdviceContent.progressTitle( { configObject: config, input: { title: "\nBeginning tests for " + domain + "...   \n" } } );
-				resolve( "RESOLVING" );
+				resolve( true );
 			}
 		);
 	}
 
 	static domainCommandRunner( {input = null})
 	{
-		// console.log( input );
-		
 		return new Promise(
 			(resolve, reject) =>
 			{
-				// AdviceContent.progressTitle( { configObject: input.inputOptions, input: { title: "\nBeginning tests for " + input.domain + "...   \n" } } );
+				let domain = input.domain;
+				// TODO: Validate that this has already been normalized, then remove this test
+				if( typeof domain === "object" )
+				{
+					domain = input.domain.domain;
+				}
+				let cmds = input.inputOptions.domain[domain].commands;
+				let config = input.inputOptions.domain[domain];
 
+				// TODO: Get input options from "-i " one level above this
 
-				resolve( "RESOLVING" );
+				let CW_Advice = require( "../dist/CW_Advice.js" );
+				let runner = new CW_Runner();
+
+				if( cmds )
+				{
+					async.eachSeries(
+						cmds,
+						async ( command ) =>
+						{
+							let advice = new CW_Advice();
+							await runner.commandResolutionWrapper( { command: command, configObject: config, adviceObject: advice } );
+						},
+						(error) =>
+						{
+							// TODO: Test to see if we can get an error here, otherwise always reolve `true` because we'll only end up here at the end of the commands
+							// console
+							resolve( true );
+						}); // end async.eachSeries for cmds
+				}
+			},
+			(error) =>
+			{
+				// TODO: Test to see if we can reach here
+				console.log( "Outside callback with error: " );
+				console.log( error );
+			}
+		);
+	}
+
+	// Abstract command Promises so that the first returned Promise doesn't end a loop
+	commandResolutionWrapper( { command: command, configObject: config, adviceObject: advice } )
+	{
+		return new Promise(
+			(resolve, reject) =>
+			{
+				this.runCommand( { command: command, configObject: config, adviceObject: advice } )
+				.then(
+					( response ) =>
+					{
+						// console.log( "Resolving Response: " );
+						// console.log( response ); // TODO: Show the response at the console if "-r" is set
+						resolve( response );
+						
+					}
+				)
+				.catch(
+					(error) =>
+					{
+						// TODO: Test to see if we can reach here
+						console.log( "Error resolving command: " );
+						console.log( error );
+					}
+				);
 			}
 		);
 	}
@@ -212,9 +292,6 @@ class CW_Runner
 	 */
 	runCommand( { command = "", configObject = null, adviceObject = null } )
     {
-        // sanity check the requested command
-		// command = this.sanitizeCommand( command );
-
 		if( !adviceObject )
 		{
 			adviceObject = new CW_Advice();
@@ -884,8 +961,6 @@ class CW_Runner
 	  */
 	  command_Domain( { configObject = null, adviceObject = null } )
 	 {
-
-		let async = require( "../node_modules/async" );
 		let StringUtil = require( "./CW_StringUtil.js" );
 		let AdviceContent = require( "./CW_AdviceContent.js" );
 

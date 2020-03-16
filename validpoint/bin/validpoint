@@ -53,26 +53,35 @@ require( "strict-mode" )(
 						}
 						domainCounter++;
 
+						// TODO: Print response only if not quiet
 						await CW_Runner.printDomainHeadline( {config: runParameters.inputOptions, domain: runParameters.domain} )
 							.then(
-								(response) =>
+								async (response) =>
 								{
-									CW_Runner.domainCommandRunner( {input: runParameters } )
+									// prinDomainHeader always resolves 'true'
+
+									// Run commands form each domain
+									await CW_Runner.domainCommandRunner( {input: runParameters } )
 										.then(
 											(response) =>
 											{
-												console.log( "domainRunner then" );
-												console.log( response ); // TODO: Print response only if not quiet
+												// console.log( "domainCommandRunner then" ); // prinDomainHeader always resolves 'true'
+											}
+										)
+										.catch(
+											(error) =>
+											{
+												console.log( "command runner error" ); // This should never catch
+												console.log( error );
 											}
 										);
 								}
 							);
 
-					}, // each series domains
+					}, // each series for domains
 					(error) =>
 					{
 						// There are no errors received here, so this is only reached on completion
-					});// processinputArguments then
-			}
-		);
-});
+					});// end domains eachSeries final callback
+			});  // end then() for processInputArguments()
+}); // strict-mode container
