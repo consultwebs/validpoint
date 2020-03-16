@@ -64,7 +64,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent {
         returnValue.printSubject += Math.ceil(this.test_result.raw_response.response_time).toString().result + "ms".result;
 
         if (this.test_result.raw_response.response_time < CW_Constants.MAX_HTTTP_RESPONSE_TIME) {
-          returnValue.printSubject += " good".ok;
+          returnValue.printSubject += " good\n".ok;
         } else {
           returnValue.printSubject += " warning\n".warn;
           returnValue.printSubject += this.contentForSeverity({
@@ -224,7 +224,7 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent {
             returnValue.printDetail = returnValue.printDetail.warn;
           } else if (severity == CW_Constants.SEVERITY_OK) // "OK" conditions that may have extra output
             {
-              returnValue.printAnswer = "good".ok;
+              returnValue.printAnswer = "good\n".ok;
               returnValue.printDetail = returnValue.printDetail.ok;
             } else // Errors (not a notice or "OK" with a tag)
             {

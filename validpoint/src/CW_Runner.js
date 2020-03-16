@@ -202,7 +202,7 @@ class CW_Runner
 		return new Promise( 
 			(resolve, reject) =>
 			{
-				AdviceContent.progressTitle( { configObject: config, input: { title: "\nBeginning tests for " + domain + "...   \n" } } );
+				AdviceContent.progressTitle( { configObject: config, input: "\nBeginning tests for " + domain + "...   \n" } );
 				resolve( true );
 			}
 		);
@@ -620,7 +620,7 @@ class CW_Runner
 				let AdviceContent = require( "./CW_AdviceContent" );
 
 				AdviceContent.progressContent( { configObject: configObject,
-					input: "Downloading content for  ".header + configObject.url.subject + "...   ".header 
+					input: "\nDownloading content for  ".header + configObject.url.subject + "...   ".header 
 				});
 
 				try
@@ -715,7 +715,7 @@ class CW_Runner
 				let AdviceContent = require( "./CW_AdviceContent" );
 
 				AdviceContent.progressContent( { configObject: configObject,
-					input: "Checking port " + port.toString().subject + " response code for ".header + configObject.url.subject + "...   ".header 
+					input: "\nChecking port " + port.toString().subject + " response code for ".header + configObject.url.subject + "...   ".header 
 				});
 
 				CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } )
@@ -964,7 +964,9 @@ class CW_Runner
 		let StringUtil = require( "./CW_StringUtil.js" );
 		let AdviceContent = require( "./CW_AdviceContent.js" );
 
-		AdviceContent.progressTitle( { configObject: configObject, input: "Beginning Domain tests for " + configObject.domain + "...   \n" } );
+		AdviceContent.progressContent( { configObject: configObject,
+			input: "Beginning domain tests for ".text + configObject.domain.header + "...   \n".text 
+		});
 
 		adviceObject.item_result.command = "domain";
 		adviceObject.item_result.category = "website-admin";
@@ -1295,7 +1297,7 @@ class CW_Runner
 		}
 
 		AdviceContent.progressContent( { configObject: configObject,
-			input: "Checking website availability for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
+			input: "\nChecking website availability for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
 		});
 
 		// wrap the entire waterfall in a promise
@@ -1372,7 +1374,7 @@ class CW_Runner
 						( result, completion ) =>
 						{
 							AdviceContent.progressContent( { configObject: configObject,
-								input: "Checking website response for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
+								input: "\nChecking website response for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
 							});
 
 							CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )

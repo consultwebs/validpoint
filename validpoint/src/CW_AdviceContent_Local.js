@@ -58,17 +58,17 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 			case "LOCAL_NETWORK":
 				if( this.test_result.result == CW_Constants.RESULT_PASS )
 				{
-					returnValue.printAnswer = "good".ok;
+					returnValue.printAnswer = "good\n".ok;
 				}
 				else if( this.test_result.result == CW_Constants.RESULT_FAIL &&
 					this.test_result.raw_response && this.test_result.raw_response.message && this.test_result.raw_response.message.length > 0 )
 				{
-					returnValue.printAnswer = "fail".error;
+					returnValue.printAnswer = "fail\n".error;
 					returnValue.printDetail = this.test_result.raw_response.message;
 				}
 				else
 				{
-					returnValue.printAnswer = "fail".error;
+					returnValue.printAnswer = "fail\n".error;
 					severity = this.resultTagToSeverity( { resultTag: this.test_result.result } );
 					returnValue.printDetail = this.contentForSeverity( { severity: severity } ).error;
 				}
