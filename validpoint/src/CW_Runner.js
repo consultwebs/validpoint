@@ -954,7 +954,7 @@ class CW_Runner
 	/**
 	  * Validate details of the user's domain name and registration
 	  * 
-	  * TODO: Refactor the completion blocks for maintainabiolity
+	  * TODO: Refactor the completion blocks for maintainability
 	  * @author costmo
 	  * @param {*} configObject				A parsed config object from JSON input
 	  * @param {*} adviceObject		A constructed CW_Advice instance
