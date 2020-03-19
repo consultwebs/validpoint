@@ -162,13 +162,13 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent {
             result_value: CW_Constants.RESULT_FAIL
           });
         } else if (this.test_result.days_til_expiry < 90) {
-          serverArray = [configObject.domain.subject + " is expiring in " + this.test_result.days_til_expiry + " days"];
+          serverArray = [configObject.domain.subject + " is expiring in "];
           tags.push({
             intermediate_key: "DOMAIN_WILL_EXPIRE",
             result_value: CW_Constants.RESULT_PUNT
           });
         } else {
-          returnValue.printSubject = configObject.domain.subject + " is expiring in " + this.test_result.days_til_expiry + " days";
+          returnValue.printSubject = configObject.domain.subject + " is expiring in ";
           serverArray = [this.test_result.days_til_expiry + " days"];
         }
 

@@ -18,24 +18,25 @@
     "transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs,transform-dynamic-import,search-and-replace src --out-dir dist --copy-files",
     "docs": "jsdoc -d docs/ -r src/*",
     "webpack": "webpack --mode production --display verbose",
-	"build": "npm run transpile && npm run docs && npm run test && npm run webpack",
-	"dev": "npm run transpile && ./bin/validpoint -r"
+    "build": "npm run transpile && npm run docs && npm run test && npm run webpack",
+    "dev": "npm run transpile && ./bin/validpoint domain -d appideas.com"
   },
   "babel": {
     "presets": [],
     "plugins": [
       "@babel/plugin-transform-modules-commonjs",
-	  "transform-dynamic-import",
-		[
-			"search-and-replace",
-			{
-				"rules": 
-				[{
-					"search": "/src/",
-					"replace": "/dist/"
-				}]
-			}
-		]	
+      "transform-dynamic-import",
+      [
+        "search-and-replace",
+        {
+          "rules": [
+            {
+              "search": "/src/",
+              "replace": "/dist/"
+            }
+          ]
+        }
+      ]
     ]
   },
   "dependencies": {
@@ -45,13 +46,13 @@
     "node-dig-dns": "^0.2.10",
     "node-html-parser": "^1.2.0",
     "node-ssllabs": "^1.1.2",
-    "parser-whoisv2": "^1.0.0",
     "ping": ">=0.2.2",
     "puppeteer": "^2.1.0",
     "read-package-json": "^2.1.1",
     "strict-mode": ">=1.1.4",
     "tcp-ping": "^0.1.1",
     "whois": "^2.12.0",
+    "whois-parsed": "^1.0.12",
     "yargs": "^15.1.0"
   },
   "devDependencies": {

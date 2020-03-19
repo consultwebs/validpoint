@@ -502,35 +502,22 @@ class CW_PromiseResolver
 	 * @param	{*}		reject		Reject function6
 	 * @param {*} domain		The domain name to lookup 
 	 */
-	resolve_getWhoisInfo( resolve, reject, { domain = null }  )
+	async resolve_getWhoisInfo( resolve, reject, { domain = null }  )
 	{
 		try
 		{
-			const whois = require( "../node_modules/whois" );
-			const whoisParser = require( "../node_modules/parser-whoisv2" );
+			const whois = require( "../node_modules/whois-parsed" );
 
-			whois.lookup(
-				domain,
-				( error, response ) =>
-				{
-					// TODO: See what happens if we can get this return a non-array
-					let lineItems = whoisParser.parseWhoIsData( response )
-					lineItems.forEach(
-							item => 
-							{
-								let lowerCaseAttribute = item.attribute.toLowerCase();
-								if( lowerCaseAttribute.includes( "expiration" ) )
-								{
-									resolve( item.value );
-								}
-								else if( lowerCaseAttribute.includes( "error:" ) )
-								{
-									reject( "NO_WHOIS" );
-								}
-							}
-						);
-				}
-			); // There's no way to get into a .catch from this .then apart from a code/system error
+			let result = await whois.lookup( domain );
+
+			if( result.expirationDate )
+			{
+				resolve( result.expirationDate );
+			}
+			else
+			{
+				reject( "NO_WHOIS" );
+			}
 		}
 		catch( error )
 		{

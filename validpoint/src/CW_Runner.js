@@ -123,9 +123,23 @@ class CW_Runner
 			domainOut = domain.domain;
 		}
 
-		let configUrl = (input.domain[domainOut].url) ? input.domain[domainOut].url : "www." + domainOut;
-		let configName = (input.domain[domainOut].name) ? input.domain[domainOut].name : domainOut;
+		let configUrl = "";
+		let configName = "";
 
+		// No configuration input JSON
+		if( undefined === input.domain[domainOut] )
+		{
+			input.domain[domainOut] = 
+			{
+				domain: domainOut,
+				name: domainOut,
+				url: "www." + domainOut
+			}
+		}
+
+		configUrl = (input.domain[domainOut].url) ? input.domain[domainOut].url : "www." + domainOut;
+		configName = (input.domain[domainOut].name) ? input.domain[domainOut].name : domainOut;
+		
 		if( !input.domain[domainOut].commands )
 		{
 			input.domain[domainOut].commands = input.command;
@@ -263,10 +277,8 @@ class CW_Runner
 				.then(
 					( response ) =>
 					{
-						// console.log( "Resolving Response: " );
 						// console.log( response ); // TODO: Show the response at the console if "-r" is set
 						resolve( response );
-						
 					}
 				)
 				.catch(
@@ -478,7 +490,7 @@ class CW_Runner
 												}
 												catch( error )
 												{
-													console.log( "ERROR:" );
+													console.log( "ERROR:" ); // TODO: See if it is appropriate can exit silently
 													console.log( error );
 													// File doesn't exists - this means there's no registry, not a system error that requires error handling
 												}
@@ -1221,7 +1233,7 @@ class CW_Runner
 							( result, completion ) => // Step 7. Perform a whois lookup to get the domain expiration
 							{
 								AdviceContent.progressContent( { configObject: configObject,
-									input: "Testing domain registration details for ".header + configObject.domain.subject + "...   ".header
+									input: "Testing domain registration details for ".header + configObject.domain.subject + "...   \n".header
 								});
 
 								CW_Runner.network.getWhoisInfo( { domain: configObject.domain } )

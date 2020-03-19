@@ -408,27 +408,19 @@ class CW_PromiseResolver {
    */
 
 
-  resolve_getWhoisInfo(resolve, reject, {
+  async resolve_getWhoisInfo(resolve, reject, {
     domain = null
   }) {
     try {
-      const whois = require("../node_modules/whois");
+      const whois = require("../node_modules/whois-parsed");
 
-      const whoisParser = require("../node_modules/parser-whoisv2");
+      let result = await whois.lookup(domain);
 
-      whois.lookup(domain, (error, response) => {
-        // TODO: See what happens if we can get this return a non-array
-        let lineItems = whoisParser.parseWhoIsData(response);
-        lineItems.forEach(item => {
-          let lowerCaseAttribute = item.attribute.toLowerCase();
-
-          if (lowerCaseAttribute.includes("expiration")) {
-            resolve(item.value);
-          } else if (lowerCaseAttribute.includes("error:")) {
-            reject("NO_WHOIS");
-          }
-        });
-      }); // There's no way to get into a .catch from this .then apart from a code/system error
+      if (result.expirationDate) {
+        resolve(result.expirationDate);
+      } else {
+        reject("NO_WHOIS");
+      }
     } catch (error) {
       let returnError = { ...new Error(),
         raw_response: error,
