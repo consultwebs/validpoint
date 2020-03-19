@@ -23,6 +23,7 @@
 		"bravoreviews.com": {
 			"domain": "meta.bravoreviews.com",
 			"url": "meta.bravoreviews.com",
+			"name": "Bravo Reviews",
 			"commands":
 			[
 				"https-response", "ssl"

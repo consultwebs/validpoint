@@ -216,7 +216,12 @@ class CW_Runner
 		return new Promise( 
 			(resolve, reject) =>
 			{
-				AdviceContent.progressTitle( { configObject: config, input: "\nBeginning tests for " + domain + "...   \n" } );
+				let configName = domain;
+				if( config.domain[configName] && config.domain[configName].name && config.domain[configName].name.length > 0 )
+				{
+					configName = config.domain[configName].name;
+				}
+				AdviceContent.progressTitle( { configObject: config, input: "\nBeginning tests for " + configName + "...   \n" } );
 				resolve( true );
 			}
 		);
