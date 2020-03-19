@@ -100,48 +100,87 @@ class CW_Runner {
     domains = null,
     input = null
   }) {
-    let domainOut = domain;
+    return new Promise((resolve, reject) => {
+      let CW_InputParser = require("./CW_InputParser");
 
-    if (domain == 0) {
-      domainOut = domains[0];
-      input.domain[domain] = {};
-    } else if (typeof domain === "object") {
-      domainOut = domain.domain;
-    }
+      let domainOut = domain;
 
-    let configUrl = "";
-    let configName = ""; // No configuration input JSON
+      if (domain == 0) {
+        domainOut = domains[0];
+        input.domain[domain] = {};
+      } else if (typeof domain === "object") {
+        domainOut = domain.domain;
+      } // No configuration input JSON
 
-    if (undefined === input.domain[domainOut]) {
-      input.domain[domainOut] = {
-        domain: domainOut,
-        name: domainOut,
-        url: "www." + domainOut
+
+      if (undefined === input.domain[domainOut]) {
+        input.domain[domainOut] = {};
+      }
+
+      let configUrl = input.domain[domainOut].url ? input.domain[domainOut].url : "www." + domainOut;
+      let configName = input.domain[domainOut].name ? input.domain[domainOut].name : domainOut;
+
+      if (!input.domain[domainOut].commands) {
+        input.domain[domainOut].commands = input.command;
+      }
+
+      if (input.domain[domainOut].preflight_commands && input.domain[domainOut].preflight_commands.length > 0) {
+        input.domain[domainOut].commands = input.domain[domainOut].preflight_commands.concat(input.domain[domainOut].commands);
+      }
+
+      input.domain[domainOut] = { ...input.domain[domainOut],
+        url: configUrl,
+        name: configName
       };
-    }
+      let returnValue = {
+        domain: domainOut,
+        url: configUrl,
+        name: configName,
+        input: input
+      }; // Get input from the an input JSON file if one exists for the domain
 
-    configUrl = input.domain[domainOut].url ? input.domain[domainOut].url : "www." + domainOut;
-    configName = input.domain[domainOut].name ? input.domain[domainOut].name : domainOut;
+      let parser = new CW_InputParser(domainOut + ".json", "./");
+      parser.init(function () {
+        try {
+          let config = this.parseJsonString(); // The output node doesn't yet exist - make it
 
-    if (!input.domain[domainOut].commands) {
-      input.domain[domainOut].commands = input.command;
-    }
+          if (!returnValue.input.domain[domainOut]) {
+            returnValue.input.domain[domainOut] = {};
+          } // Override already grabbed-values from JSON input for the domain
 
-    if (input.domain[domainOut].preflight_commands && input.domain[domainOut].preflight_commands.length > 0) {
-      input.domain[domainOut].commands = input.domain[domainOut].preflight_commands.concat(input.domain[domainOut].commands);
-    }
 
-    input.domain[domainOut] = { ...input.domain[domainOut],
-      url: configUrl,
-      name: configName
-    };
-    let returnValue = {
-      domain: domainOut,
-      url: configUrl,
-      name: configName,
-      input: input
-    };
-    return returnValue;
+          if (config.name && config.name.length > 0) {
+            returnValue.input.domain[domainOut].name = config.name;
+          }
+
+          if (config.domain && config.domain.length > 0) {
+            returnValue.input.domain[domainOut].domain = config.domain;
+          } else {
+            returnValue.input.domain[domainOut].domain = domainOut;
+          }
+
+          if (config.url && config.url.length > 0) {
+            returnValue.input.domain[domainOut].url = config.url;
+          } // Override preflight commands and commands
+
+
+          if (config.commands && config.commands.length > 0) {
+            if (config.preflight_commands && config.preflight_commands.length > 0) {
+              returnValue.input.domain[domainOut].commands = config.preflight_commands.concat(config.commands);
+            } else {
+              returnValue.input.domain[domainOut].commands = config.commands;
+            }
+          } else if (config.preflight_commands && config.preflight_commands.length > 0) {
+            returnValue.input.domain[domainOut].commands = config.preflight_commands;
+          }
+
+          resolve(returnValue);
+        } catch (error) {
+          // File does not exist, which means we won't override the input - no error condition here
+          resolve(returnValue);
+        }
+      });
+    });
   }
   /**
    * Parse input for this run to get an array of domain names or domain objects
@@ -187,7 +226,6 @@ class CW_Runner {
     domain = null
   }) {
     return new Promise((resolve, reject) => {
-      // console.log( config );
       let configName = domain;
 
       if (config.domain[configName] && config.domain[configName].name && config.domain[configName].name.length > 0) {
@@ -423,9 +461,10 @@ class CW_Runner {
                       }
                     }
                   } catch (error) {
+                    // File doesn't exists - this means there's no registry, not a system error that requires error handling
                     console.log("ERROR:"); // TODO: See if it is appropriate can exit silently
 
-                    console.log(error); // File doesn't exists - this means there's no registry, not a system error that requires error handling
+                    console.log(error);
                   }
                 });
 

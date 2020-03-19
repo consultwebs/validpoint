@@ -16,10 +16,6 @@ require( "strict-mode" )(
 	const CW_Runner = require( "../dist/CW_Runner.js" );
 	const runner = new CW_Runner();
 
-	// And an instance of the parser
-	// const CW_InputParser =  require( "../dist/CW_InputParser.js" );
-	// let config = null;
-
 	let async = require("../node_modules/async");
 
 	const CW_Constants =  require( "../dist/CW_Constants.js" );
@@ -39,42 +35,48 @@ require( "strict-mode" )(
 					domains,
 					async ( domain ) =>
 					{
-						cmds = CW_Runner.parseInputForCommands( {domain: domain, input: inputOptions, arrayIndex: domainCounter} )
-						let normalizedInput = CW_Runner.normalizeInput( {domain: domain, domains: domains, input: inputOptions} )
-
-						let runParameters = 
-						{
-							domain: normalizedInput.domain,
-							commands: cmds,
-							inputOptions: normalizedInput.input,
-							optionIndex: domainCounter
-						}
-						domainCounter++;
-
-						// TODO: Print response only if not quiet
-						await CW_Runner.printDomainHeadline( {config: runParameters.inputOptions, domain: runParameters.domain} )
-							.then(
-								async (response) =>
+						cmds = CW_Runner.parseInputForCommands( {domain: domain, input: inputOptions, arrayIndex: domainCounter} );
+						await CW_Runner.normalizeInput( {domain: domain, domains: domains, input: inputOptions} )
+						.then(
+							async (normalizedInput) =>
+							{
+								let runParameters = 
 								{
-									// printDomainHeader always resolves 'true' so the response doesn't need to be parsed or displayed
-
-									// Run commands form each domain
-									await CW_Runner.domainCommandRunner( {input: runParameters } )
-										.then(
-											(response) =>
-											{
-												// console.log( "domainCommandRunner then" ); // We're not doing anything with the 'true' response
-											}
-										)
-										.catch(
-											(error) =>
-											{
-												console.log( "command runner error" ); // This should never catch
-												console.log( error );
-											}
-										);
+									domain: normalizedInput.domain,
+									commands: cmds,
+									inputOptions: normalizedInput.input,
+									optionIndex: domainCounter
 								}
-							);
+								domainCounter++;
+
+								// TODO: Print response only if not quiet
+								await CW_Runner.printDomainHeadline( {config: runParameters.inputOptions, domain: runParameters.domain} )
+									.then(
+										async (response) =>
+										{
+											// printDomainHeader always resolves 'true' so the response doesn't need to be parsed or displayed
+
+											// Run commands form each domain
+											await CW_Runner.domainCommandRunner( {input: runParameters } )
+												.then(
+													(response) =>
+													{
+														// console.log( "domainCommandRunner then" ); // We're not doing anything with the 'true' response
+													}
+												)
+												.catch(
+													(error) =>
+													{
+														console.log( "command runner error" ); // This should never catch
+														console.log( error );
+													}
+												);
+										}
+									);
+							}
+						);
+
+
 
 					}, // each series for domains
 					(error) =>
