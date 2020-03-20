@@ -199,7 +199,7 @@ class CW_PromiseResolver {
       let puppeteer = require("../node_modules/puppeteer");
 
       let browser = await puppeteer.launch({
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
         ignoreHTTPSErrors: true
       });
       let page = await browser.newPage();

@@ -246,7 +246,7 @@ class CW_PromiseResolver
 				{ 
 					args: 
 					[
-						'--no-sandbox', '--disable-setuid-sandbox'
+						'--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage'
 					],
 					ignoreHTTPSErrors: true 
 				});
