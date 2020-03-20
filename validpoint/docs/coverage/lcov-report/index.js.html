@@ -1,0 +1,79 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for index.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="prettify.css" />
+    <link rel="stylesheet" href="base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="index.html">All files</a> index.js</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">24.07% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>13/54</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">11.76% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>4/34</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">17.24% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>5/29</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>1/1</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+    </div>
+    <div class='status-line low'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">module.exports=function(e){var t={};function n(o){<span class="missing-if-branch" title="if path not taken" >I</span>if(t[o])<span class="cstat-no" title="statement not covered" >return t[o].exports;v</span>ar r=t[o]={i:o,l:!1,exports:{}};return e[o].call(r.exports,r,r.exports,n),r.l=!0,r.exports}return n.m=e,n.c=t,n.d=<span class="fstat-no" title="function not covered" >fu</span>nction(e,t,o){<span class="cstat-no" title="statement not covered" >n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:o})}</span>,n.r=function(e){"undefined"!=typeof Symbol&amp;&amp;Symbol.toStringTag&amp;&amp;Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=<span class="fstat-no" title="function not covered" >fu</span>nction(e,t){<span class="cstat-no" title="statement not covered" >if(1&amp;t&amp;&amp;(e=n(e)),8&amp;t)<span class="cstat-no" title="statement not covered" >return e;<span class="cstat-no" title="statement not covered" >i</span></span>f(4&amp;t&amp;&amp;"object"==typeof e&amp;&amp;e&amp;&amp;e.__esModule)<span class="cstat-no" title="statement not covered" >return e;v</span></span>ar o=<span class="cstat-no" title="statement not covered" >Object.create(null);<span class="cstat-no" title="statement not covered" ></span>if(n.r(o),Object.defineProperty(o,"default",{enumerable:!0,value:e}),2&amp;t&amp;&amp;"string"!=typeof e)<span class="cstat-no" title="statement not covered" >for(var r in e)<span class="cstat-no" title="statement not covered" >n.d(o,r,<span class="fstat-no" title="function not covered" >fu</span>nction(t){<span class="cstat-no" title="statement not covered" >return e[t]}</span>.bind(null,r));<span class="cstat-no" title="statement not covered" >r</span></span></span>eturn o}</span>,n.n=<span class="fstat-no" title="function not covered" >fu</span>nction(e){var t=<span class="cstat-no" title="statement not covered" >e&amp;&amp;e.__esModule?<span class="fstat-no" title="function not covered" >fu</span>nction(){<span class="cstat-no" title="statement not covered" >return e.default}</span>:<span class="fstat-no" title="function not covered" >fu</span>nction(){<span class="cstat-no" title="statement not covered" >return e}</span>;<span class="cstat-no" title="statement not covered" ></span>return n.d(t,"a",t),t}</span>,n.o=<span class="fstat-no" title="function not covered" >fu</span>nction(e,t){<span class="cstat-no" title="statement not covered" >return Object.prototype.hasOwnProperty.call(e,t)}</span>,n.p="",n(n.s=0)}([function(e,t,n){"use strict";n.r(t),require("strict-mode")(()=&gt;{});const o=new(require("./CW_Runner.js")),r=require("./CW_InputParser.js");let a=null;exports.commandHook=<span class="fstat-no" title="function not covered" >(e</span>,t,n)=&gt;{<span class="cstat-no" title="statement not covered" >c({domain:t,command:e,callback:n})}</span>,exports.testDomain=<span class="fstat-no" title="function not covered" >(e</span>,t)=&gt;{<span class="cstat-no" title="statement not covered" >c({domain:e,command:"domain",callback:t})}</span>,exports.testSecureWebsite=<span class="fstat-no" title="function not covered" >(e</span>,t)=&gt;{<span class="cstat-no" title="statement not covered" >c({domain:e,command:"secure-website",callback:t})}</span>,exports.testWebsiteContent=<span class="fstat-no" title="function not covered" >(e</span>,t)=&gt;{<span class="cstat-no" title="statement not covered" >c({domain:e,command:"website-content",callback:t})}</span>,exports.testWebsite=<span class="fstat-no" title="function not covered" >(e</span>,t)=&gt;{<span class="cstat-no" title="statement not covered" >c({domain:e,command:"website",callback:t})}</span>,exports.testHTTPSResponse=<span class="fstat-no" title="function not covered" >(e</span>,t)=&gt;{<span class="cstat-no" title="statement not covered" >c({domain:e,command:"https-response",callback:t})}</span>,exports.testHTTPResponse=<span class="fstat-no" title="function not covered" >(e</span>,t)=&gt;{<span class="cstat-no" title="statement not covered" >c({domain:e,command:"http-response",callback:t})}</span>,exports.testLocalDNS=<span class="fstat-no" title="function not covered" >(e</span>,t)=&gt;{<span class="cstat-no" title="statement not covered" >c({domain:e,command:"local-dns",callback:t})}</span>,exports.testLocalNetwork=<span class="fstat-no" title="function not covered" >(e</span>,t)=&gt;{<span class="cstat-no" title="statement not covered" >c({domain:e,command:"local-network",callback:t})}</span>,exports.testHTTPPort=<span class="fstat-no" title="function not covered" >(e</span>,t)=&gt;{<span class="cstat-no" title="statement not covered" >c({domain:e,command:"http-port",callback:t})}</span>,exports.testHTTPSPort=<span class="fstat-no" title="function not covered" >(e</span>,t)=&gt;{<span class="cstat-no" title="statement not covered" >c({domain:e,command:"https-port",callback:t})}</span>,exports.jsonConfig=<span class="fstat-no" title="function not covered" >()</span>=&gt;<span class="cstat-no" title="statement not covered" >"jsonConfig";</span>let c=<span class="fstat-no" title="function not covered" >({</span>domain:e=<span class="branch-0 cbranch-no" title="branch not covered" >null,</span>command:t=<span class="branch-0 cbranch-no" title="branch not covered" >null,</span>callback:n=<span class="branch-0 cbranch-no" title="branch not covered" >null}</span>)=&gt;{<span class="cstat-no" title="statement not covered" >r.makeRunnerObjects({domain:e,directory:null}).then(<span class="fstat-no" title="function not covered" >e=</span>&gt;{<span class="cstat-no" title="statement not covered" >e.forEach(<span class="fstat-no" title="function not covered" >e=</span>&gt;{<span class="cstat-no" title="statement not covered" >new r(e.file,"./").init((<span class="fstat-no" title="function not covered" >as</span>ync function(){<span class="cstat-no" title="statement not covered" >try{<span class="cstat-no" title="statement not covered" >if(a=this.parseJsonString(),null==a)<span class="cstat-no" title="statement not covered" >throw new Error("COULD NOT READ INPUT CONFIGURATION FILE. EXITING.");<span class="cstat-no" title="statement not covered" >i</span></span>f(a.error&amp;&amp;a.error.length&gt;0)<span class="cstat-no" title="statement not covered" >throw new Error(a.error);l</span></span>et e=<span class="cstat-no" title="statement not covered" >new(require("./CW_Advice.js"));<span class="cstat-no" title="statement not covered" ></span>o.runCommand({command:t,configObject:a,adviceObject:e}).then(<span class="fstat-no" title="function not covered" >e=</span>&gt;{<span class="cstat-no" title="statement not covered" >n(null,e)}</span>)}</span>catch(e){<span class="cstat-no" title="statement not covered" >console.log(e)}</span>}</span>))}</span>)}</span>)}</span>}]);</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
+                at Fri Mar 20 2020 03:41:02 GMT-0700 (Pacific Daylight Time)
+            </div>
+        </div>
+        <script src="prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="sorter.js"></script>
+        <script src="block-navigation.js"></script>
+    </body>
+</html>
+    
