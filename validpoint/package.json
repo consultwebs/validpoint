@@ -15,12 +15,13 @@
   "scripts": {
     "start": "./bin/validpoint help",
     "help": "./bin/validpoint help",
-    "test": "jest --coverage --coverage-directory docs/coverage",
+    "test": "jest --coverage --coverage-directory docs/coverage && npm run linter",
     "transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs,transform-dynamic-import,search-and-replace src --out-dir dist --copy-files",
     "docs": "jsdoc -d docs/ -r src/*",
     "webpack": "webpack --mode production --display verbose",
     "build": "npm run transpile && npm run docs && npm run test && npm run webpack",
-    "dev": "npm run transpile && ./bin/validpoint domain -d appideas.com"
+    "dev": "npm run transpile && ./bin/validpoint domain -d appideas.com",
+    "linter": "./node_modules/.bin/eslint ./dist/"
   },
   "babel": {
     "presets": [],
@@ -67,7 +68,10 @@
     "babel-loader": "^8.0.6",
     "babel-plugin-search-and-replace": "^1.0.1",
     "babel-plugin-transform-dynamic-import": "^2.1.0",
-    "jest": "^25.1.0",
+    "complexity-report": "^2.0.0-alpha",
+    "eslint": "^6.8.0",
+    "eslint-plugin-jsdoc": "^22.1.0",
+    "jest": "^24.9.0",
     "jsdoc": "^3.6.3",
     "module-structure": "^2.0.1",
     "module-structure-lang-html": "^1.0.6",

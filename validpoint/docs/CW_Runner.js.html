@@ -36,6 +36,9 @@ const network = new CW_Network();
 
 let CW_Constants = require( "./CW_Constants" );
 let CW_Advice = require( "./CW_Advice" );
+let AdviceContent = require( "../dist/CW_AdviceContent" );
+
+let async = require( "../node_modules/async" );
 
 const colors = require( "../node_modules/colors" );
 
@@ -70,6 +73,324 @@ class CW_Runner
 		
 		return returnValue;
 	}
+
+	/**
+	 * Parse input for this domain to get an array of commands to run
+	 */
+	static parseInputForCommands( {domain = null, input = null, arrayIndex = -1} )
+	{
+		let cmds = {};
+
+
+		// Override commands from config/input
+		if( Array.isArray( input.domain ) )
+		{
+			if( input.domain[arrayIndex].preflight_commands &amp;&amp; 
+				Object.keys( input.domain[arrayIndex].preflight_commands ).length > 0 )
+			{
+				cmds = input.domain[arrayIndex].preflight_commands;
+			}
+
+			if( input.domain[arrayIndex].commands &amp;&amp; 
+				Object.keys( input.domain[arrayIndex].commands ).length > 0 )
+			{
+				// If there were no preflight commands, override any previously specified commands
+				if( !input.domain[arrayIndex].preflight_commands || 
+					Object.keys( input.domain[arrayIndex].preflight_commands ).length &lt; 1 )
+				{
+					cmds = input.domain[arrayIndex].commands;
+				}
+				else // or else add to the preflight commands
+				{
+					cmds = Object.assign( cmds, input.domain[arrayIndex].commands );
+				}
+			}
+
+			
+		}
+		else if( input.domain[domain] &amp;&amp; Object.keys( input.domain[domain] ).length > 0 )
+		{
+			if( input.domain[domain].preflight_commands &amp;&amp; 
+				Object.keys( input.domain[domain].preflight_commands ).length > 0 )
+			{
+				cmds = input.domain[domain].preflight_commands;
+			}
+
+			if( input.domain[domain].commands &amp;&amp; 
+				Object.keys( input.domain[domain].commands ).length > 0 )
+			{
+				// If there were no preflight commands, override any previously specified commands
+				if( !input.domain[domain].preflight_commands || 
+					Object.keys( input.domain[domain].preflight_commands ).length &lt; 1 )
+				{
+					cmds = input.domain[domain].commands;
+				}
+				else // or else add to the preflight commands
+				{
+					cmds = Object.assign( cmds, input.domain[domain].commands );
+				}
+			}
+		}
+
+		return cmds;
+	}
+
+	/**
+	 * Final normaliztion of domain and other input for processing
+	 * @param {*} param0 
+	 */
+	static normalizeInput( {domain = null, domains = null, input = null} )
+	{
+		return new Promise(
+			(resolve, reject) =>
+			{
+				let CW_InputParser = require( "./CW_InputParser" );
+
+				let domainOut = domain;
+				if( domain == 0 )
+				{
+					domainOut = domains[0];
+					input.domain[domain] = {};
+				}
+				else if( typeof domain === "object" )
+				{
+					domainOut = domain.domain;
+				}
+
+				// No configuration input JSON
+				if( undefined === input.domain[domainOut] )
+				{
+					input.domain[domainOut] = {};
+				}
+
+				let configUrl = (input.domain[domainOut].url) ? input.domain[domainOut].url : "www." + domainOut;
+				let configName = (input.domain[domainOut].name) ? input.domain[domainOut].name : domainOut;
+				
+				if( !input.domain[domainOut].commands )
+				{
+					input.domain[domainOut].commands = input.command;
+				}
+
+				if( input.domain[domainOut].preflight_commands &amp;&amp; input.domain[domainOut].preflight_commands.length > 0 )
+				{
+					input.domain[domainOut].commands = input.domain[domainOut].preflight_commands.concat( input.domain[domainOut].commands );
+				}
+
+				if( input.input &amp;&amp; input.input.length > 0 )
+				{
+					input.domain[domainOut].input = input;
+				}
+				else
+				{
+					input.domain[domainOut].input = null;
+				}
+
+				input.domain[domainOut] = 
+				{ ...input.domain[domainOut],
+					url: configUrl,
+					name: configName
+				};
+
+				let returnValue = 
+				{
+					domain: domainOut,
+					url: configUrl,
+					name: configName,
+					input: input
+				};
+
+				// Get input from the an input JSON file if one exists for the domain
+				let parser = new CW_InputParser( domainOut + ".json", "./" );
+				parser.init(
+					function()
+					{
+						try
+						{
+							let config = this.parseJsonString();
+
+							// The output node doesn't yet exist - make it
+							if( !returnValue.input.domain[domainOut] )
+							{
+								returnValue.input.domain[domainOut] = {};
+							}
+
+							// Override already grabbed-values from JSON input for the domain
+							if( config.name &amp;&amp; config.name.length > 0 )
+							{
+								returnValue.input.domain[domainOut].name = config.name;
+							}
+							if( config.domain &amp;&amp; config.domain.length > 0 )
+							{
+								returnValue.input.domain[domainOut].domain = config.domain;
+							}
+							else
+							{
+								returnValue.input.domain[domainOut].domain = domainOut;
+							}
+							if( config.url &amp;&amp; config.url.length > 0 )
+							{
+								returnValue.input.domain[domainOut].url = config.url;
+							}
+
+							if( (config.preflight_commands &amp;&amp; Object.keys( config.preflight_commands ).length > 0) ||
+								(config.commands &amp;&amp; Object.keys( config.commands ).length > 0) )
+							{
+								returnValue.input.domain[domainOut].commands = {};
+							}
+
+							// Override preflight commands and commands
+							if( config.preflight_commands &amp;&amp; Object.keys( config.preflight_commands ).length > 0 )
+							{
+								returnValue.input.domain[domainOut].commands = Object.assign( {}, config.preflight_commands );
+							}
+							if( config.commands &amp;&amp; Object.keys( config.commands ).length > 0 )
+							{
+								returnValue.input.domain[domainOut].commands = Object.assign( returnValue.input.domain[domainOut].commands, config.commands );
+							}
+
+							resolve( returnValue );
+						}
+						catch( error )
+						{
+							// File does not exist, which means we won't override the input - no error condition here
+							resolve( returnValue );
+						}
+					}
+				);
+			}
+		);
+	}
+
+	/**
+	 * Parse input for this run to get an array of domain names or domain objects
+	 */
+	static parseInputForDomains( {input = null} )
+	{
+		let domains = input.domain;
+		let inputDirectory = null;
+
+		// normalize the input directory
+		if( input.directory &amp;&amp; input.directory.length > 0 )
+		{
+			inputDirectory = input.directory;
+		}
+		input.inputDirectory = inputDirectory;
+
+		// There were no input options and no config file input
+		// Show the help screen and stop
+		if( !domains || 
+			(domains.length == 1 &amp;&amp; domains[0] === undefined) )
+		{
+			console.log();
+			console.log( "You must specify a domain with '-d &lt;domain>', supply an input configuration file, or have a validpoint.json file in the current directory." );
+			console.log();
+
+			let yargs = CW_Runner.getYargs();
+			yargs.showHelp();
+			process.exit();
+		}
+
+		// Convert Object input to an array of objects
+		if( !Array.isArray( domains ) )
+		{
+			let tmpOutput = [];
+			Object.keys( domains ).forEach(
+				(domain, index) =>
+				{
+					tmpOutput.push( domain );
+				}
+			);
+			domains = tmpOutput;
+		}
+
+		return domains;
+	}
+
+	static printDomainHeadline( {config = null, domain = null} )
+	{
+		return new Promise( 
+			(resolve, reject) =>
+			{
+				let configName = domain;
+				if( config.domain[configName] &amp;&amp; config.domain[configName].name &amp;&amp; config.domain[configName].name.length > 0 )
+				{
+					configName = config.domain[configName].name;
+				}
+				AdviceContent.progressTitle( { configObject: config, input: "\nBeginning tests for " + configName + "...   \n" } );
+				resolve( true );
+			}
+		);
+	}
+
+	static domainCommandRunner( {input = null})
+	{
+		return new Promise(
+			async (resolve, reject) =>
+			{
+				let domain = input.domain;
+				// TODO: Validate that this has already been normalized, then remove this test
+				if( typeof domain === "object" )
+				{
+					domain = input.domain.domain;
+				}
+				let cmds = input.inputOptions.domain[domain].commands;
+				let config = input.inputOptions.domain[domain];
+
+				// TODO: Get input options from "-i " one level above this
+
+				let CW_Advice = require( "../dist/CW_Advice.js" );
+				let runner = new CW_Runner();
+
+				if( cmds )
+				{
+					async.eachSeries(
+						Object.keys( cmds ),
+						async (command) =>
+						{
+							let advice = new CW_Advice();
+							await runner.commandResolutionWrapper( { command: command, configObject: config, adviceObject: advice } );
+						},
+						(error) =>
+						{
+							// TODO: Test to see if we can get an error here, otherwise always reolve `true` because we'll only end up here at the end of the commands
+							resolve( true );
+						}); // end async.eachSeries for cmds
+				}
+			},
+			(error) =>
+			{
+				// TODO: Test to see if we can reach here
+				console.log( "Outside callback with error: " );
+				console.log( error );
+			}
+		);
+	}
+
+	// Abstract command Promises so that the first returned Promise doesn't end a loop
+	commandResolutionWrapper( { command: command, configObject: config, adviceObject: advice } )
+	{
+		return new Promise(
+			(resolve, reject) =>
+			{
+				this.runCommand( { command: command, configObject: config, adviceObject: advice } )
+				.then(
+					( response ) =>
+					{
+						// TODO: Show the response at the console if "-r" is set
+						resolve( response );
+					}
+				)
+				.catch(
+					(error) =>
+					{
+						// TODO: Test to see if we can reach here
+						console.log( "Error resolving command: " );
+						console.log( error );
+					}
+				);
+			}
+		);
+	}
 	
 	/**
 	 * Run a command
@@ -82,9 +403,6 @@ class CW_Runner
 	 */
 	runCommand( { command = "", configObject = null, adviceObject = null } )
     {
-        // sanity check the requested command
-		// command = this.sanitizeCommand( command );
-
 		if( !adviceObject )
 		{
 			adviceObject = new CW_Advice();
@@ -250,7 +568,6 @@ class CW_Runner
 											{
 												let registryFilePath = currentDir + "/node_modules/" + addon + "/validpoint.registry.js";
 
-												// TODO: Need to try/catch
 												try
 												{
 													if( fs.existsSync( registryFilePath ) )
@@ -258,12 +575,19 @@ class CW_Runner
 														let addonRegistry = require( registryFilePath );
 														if( addonRegistry[command] &amp;&amp; addonRegistry[command].handler )
 														{
+															let saveInput = (configObject.input) ? configObject.input.input : null;
+
+															if( configObject.commands[ command ] &amp;&amp; Object.keys( configObject.commands[ command ] ).length > 0 )
+															{
+																saveInput = configObject.commands[ command ];
+															}
+
 															foundCommand = true;
-															let handlerInput = 
+															let handlerInput =
 															{
 																"domain":  configObject.domain,
 																"url": configObject.url,
-																"input": configObject.input
+																"input": saveInput
 															};
 															resolve( addonRegistry[command].handler( {input: handlerInput} ) );
 														}
@@ -271,9 +595,9 @@ class CW_Runner
 												}
 												catch( error )
 												{
-													console.log( "ERROR:" );
-													console.log( error );
 													// File doesn't exists - this means there's no registry, not a system error that requires error handling
+													// console.log( "ERROR:" ); // TODO: See if it is appropriate to exit silently
+													// console.log( error );
 												}
 											}
 										);
@@ -413,7 +737,7 @@ class CW_Runner
 				let AdviceContent = require( "./CW_AdviceContent" );
 
 				AdviceContent.progressContent( { configObject: configObject,
-					input: "Downloading content for  ".header + configObject.url.subject + "...   ".header 
+					input: "\nDownloading content for  ".header + configObject.url.subject + "...   ".header 
 				});
 
 				try
@@ -508,7 +832,7 @@ class CW_Runner
 				let AdviceContent = require( "./CW_AdviceContent" );
 
 				AdviceContent.progressContent( { configObject: configObject,
-					input: "Checking port " + port.toString().subject + " response code for ".header + configObject.url.subject + "...   ".header 
+					input: "\nChecking port " + port.toString().subject + " response code for ".header + configObject.url.subject + "...   ".header 
 				});
 
 				CW_Runner.network.checkWebsiteAvailability( { domain: configObject.url, port: port } )
@@ -747,19 +1071,19 @@ class CW_Runner
 	/**
 	  * Validate details of the user's domain name and registration
 	  * 
-	  * TODO: Refactor the completion blocks for maintainabiolity
+	  * TODO: Refactor the completion blocks for maintainability
 	  * @author costmo
 	  * @param {*} configObject				A parsed config object from JSON input
 	  * @param {*} adviceObject		A constructed CW_Advice instance
 	  */
 	  command_Domain( { configObject = null, adviceObject = null } )
 	 {
-
-		let async = require( "../node_modules/async" );
 		let StringUtil = require( "./CW_StringUtil.js" );
 		let AdviceContent = require( "./CW_AdviceContent.js" );
 
-		AdviceContent.progressTitle( { configObject: configObject, input: "Beginning Domain tests for " + configObject.domain + "...   \n" } );
+		AdviceContent.progressContent( { configObject: configObject,
+			input: "Beginning domain tests for ".text + configObject.domain.header + "...   \n".text 
+		});
 
 		adviceObject.item_result.command = "domain";
 		adviceObject.item_result.category = "website-admin";
@@ -1014,7 +1338,7 @@ class CW_Runner
 							( result, completion ) => // Step 7. Perform a whois lookup to get the domain expiration
 							{
 								AdviceContent.progressContent( { configObject: configObject,
-									input: "Testing domain registration details for ".header + configObject.domain.subject + "...   ".header
+									input: "Testing domain registration details for ".header + configObject.domain.subject + "...   \n".header
 								});
 
 								CW_Runner.network.getWhoisInfo( { domain: configObject.domain } )
@@ -1090,7 +1414,7 @@ class CW_Runner
 		}
 
 		AdviceContent.progressContent( { configObject: configObject,
-			input: "Checking website availability for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
+			input: "\nChecking website availability for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
 		});
 
 		// wrap the entire waterfall in a promise
@@ -1167,7 +1491,7 @@ class CW_Runner
 						( result, completion ) =>
 						{
 							AdviceContent.progressContent( { configObject: configObject,
-								input: "Checking website response for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
+								input: "\nChecking website response for  ".header + configObject.url.subject + " on port " + port.toString().subject + "...   ".header 
 							});
 
 							CW_Runner.network.checkWebsiteResponse( { url: configObject.url, port: port } )
@@ -1354,8 +1678,9 @@ class CW_Runner
 						}
 						else
 						{
-							returnValue.preflight_commands = [];
+							returnValue.preflight_commands = {};
 						}
+
 						if( config.commands &amp;&amp; config.commands.length > 0 &amp;&amp; config.commands[0] != "all" )
 						{
 							returnValue.command = returnValue.command.concat( config.commands );
@@ -1376,9 +1701,13 @@ class CW_Runner
 			else
 			{
 				// Receiver expects an array for command and domain
+				// TODO: add command line input to returnValue.command
 				if( yargs.argv._[0] &amp;&amp; yargs.argv._[0].length > 0 &amp;&amp; yargs.argv._[0] !== "all" )
 				{
-					returnValue.command = [ yargs.argv._[0] ];
+					returnValue.command = 
+					{
+						[ yargs.argv._[0] ]: {}
+					}
 				}
 				else if( !yargs.argv.command || yargs.argv.command == "all" )
 				{
@@ -1386,8 +1715,21 @@ class CW_Runner
 				}
 				else
 				{
-					returnValue.command = [ yargs.argv.command ];
+					returnValue.command = 
+					{
+						[ yargs.argv.command ]: {}
+					}
 				}
+
+				if( yargs.argv.i &amp;&amp; yargs.argv.i.length > 0 )
+				{
+					returnValue.input = yargs.argv.i;
+				}
+				else
+				{
+					returnValue.input = null;
+				}
+
 				returnValue.preflight_commands = [];
 				returnValue.domain = [ yargs.argv.domain ];
 				returnValue.directory = null;
@@ -1417,7 +1759,7 @@ module.exports = CW_Runner;</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Mar 09 2020 16:49:50 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Fri Mar 20 2020 01:59:05 GMT-0700 (Pacific Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
