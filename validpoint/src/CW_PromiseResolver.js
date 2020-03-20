@@ -242,7 +242,14 @@ class CW_PromiseResolver
 		{
 			let puppeteer = require( "../node_modules/puppeteer" );
 
-			let browser = await puppeteer.launch( { ignoreHTTPSErrors: true } );
+			let browser = await puppeteer.launch( 
+				{ 
+					args: 
+					[
+						'--no-sandbox', '--disable-setuid-sandbox'
+					],
+					ignoreHTTPSErrors: true 
+				});
 			let page = await browser.newPage();
 			await page.goto( "https://" + url );
 
