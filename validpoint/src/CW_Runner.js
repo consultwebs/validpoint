@@ -148,6 +148,15 @@ class CW_Runner
 					input.domain[domainOut].commands = input.domain[domainOut].preflight_commands.concat( input.domain[domainOut].commands );
 				}
 
+				if( input.input && input.input.length > 0 )
+				{
+					input.domain[domainOut].input = input;
+				}
+				else
+				{
+					input.domain[domainOut].input = null;
+				}
+
 				input.domain[domainOut] = 
 				{ ...input.domain[domainOut],
 					url: configUrl,
@@ -339,7 +348,6 @@ class CW_Runner
 				.then(
 					( response ) =>
 					{
-
 						// TODO: Show the response at the console if "-r" is set
 						resolve( response );
 					}
@@ -539,12 +547,19 @@ class CW_Runner
 														let addonRegistry = require( registryFilePath );
 														if( addonRegistry[command] && addonRegistry[command].handler )
 														{
+															let saveInput = (configObject.input) ? configObject.input.input : null;
+
+															if( configObject.commands[ command ] && Object.keys( configObject.commands[ command ] ).length > 0 )
+															{
+																saveInput = configObject.commands[ command ];
+															}
+
 															foundCommand = true;
-															let handlerInput = 
+															let handlerInput =
 															{
 																"domain":  configObject.domain,
 																"url": configObject.url,
-																"input": configObject.input
+																"input": saveInput
 															};
 															resolve( addonRegistry[command].handler( {input: handlerInput} ) );
 														}
@@ -1657,8 +1672,6 @@ class CW_Runner
 			}
 			else
 			{
-
-
 				// Receiver expects an array for command and domain
 				// TODO: add command line input to returnValue.command
 				if( yargs.argv._[0] && yargs.argv._[0].length > 0 && yargs.argv._[0] !== "all" )
@@ -1678,6 +1691,15 @@ class CW_Runner
 					{
 						[ yargs.argv.command ]: {}
 					}
+				}
+
+				if( yargs.argv.i && yargs.argv.i.length > 0 )
+				{
+					returnValue.input = yargs.argv.i;
+				}
+				else
+				{
+					returnValue.input = null;
 				}
 
 				returnValue.preflight_commands = [];

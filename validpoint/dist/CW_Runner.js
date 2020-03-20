@@ -127,6 +127,12 @@ class CW_Runner {
         input.domain[domainOut].commands = input.domain[domainOut].preflight_commands.concat(input.domain[domainOut].commands);
       }
 
+      if (input.input && input.input.length > 0) {
+        input.domain[domainOut].input = input;
+      } else {
+        input.domain[domainOut].input = null;
+      }
+
       input.domain[domainOut] = { ...input.domain[domainOut],
         url: configUrl,
         name: configName
@@ -449,11 +455,17 @@ class CW_Runner {
                       let addonRegistry = require(registryFilePath);
 
                       if (addonRegistry[command] && addonRegistry[command].handler) {
+                        let saveInput = configObject.input ? configObject.input.input : null;
+
+                        if (configObject.commands[command] && Object.keys(configObject.commands[command]).length > 0) {
+                          saveInput = configObject.commands[command];
+                        }
+
                         foundCommand = true;
                         let handlerInput = {
                           "domain": configObject.domain,
                           "url": configObject.url,
-                          "input": configObject.input
+                          "input": saveInput
                         };
                         resolve(addonRegistry[command].handler({
                           input: handlerInput
@@ -1491,6 +1503,12 @@ class CW_Runner {
           returnValue.command = {
             [yargs.argv.command]: {}
           };
+        }
+
+        if (yargs.argv.i && yargs.argv.i.length > 0) {
+          returnValue.input = yargs.argv.i;
+        } else {
+          returnValue.input = null;
         }
 
         returnValue.preflight_commands = [];
