@@ -15,7 +15,7 @@
   "scripts": {
     "start": "./bin/validpoint help",
     "help": "./bin/validpoint help",
-    "test": "jest --coverage --coverage-directory docs/coverage && npm run linter",
+    "test": "npm run transpile && npm run linter && jest --coverage --coverage-directory docs/coverage",
     "transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs,transform-dynamic-import,search-and-replace src --out-dir dist --copy-files",
     "docs": "jsdoc -d docs/ -r src/*",
     "webpack": "webpack --mode production --display verbose",
