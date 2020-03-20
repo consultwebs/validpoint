@@ -2,12 +2,12 @@
     "name": "APPideas",
 	"domain": "appideas.com",
 	"url": "www.appideas.com",
-	"preflight_commands":
-	[
-		"local-network", "local-dns"
-	],
+	"preflight_commands": 
+	{
+		"local-network": {}
+	},
 	"commands":
-	[
-		"http-port", "https-port", "domain"
-	]
+	{
+		"https-response": {}
+	}
 }

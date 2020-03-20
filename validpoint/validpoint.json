@@ -1,42 +1,42 @@
 {
 	"domains": 
 	{
-		"appideas.com":
-		{
-			"domain": "appideas.com"
-		},
-		"consultwebs.com":
-		{
-			"domain": "consultwebs.com",
-			"name": "Consultwebs",
-			"url": "www.consultwebs.com",
-			"preflight_commands":
-			[
-				"local-network", "local-dns"
-			],
-			"commands":
-			[
-				"https-port", "domain", "https-response", 
-				"secure-website",  "website-content"
-			]
+		"appideas.com": {
+			"domain": "appideas.com",
+			"name": "APPideas",
+			"commands": 
+			{
+				"local-network": {},
+				"local-dns": {},
+				"domain": {}
+			}
 		},
 		"bravoreviews.com": {
 			"domain": "meta.bravoreviews.com",
 			"url": "meta.bravoreviews.com",
 			"name": "Bravo Reviews",
 			"commands":
-			[
-				"https-response", "ssl"
-			]
+			{
+				"https-response": {},
+				"domain": {},
+				"https-port": {}
+			}
 		}
 	},
 	"preflight_commands":
-	[
-		"local-network", "local-dns"
-	],
+	{
+		"local-network": {}, 
+		"local-dns": {}
+	},
 	"commands":
-	[
-		"http-port", "https-port", "domain",
-		"http-response", "https-response", "website", "secure-website",  "website-content"
-	]
+	{
+		"http-port": {}, 
+		"https-port": {}, 
+		"domain": {},
+		"http-response": {}, 
+		"https-response": {}, 
+		"website": {}, 
+		"secure-website": {},
+		"website-content": {}
+	}
 }

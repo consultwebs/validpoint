@@ -2,6 +2,7 @@
   "name": "validpoint",
   "version": "1.0.0",
   "description": "Consultwebs service validator",
+  "readme": "Consultwebs service validator",
   "license": "MIT",
   "main": "./index.mjs",
   "bin": {

@@ -27,7 +27,7 @@ require( "strict-mode" )(
 	CW_Runner.processinputArguments()
 		.then(
 			( inputOptions ) =>
-			{	
+			{
 				let cmds = inputOptions.command;
 				let domains = CW_Runner.parseInputForDomains( { input: inputOptions } );
 
@@ -35,7 +35,8 @@ require( "strict-mode" )(
 					domains,
 					async ( domain ) =>
 					{
-						cmds = CW_Runner.parseInputForCommands( {domain: domain, input: inputOptions, arrayIndex: domainCounter} );
+						cmds = await CW_Runner.parseInputForCommands( {domain: domain, input: inputOptions, arrayIndex: domainCounter} );
+						
 						await CW_Runner.normalizeInput( {domain: domain, domains: domains, input: inputOptions} )
 						.then(
 							async (normalizedInput) =>
@@ -75,9 +76,6 @@ require( "strict-mode" )(
 									);
 							}
 						);
-
-
-
 					}, // each series for domains
 					(error) =>
 					{

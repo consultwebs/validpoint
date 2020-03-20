@@ -51,54 +51,55 @@ class CW_Runner
 	 */
 	static parseInputForCommands( {domain = null, input = null, arrayIndex = -1} )
 	{
-		let cmds = [];
+		let cmds = {};
 
-		// TODO: insert the default commands and use those if there are not overrides
 
 		// Override commands from config/input
 		if( Array.isArray( input.domain ) )
 		{
 			if( input.domain[arrayIndex].preflight_commands && 
-				input.domain[arrayIndex].preflight_commands.length > 0 )
+				Object.keys( input.domain[arrayIndex].preflight_commands ).length > 0 )
 			{
 				cmds = input.domain[arrayIndex].preflight_commands;
 			}
 
 			if( input.domain[arrayIndex].commands && 
-				input.domain[arrayIndex].commands.length > 0 )
+				Object.keys( input.domain[arrayIndex].commands ).length > 0 )
 			{
 				// If there were no preflight commands, override any previously specified commands
 				if( !input.domain[arrayIndex].preflight_commands || 
-					input.domain[arrayIndex].preflight_commands.length < 1 )
+					Object.keys( input.domain[arrayIndex].preflight_commands ).length < 1 )
 				{
 					cmds = input.domain[arrayIndex].commands;
 				}
 				else // or else add to the preflight commands
 				{
-					cmds = cmds.concat( input.domain[arrayIndex].commands );
+					cmds = Object.assign( cmds, input.domain[arrayIndex].commands );
 				}
 			}
+
+			
 		}
 		else if( input.domain[domain] && Object.keys( input.domain[domain] ).length > 0 )
 		{
 			if( input.domain[domain].preflight_commands && 
-				input.domain[domain].preflight_commands.length > 0 )
+				Object.keys( input.domain[domain].preflight_commands ).length > 0 )
 			{
 				cmds = input.domain[domain].preflight_commands;
 			}
 
 			if( input.domain[domain].commands && 
-				input.domain[domain].commands.length > 0 )
+				Object.keys( input.domain[domain].commands ).length > 0 )
 			{
 				// If there were no preflight commands, override any previously specified commands
 				if( !input.domain[domain].preflight_commands || 
-					input.domain[domain].preflight_commands.length < 1 )
+					Object.keys( input.domain[domain].preflight_commands ).length < 1 )
 				{
 					cmds = input.domain[domain].commands;
 				}
 				else // or else add to the preflight commands
 				{
-					cmds = cmds.concat( input.domain[domain].commands );
+					cmds = Object.assign( cmds, input.domain[domain].commands );
 				}
 			}
 		}
@@ -194,21 +195,20 @@ class CW_Runner
 								returnValue.input.domain[domainOut].url = config.url;
 							}
 
-							// Override preflight commands and commands
-							if( config.commands && config.commands.length > 0 )
+							if( (config.preflight_commands && Object.keys( config.preflight_commands ).length > 0) ||
+								(config.commands && Object.keys( config.commands ).length > 0) )
 							{
-								if( config.preflight_commands && config.preflight_commands.length > 0 )
-								{
-									returnValue.input.domain[domainOut].commands = config.preflight_commands.concat( config.commands );
-								}
-								else
-								{
-									returnValue.input.domain[domainOut].commands = config.commands;
-								}
+								returnValue.input.domain[domainOut].commands = {};
 							}
-							else if( config.preflight_commands && config.preflight_commands.length > 0 )
+
+							// Override preflight commands and commands
+							if( config.preflight_commands && Object.keys( config.preflight_commands ).length > 0 )
 							{
-								returnValue.input.domain[domainOut].commands = config.preflight_commands;
+								returnValue.input.domain[domainOut].commands = Object.assign( {}, config.preflight_commands );
+							}
+							if( config.commands && Object.keys( config.commands ).length > 0 )
+							{
+								returnValue.input.domain[domainOut].commands = Object.assign( returnValue.input.domain[domainOut].commands, config.commands );
 							}
 
 							resolve( returnValue );
@@ -265,6 +265,7 @@ class CW_Runner
 			);
 			domains = tmpOutput;
 		}
+
 		return domains;
 	}
 
@@ -287,7 +288,7 @@ class CW_Runner
 	static domainCommandRunner( {input = null})
 	{
 		return new Promise(
-			(resolve, reject) =>
+			async (resolve, reject) =>
 			{
 				let domain = input.domain;
 				// TODO: Validate that this has already been normalized, then remove this test
@@ -306,8 +307,8 @@ class CW_Runner
 				if( cmds )
 				{
 					async.eachSeries(
-						cmds,
-						async ( command ) =>
+						Object.keys( cmds ),
+						async (command) =>
 						{
 							let advice = new CW_Advice();
 							await runner.commandResolutionWrapper( { command: command, configObject: config, adviceObject: advice } );
@@ -315,7 +316,6 @@ class CW_Runner
 						(error) =>
 						{
 							// TODO: Test to see if we can get an error here, otherwise always reolve `true` because we'll only end up here at the end of the commands
-							// console
 							resolve( true );
 						}); // end async.eachSeries for cmds
 				}
@@ -339,7 +339,8 @@ class CW_Runner
 				.then(
 					( response ) =>
 					{
-						// console.log( response ); // TODO: Show the response at the console if "-r" is set
+
+						// TODO: Show the response at the console if "-r" is set
 						resolve( response );
 					}
 				)
@@ -552,7 +553,7 @@ class CW_Runner
 												catch( error )
 												{
 													// File doesn't exists - this means there's no registry, not a system error that requires error handling
-													// console.log( "ERROR:" ); // TODO: See if it is appropriate can exit silently
+													// console.log( "ERROR:" ); // TODO: See if it is appropriate to exit silently
 													// console.log( error );
 												}
 											}
@@ -1634,8 +1635,9 @@ class CW_Runner
 						}
 						else
 						{
-							returnValue.preflight_commands = [];
+							returnValue.preflight_commands = {};
 						}
+
 						if( config.commands && config.commands.length > 0 && config.commands[0] != "all" )
 						{
 							returnValue.command = returnValue.command.concat( config.commands );
@@ -1655,10 +1657,16 @@ class CW_Runner
 			}
 			else
 			{
+
+
 				// Receiver expects an array for command and domain
+				// TODO: add command line input to returnValue.command
 				if( yargs.argv._[0] && yargs.argv._[0].length > 0 && yargs.argv._[0] !== "all" )
 				{
-					returnValue.command = [ yargs.argv._[0] ];
+					returnValue.command = 
+					{
+						[ yargs.argv._[0] ]: {}
+					}
 				}
 				else if( !yargs.argv.command || yargs.argv.command == "all" )
 				{
@@ -1666,8 +1674,12 @@ class CW_Runner
 				}
 				else
 				{
-					returnValue.command = [ yargs.argv.command ];
+					returnValue.command = 
+					{
+						[ yargs.argv.command ]: {}
+					}
 				}
+
 				returnValue.preflight_commands = [];
 				returnValue.domain = [ yargs.argv.domain ];
 				returnValue.directory = null;
