@@ -237,28 +237,23 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent {
     ; // For live progress, display results on the screen
 
     if (returnType == "screen") {
-      try {
+      CW_AdviceContent.progressContent({
+        configObject: configObject,
+        input: returnValue.printAnswer + "\n" + returnValue.printSubject
+      });
+
+      if (returnValue.printDetail) {
+        // process.stdout.write( returnValue.printDetail + "\n" );
         CW_AdviceContent.progressContent({
           configObject: configObject,
-          input: returnValue.printAnswer + "\n" + returnValue.printSubject
+          input: returnValue.printDetail + "\n"
         });
-
-        if (returnValue.printDetail) {
-          // process.stdout.write( returnValue.printDetail + "\n" );
-          CW_AdviceContent.progressContent({
-            configObject: configObject,
-            input: returnValue.printDetail + "\n"
-          });
-        } else {
-          // process.stdout.write( "\n" );
-          CW_AdviceContent.progressContent({
-            configObject: configObject,
-            input: "\n"
-          });
-        }
-      } catch (error) {
-        console.log("CAUGHT");
-        console.log(error);
+      } else {
+        // process.stdout.write( "\n" );
+        CW_AdviceContent.progressContent({
+          configObject: configObject,
+          input: "\n"
+        });
       }
     } else // or else, return the info we've gathered so the caller can process and respond
       {

@@ -366,7 +366,14 @@ class CW_Runner
 				.then(
 					( response ) =>
 					{
-						// TODO: Show the response at the console if "-r" is set
+						// Show the response at the console if "-r" (raw output) is set
+						
+						if( undefined !== config.show_raw && config.show_raw === true )
+						{
+							console.log();
+							console.log( response );
+							console.log();
+						}
 						resolve( response );
 					}
 				)
