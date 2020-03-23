@@ -313,6 +313,24 @@ class CW_Runner
 				let CW_Advice = require( "../dist/CW_Advice.js" );
 				let runner = new CW_Runner();
 
+				if( undefined !== input.inputOptions.show_raw  )
+				{
+					config.show_raw = input.inputOptions.show_raw;
+				}
+				else
+				{
+					config.show_raw = false;
+				}
+
+				if( undefined !== input.inputOptions.quiet  )
+				{
+					config.be_quiet = input.inputOptions.quiet;
+				}
+				else
+				{
+					config.be_quiet = false;
+				}
+
 				if( cmds )
 				{
 					async.eachSeries(
@@ -559,7 +577,9 @@ class CW_Runner
 															{
 																"domain":  configObject.domain,
 																"url": configObject.url,
-																"input": saveInput
+																"input": saveInput,
+																"show_raw": (undefined !== configObject.show_raw) ? configObject.show_raw : false,
+																"be_quiet": (undefined !== configObject.be_quiet) ? configObject.be_quiet : false
 															};
 															resolve( addonRegistry[command].handler( {input: handlerInput} ) );
 														}

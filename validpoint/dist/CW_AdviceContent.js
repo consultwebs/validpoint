@@ -71,8 +71,7 @@ class CW_AdviceContent {
     configObject = null,
     input = null
   }) {
-    // if( configObject.be_quiet === false || configObject.quiet === false )
-    {
+    if (!configObject || configObject.be_quiet === false || configObject.quiet === false) {
       process.stdout.write(input.title + "\n");
     }
   }
@@ -81,8 +80,7 @@ class CW_AdviceContent {
     configObject = null,
     input = null
   }) {
-    // if( configObject.be_quiet === false )
-    {
+    if (!configObject || configObject.be_quiet === false) {
       process.stdout.write(input);
     }
   }
@@ -91,8 +89,7 @@ class CW_AdviceContent {
     configObject = null,
     input = null
   }) {
-    // if( configObject.be_quiet === false )
-    {
+    if (!configObject || configObject.be_quiet === false) {
       process.stdout.write(input.ok + "\n");
     }
   }
