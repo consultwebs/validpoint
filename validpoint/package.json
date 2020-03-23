@@ -21,7 +21,7 @@
     "webpack": "webpack --mode production --display verbose",
     "build": "npm run transpile && npm run docs && npm run test && npm run webpack",
     "dev": "npm run transpile && ./bin/validpoint domain -d appideas.com",
-    "linter": "./node_modules/.bin/eslint ./dist/"
+    "linter": "npm run transpile && ./node_modules/.bin/eslint ./dist/"
   },
   "babel": {
     "presets": [],

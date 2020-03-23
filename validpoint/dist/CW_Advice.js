@@ -4,8 +4,8 @@
  * Produce human-meaningful advice.
  * 
  * Tests should generally PASS or FAIL, but we're providing a PUNT state to 
- *    allow a caller to take possession and make decisions on non-binary 
- *    results (something other than PAS|FAIL)
+ * allow a caller to take possession and make decisions on non-binary 
+ * results (something other than PAS|FAIL)
  * 
  * NOTE: Member variables that are intended to be used directly in JSON output are not camelCased.
  * 

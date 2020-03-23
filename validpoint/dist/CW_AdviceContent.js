@@ -37,8 +37,8 @@ class CW_AdviceContent {
   /**
    * Map a severity level to the result tag
    * 
-   * This sets the default severity levels for the system. Children should override states that need to return
-   *     something different than the default for a given severity, depending on global and local congifuration
+   * This sets the default severity levels for the system. Children should override states that need to return \
+   * something different than the default for a given severity, depending on global and local congifuration
    * 
    * @author costmo
    * @returns int

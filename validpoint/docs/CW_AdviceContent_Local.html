@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>CW_AdviceContent_Local<span class="signature">(command, testResult, configObject)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>CW_AdviceContent_Local<span class="signature">(input)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,7 +41,7 @@
     
 
     
-    <h4 class="name" id="CW_AdviceContent_Local"><span class="type-signature"></span>new CW_AdviceContent_Local<span class="signature">(command, testResult, configObject)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="CW_AdviceContent_Local"><span class="type-signature"></span>new CW_AdviceContent_Local<span class="signature">(input)</span><span class="type-signature"></span></h4>
     
 
     
@@ -85,13 +85,55 @@
 
         <tr>
             
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Named parameters for input
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
                 <td class="name"><code>command</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type">string</span>
 
 
             
@@ -114,7 +156,7 @@
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type">object</span>
 
 
             
@@ -137,7 +179,7 @@
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type">object</span>
 
 
             
@@ -148,6 +190,13 @@
             
 
             <td class="description last">A user's config object</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -178,6 +227,13 @@
     
 
     
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>costmo</li>
+        </ul>
+    </dd>
+    
 
     
 
@@ -188,7 +244,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line23">line 23</a>
+        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line24">line 24</a>
     </li></ul></dd>
     
 
@@ -254,8 +310,8 @@
 <div class="description">
     Advice content hub for "local" requests.
 
-Once an Advice object has its test results, the parser runs this category-specific method to 
-  produce an action object
+Once an Advice object has its test results, the parser runs this category-specific method to \
+produce an action object
 </div>
 
 
@@ -306,7 +362,7 @@ Once an Advice object has its test results, the parser runs this category-specif
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line102">line 102</a>
+        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line103">line 103</a>
     </li></ul></dd>
     
 
@@ -452,7 +508,7 @@ Commands in the "local" category only need content for ESSENTIAL and URGENT
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line127">line 127</a>
+        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line128">line 128</a>
     </li></ul></dd>
     
 
@@ -642,7 +698,7 @@ Commands in the "local" category only need content for ESSENTIAL and URGENT
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line43">line 43</a>
+        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line44">line 44</a>
     </li></ul></dd>
     
 
@@ -794,7 +850,7 @@ TODO: Get this setting from client configuration and override the system config 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line152">line 152</a>
+        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line153">line 153</a>
     </li></ul></dd>
     
 
@@ -846,7 +902,7 @@ TODO: Get this setting from client configuration and override the system config 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Mar 23 2020 02:41:52 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Mar 23 2020 03:07:49 GMT-0700 (Pacific Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

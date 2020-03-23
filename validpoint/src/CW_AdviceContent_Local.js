@@ -1,9 +1,8 @@
-
 /**
  * Offering advice for "local" tests
  * 
- * These are going to be simpler than most other tests since any failure is a show-stopper,
- *    and each test has a binary respnonse
+ * These are going to be simpler than most other tests since any failure is a show-stopper, \
+ * and each test has a binary respnonse
  * 
  * @author costmo
  */
@@ -16,9 +15,11 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	/**
 	 * Create an instance for a finished command and testResult
 	 * 
-	 * @param {*} command		The command that has finished
-	 * @param {*} testResult	A test_result object to parse 
-	 * @param {*} configObject	A user's config object
+	 * @author costmo
+	 * @param {object} input					Named parameters for input
+	 * @param {string} input.command		The command that has finished
+	 * @param {object} input.testResult	A test_result object to parse 
+	 * @param {object} input.configObject	A user's config object
 	 */
 	constructor( { command = null, testResult = null, configObject = null } )
 	{
@@ -93,8 +94,8 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	/**
 	 * Advice content hub for "local" requests.
 	 * 
-	 * Once an Advice object has its test results, the parser runs this category-specific method to 
-	 *   produce an action object
+	 * Once an Advice object has its test results, the parser runs this category-specific method to \
+	 * produce an action object
 	 * 
 	 * @author costmo
 	 * 
