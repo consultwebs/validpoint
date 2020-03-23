@@ -1472,8 +1472,13 @@ class CW_Runner {
         usefile = yargs.argv.file;
       }
 
-      if (yargs.argv.input && yargs.argv.input.length > 0) {
-        returnValue.input = yargs.argv.input;
+      if (yargs.argv.input && (yargs.argv.input.length > 0 || Number.isInteger(yargs.argv.input))) {
+        // convert numeric CLI input to string
+        if (Number.isInteger(yargs.argv.input)) {
+          returnValue.input = yargs.argv.input.toString();
+        } else {
+          returnValue.input = yargs.argv.input;
+        }
       } else {
         returnValue.input = null;
       }
@@ -1519,8 +1524,13 @@ class CW_Runner {
           };
         }
 
-        if (yargs.argv.i && yargs.argv.i.length > 0) {
-          returnValue.input = yargs.argv.i;
+        if (yargs.argv.i && (yargs.argv.i.length > 0 || Number.isInteger(yargs.argv.i))) {
+          // convert numeric CLI input to string
+          if (Number.isInteger(yargs.argv.i)) {
+            returnValue.input = yargs.argv.i.toString();
+          } else {
+            returnValue.i = yargs.argv.i;
+          }
         } else {
           returnValue.input = null;
         }
