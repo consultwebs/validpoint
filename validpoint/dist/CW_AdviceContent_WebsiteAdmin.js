@@ -173,8 +173,9 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent {
         }
 
         break;
-    } // No tags present means a passed test
+    }
 
+    ; // No tags present means a passed test
 
     if (tags.length < 1) {
       severity = this.resultTagToSeverity({
@@ -231,17 +232,33 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent {
               returnValue.printDetail = returnValue.printDetail.error;
             }
         });
-      } // For live progress, display results on the screen
+      }
 
+    ; // For live progress, display results on the screen
 
     if (returnType == "screen") {
-      process.stdout.write(returnValue.printAnswer + "\n");
-      process.stdout.write(returnValue.printSubject);
+      try {
+        CW_AdviceContent.progressContent({
+          configObject: configObject,
+          input: returnValue.printAnswer + "\n" + returnValue.printSubject
+        });
 
-      if (returnValue.printDetail) {
-        process.stdout.write(returnValue.printDetail + "\n");
-      } else {
-        process.stdout.write("\n");
+        if (returnValue.printDetail) {
+          // process.stdout.write( returnValue.printDetail + "\n" );
+          CW_AdviceContent.progressContent({
+            configObject: configObject,
+            input: returnValue.printDetail + "\n"
+          });
+        } else {
+          // process.stdout.write( "\n" );
+          CW_AdviceContent.progressContent({
+            configObject: configObject,
+            input: "\n"
+          });
+        }
+      } catch (error) {
+        console.log("CAUGHT");
+        console.log(error);
       }
     } else // or else, return the info we've gathered so the caller can process and respond
       {
