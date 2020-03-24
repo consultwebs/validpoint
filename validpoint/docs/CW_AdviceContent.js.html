@@ -26,21 +26,32 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>
+            <pre class="prettyprint source linenums"><code>let CW_Constants = require( "./CW_Constants.js" );
+const colors = require( "../node_modules/colors" );
+colors.setTheme( CW_Constants.COLOR_THEME );
+
 /**
  * Parent class for providing advice content. Individual categories should subclass
  * 
  * @author costmo
  */
-
-let CW_Constants = require( "./CW_Constants.js" );
-const colors = require( "../node_modules/colors" );
-colors.setTheme( CW_Constants.COLOR_THEME );
-
 class CW_AdviceContent
 {
+	/**
+	 * Create an instance of the AdviceContent class
+	 * 
+	 * @param {object} input					Named parameters for input
+	 * @param {string} input.category		The category of the command
+	 * @param {string} input.command		The command that s being run
+	 * @param {object} input.testResult		A test_result object to pass around
+	 */
 	constructor( { category = null, command = null, testResult = null } )
 	{
+		/**
+		 * The category of the command
+		 * 
+		 * @type {string}
+		 */
 		this.category = category;
 		this.command = command;
 		this.severity = CW_Constants.SEVERITY_IGNORE;
@@ -66,8 +77,8 @@ class CW_AdviceContent
 	 * something different than the default for a given severity, depending on global and local congifuration
 	 * 
 	 * @author costmo
-	 * @returns int
-	 * @param {*} resultTag				The result tag to map 
+	 * @returns {number}					The constant resolving to the given severity
+	 * @param {string} resultTag				The result tag to map 
 	 */
 	resultTagToSeverity( { resultTag = null } )
 	{
@@ -86,6 +97,14 @@ class CW_AdviceContent
 		}
 	}
 
+	/**
+	 * Show an in-progress title, gated by runtime configuration
+	 * 
+	 * @author costmo
+	 * @param {object} input					Named parameters for input
+	 * @param {object} input.configObject		A configuration object
+	 * @param {string} input.input				The string to show
+	 */
 	static progressTitle( {configObject = null, input = null} )
 	{
 		if( !configObject || (configObject.be_quiet === false || configObject.quiet === false) )
@@ -94,6 +113,14 @@ class CW_AdviceContent
 		}
 	}
 
+	/**
+	 * Show an in-progress string, gated by runtime configuration
+	 * 
+	 * @author costmo
+	 * @param {object} input					Named parameters for input
+	 * @param {object} input.configObject		A configuration object
+	 * @param {string} input.input				The string to show
+	 */
 	static progressContent( {configObject = null, input = null} )
 	{
 		if( !configObject || configObject.be_quiet === false )
@@ -102,6 +129,14 @@ class CW_AdviceContent
 		}
 	}
 
+	/**
+	 * Show an in-progress "OK" result, gated by runtime configuration
+	 * 
+	 * @author costmo
+	 * @param {object} input					Named parameters for input
+	 * @param {object} input.configObject		A configuration object
+	 * @param {string} input.input				The string to show
+	 */
 	static progressResult( {configObject = null, input = null} )
 	{
 		if( !configObject || configObject.be_quiet === false )
@@ -110,6 +145,15 @@ class CW_AdviceContent
 		}
 	}
 
+	/**
+	 * Spin work off to helper/child classes to get specific advice
+	 * 
+	 * @author costmo
+	 * @param {object} input					Named parameters for input
+	 * @param {object} input.configObject		A configuration object
+	 * @param {object} input.adviceObject		A populated Advice object
+	 * @param {string} input.testKey			An extra string to use as an intermediate key in finding the correct output
+	 */
 	static progressAdvice( {configObject = null, adviceObject = null, testKey = null} )
 	{	
 		// Don't go further if we aren't going to show output
@@ -162,13 +206,13 @@ module.exports = CW_AdviceContent;</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CW_Advice.html">CW_Advice</a></li><li><a href="CW_AdviceContent_Local.html">CW_AdviceContent_Local</a></li><li><a href="CW_AdviceContent_Website.html">CW_AdviceContent_Website</a></li><li><a href="CW_AdviceContent_WebsiteAdmin.html">CW_AdviceContent_WebsiteAdmin</a></li><li><a href="CW_InputParser.html">CW_InputParser</a></li><li><a href="global.html#CW_Network">CW_Network</a></li><li><a href="CW_PromiseResolver.html">CW_PromiseResolver</a></li><li><a href="CW_Runner.html">CW_Runner</a></li><li><a href="CW_StringUtil.html">CW_StringUtil</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CW_Constants">CW_Constants</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CW_Advice.html">CW_Advice</a></li><li><a href="CW_AdviceContent.html">CW_AdviceContent</a></li><li><a href="CW_AdviceContent_Local.html">CW_AdviceContent_Local</a></li><li><a href="CW_AdviceContent_Website.html">CW_AdviceContent_Website</a></li><li><a href="CW_AdviceContent_WebsiteAdmin.html">CW_AdviceContent_WebsiteAdmin</a></li><li><a href="CW_InputParser.html">CW_InputParser</a></li><li><a href="global.html#CW_Network">CW_Network</a></li><li><a href="CW_PromiseResolver.html">CW_PromiseResolver</a></li><li><a href="CW_Runner.html">CW_Runner</a></li><li><a href="CW_StringUtil.html">CW_StringUtil</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CW_Constants">CW_Constants</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Mar 23 2020 03:07:49 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Tue Mar 24 2020 01:46:48 GMT-0700 (Pacific Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

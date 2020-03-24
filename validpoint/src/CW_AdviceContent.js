@@ -1,18 +1,29 @@
+let CW_Constants = require( "./CW_Constants.js" );
+const colors = require( "../node_modules/colors" );
+colors.setTheme( CW_Constants.COLOR_THEME );
 
 /**
  * Parent class for providing advice content. Individual categories should subclass
  * 
  * @author costmo
  */
-
-let CW_Constants = require( "./CW_Constants.js" );
-const colors = require( "../node_modules/colors" );
-colors.setTheme( CW_Constants.COLOR_THEME );
-
 class CW_AdviceContent
 {
+	/**
+	 * Create an instance of the AdviceContent class
+	 * 
+	 * @param {object} input					Named parameters for input
+	 * @param {string} input.category		The category of the command
+	 * @param {string} input.command		The command that s being run
+	 * @param {object} input.testResult		A test_result object to pass around
+	 */
 	constructor( { category = null, command = null, testResult = null } )
 	{
+		/**
+		 * The category of the command
+		 * 
+		 * @type {string}
+		 */
 		this.category = category;
 		this.command = command;
 		this.severity = CW_Constants.SEVERITY_IGNORE;
@@ -38,8 +49,8 @@ class CW_AdviceContent
 	 * something different than the default for a given severity, depending on global and local congifuration
 	 * 
 	 * @author costmo
-	 * @returns int
-	 * @param {*} resultTag				The result tag to map 
+	 * @returns {number}					The constant resolving to the given severity
+	 * @param {string} resultTag				The result tag to map 
 	 */
 	resultTagToSeverity( { resultTag = null } )
 	{
@@ -58,6 +69,14 @@ class CW_AdviceContent
 		}
 	}
 
+	/**
+	 * Show an in-progress title, gated by runtime configuration
+	 * 
+	 * @author costmo
+	 * @param {object} input					Named parameters for input
+	 * @param {object} input.configObject		A configuration object
+	 * @param {string} input.input				The string to show
+	 */
 	static progressTitle( {configObject = null, input = null} )
 	{
 		if( !configObject || (configObject.be_quiet === false || configObject.quiet === false) )
@@ -66,6 +85,14 @@ class CW_AdviceContent
 		}
 	}
 
+	/**
+	 * Show an in-progress string, gated by runtime configuration
+	 * 
+	 * @author costmo
+	 * @param {object} input					Named parameters for input
+	 * @param {object} input.configObject		A configuration object
+	 * @param {string} input.input				The string to show
+	 */
 	static progressContent( {configObject = null, input = null} )
 	{
 		if( !configObject || configObject.be_quiet === false )
@@ -74,6 +101,14 @@ class CW_AdviceContent
 		}
 	}
 
+	/**
+	 * Show an in-progress "OK" result, gated by runtime configuration
+	 * 
+	 * @author costmo
+	 * @param {object} input					Named parameters for input
+	 * @param {object} input.configObject		A configuration object
+	 * @param {string} input.input				The string to show
+	 */
 	static progressResult( {configObject = null, input = null} )
 	{
 		if( !configObject || configObject.be_quiet === false )
@@ -82,6 +117,15 @@ class CW_AdviceContent
 		}
 	}
 
+	/**
+	 * Spin work off to helper/child classes to get specific advice
+	 * 
+	 * @author costmo
+	 * @param {object} input					Named parameters for input
+	 * @param {object} input.configObject		A configuration object
+	 * @param {object} input.adviceObject		A populated Advice object
+	 * @param {string} input.testKey			An extra string to use as an intermediate key in finding the correct output
+	 */
 	static progressAdvice( {configObject = null, adviceObject = null, testKey = null} )
 	{	
 		// Don't go further if we aren't going to show output

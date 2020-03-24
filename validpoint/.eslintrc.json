@@ -1,10 +1,18 @@
 {
+	"parser": "@typescript-eslint/parser",
+
     "env": {
         "browser": true,
         "commonjs": true,
         "es6": true
 	},
-	"plugins": [ "jsdoc" ],
+
+	// "extends": [
+	// 	"eslint:recommended",
+	// 	"plugin:@typescript-eslint/recommended"
+	// ],
+	
+	"plugins": [ "jsdoc", "@typescript-eslint" ],
 
     "globals": {
         "Atomics": "readonly",
@@ -22,12 +30,23 @@
         "jsdoc/check-tag-names": 1, // Recommended
         "jsdoc/check-types": 1, // Recommended
         "jsdoc/implements-on-classes": 1, // Recommended
-        "jsdoc/match-description": 1,
+        "jsdoc/match-description": [ "error", { "matchDescription": "[A-Z.*\\.]"} ],
         "jsdoc/newline-after-description": 1, // Recommended
         "jsdoc/no-types": 0,
         "jsdoc/no-undefined-types": 1, // Recommended
         "jsdoc/require-description": 1,
-        "jsdoc/require-jsdoc": 1, // Recommended
+        "jsdoc/require-jsdoc": [
+			"error",
+			{
+				"require": {
+					"FunctionDeclaration": true,
+					"MethodDefinition": true,
+					"ClassDeclaration": true,
+					"ArrowFunctionExpression": true,
+					"FunctionExpression": true
+				}
+			}
+		], // Recommended
         "jsdoc/require-param": 1, // Recommended
         "jsdoc/require-param-description": 1, // Recommended
         "jsdoc/require-param-name": 1, // Recommended

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: CW_AdviceContent_Local</title>
+    <title>JSDoc: Class: CW_AdviceContent</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: CW_AdviceContent_Local</h1>
+    <h1 class="page-title">Class: CW_AdviceContent</h1>
 
     
 
@@ -28,12 +28,9 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>CW_AdviceContent_Local<span class="signature">(input)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>CW_AdviceContent<span class="signature">(input)</span><span class="type-signature"></span></h2>
         
-            <div class="class-description">Offering advice for "local" tests
-
-These are going to be simpler than most other tests since any failure is a show-stopper, \
-and each test has a binary respnonse</div>
+            <div class="class-description">Parent class for providing advice content. Individual categories should subclass</div>
         
     
 </header>
@@ -48,7 +45,7 @@ and each test has a binary respnonse</div>
     
 
     
-    <h4 class="name" id="CW_AdviceContent_Local"><span class="type-signature"></span>new CW_AdviceContent_Local<span class="signature">(input)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="CW_AdviceContent"><span class="type-signature"></span>new CW_AdviceContent<span class="signature">(input)</span><span class="type-signature"></span></h4>
     
 
     
@@ -56,7 +53,7 @@ and each test has a binary respnonse</div>
 
 
 <div class="description">
-    Create an instance for a finished command and testResult
+    Create an instance of the AdviceContent class
 </div>
 
 
@@ -134,6 +131,29 @@ and each test has a binary respnonse</div>
 
         <tr>
             
+                <td class="name"><code>category</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The category of the command</td>
+        </tr>
+
+    
+
+        <tr>
+            
                 <td class="name"><code>command</code></td>
             
 
@@ -150,7 +170,7 @@ and each test has a binary respnonse</div>
 
             
 
-            <td class="description last">The command that has finished</td>
+            <td class="description last">The command that s being run</td>
         </tr>
 
     
@@ -173,30 +193,7 @@ and each test has a binary respnonse</div>
 
             
 
-            <td class="description last">A test_result object to parse</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>configObject</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A user's config object</td>
+            <td class="description last">A test_result object to pass around</td>
         </tr>
 
     
@@ -251,7 +248,7 @@ and each test has a binary respnonse</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line23">line 23</a>
+        <a href="CW_AdviceContent.js.html">CW_AdviceContent.js</a>, <a href="CW_AdviceContent.js.html#line20">line 20</a>
     </li></ul></dd>
     
 
@@ -297,6 +294,82 @@ and each test has a binary respnonse</div>
     
 
     
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="category"><span class="type-signature"></span>category<span class="type-signature"> :string</span></h4>
+
+
+
+
+<div class="description">
+    The category of the command
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">string</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CW_AdviceContent.js.html">CW_AdviceContent.js</a>, <a href="CW_AdviceContent.js.html#line27">line 27</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -307,7 +380,7 @@ and each test has a binary respnonse</div>
     
 
     
-    <h4 class="name" id="advise"><span class="type-signature"></span>advise<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".progressAdvice"><span class="type-signature">(static) </span>progressAdvice<span class="signature">(input)</span><span class="type-signature"></span></h4>
     
 
     
@@ -315,107 +388,7 @@ and each test has a binary respnonse</div>
 
 
 <div class="description">
-    Advice content hub for "local" requests.
-
-Once an Advice object has its test results, the parser runs this category-specific method to \
-produce an action object
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>costmo</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line103">line 103</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="contentForSeverity"><span class="type-signature"></span>contentForSeverity<span class="signature">(input)</span><span class="type-signature"> &rarr; {string}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Provide the content for the discovered severity on the current instance's command.
-
-Commands in the "local" category only need content for ESSENTIAL and URGENT
+    Spin work off to helper/child classes to get specific advice
 </div>
 
 
@@ -489,244 +462,6 @@ Commands in the "local" category only need content for ESSENTIAL and URGENT
     </thead>
 
     <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>severity</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The severity for which content is needed</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-author">Author:</dt>
-    <dd class="tag-author">
-        <ul>
-            <li>costmo</li>
-        </ul>
-    </dd>
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line131">line 131</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    A string with the content for the given severity and test parameters
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">string</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="inProgressAdvice"><span class="type-signature"></span>inProgressAdvice<span class="signature">(input)</span><span class="type-signature"> &rarr; {string}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Offers advice while tests are in-progress
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>input</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Named parameters for input
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>testKey</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">A key to identify what is being tested</td>
-        </tr>
-
     
 
         <tr>
@@ -747,14 +482,37 @@ Commands in the "local" category only need content for ESSENTIAL and URGENT
 
             
 
-            <td class="description last">A constructed configuration object</td>
+            <td class="description last">A configuration object</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>returnType</code></td>
+                <td class="name"><code>adviceObject</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A populated Advice object</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>testKey</code></td>
             
 
             <td class="type">
@@ -770,7 +528,7 @@ Commands in the "local" category only need content for ESSENTIAL and URGENT
 
             
 
-            <td class="description last">"screen" to display the results, anything else to get an object</td>
+            <td class="description last">An extra string to use as an intermediate key in finding the correct output</td>
         </tr>
 
     
@@ -825,7 +583,7 @@ Commands in the "local" category only need content for ESSENTIAL and URGENT
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line44">line 44</a>
+        <a href="CW_AdviceContent.js.html">CW_AdviceContent.js</a>, <a href="CW_AdviceContent.js.html#line129">line 129</a>
     </li></ul></dd>
     
 
@@ -850,28 +608,6 @@ Commands in the "local" category only need content for ESSENTIAL and URGENT
 
 
 
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    Returns an object or prints to the screen
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">string</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -883,7 +619,7 @@ Commands in the "local" category only need content for ESSENTIAL and URGENT
     
 
     
-    <h4 class="name" id="resultTagToSeverity"><span class="type-signature"></span>resultTagToSeverity<span class="signature">(input)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    <h4 class="name" id=".progressContent"><span class="type-signature">(static) </span>progressContent<span class="signature">(input)</span><span class="type-signature"></span></h4>
     
 
     
@@ -891,12 +627,7 @@ Commands in the "local" category only need content for ESSENTIAL and URGENT
 
 
 <div class="description">
-    Override default "tag to severity" mapping for this specific "local" request
-
-Uses the system default for anything other than "FAIL"
-
-TODO: Get this setting from system configuration
-TODO: Get this setting from client configuration and override the system config setting
+    Show an in-progress string, gated by runtime configuration
 </div>
 
 
@@ -951,6 +682,712 @@ TODO: Get this setting from client configuration and override the system config 
             <td class="description last">Named parameters for input
                 <h6>Properties</h6>
                 
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>configObject</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A configuration object</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The string to show</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>costmo</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CW_AdviceContent.js.html">CW_AdviceContent.js</a>, <a href="CW_AdviceContent.js.html#line96">line 96</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".progressResult"><span class="type-signature">(static) </span>progressResult<span class="signature">(input)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Show an in-progress "OK" result, gated by runtime configuration
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Named parameters for input
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>configObject</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A configuration object</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The string to show</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>costmo</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CW_AdviceContent.js.html">CW_AdviceContent.js</a>, <a href="CW_AdviceContent.js.html#line112">line 112</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".progressTitle"><span class="type-signature">(static) </span>progressTitle<span class="signature">(input)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Show an in-progress title, gated by runtime configuration
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Named parameters for input
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>configObject</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A configuration object</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The string to show</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>costmo</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CW_AdviceContent.js.html">CW_AdviceContent.js</a>, <a href="CW_AdviceContent.js.html#line80">line 80</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="advise"><span class="type-signature"></span>advise<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Require subclasses to provide an advise() method
+
+This mimics an OO abstract method contract
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>costmo</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CW_AdviceContent.js.html">CW_AdviceContent.js</a>, <a href="CW_AdviceContent.js.html#line40">line 40</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="resultTagToSeverity"><span class="type-signature"></span>resultTagToSeverity<span class="signature">(resultTag)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Map a severity level to the result tag
+
+This sets the default severity levels for the system. Children should override states that need to return \
+something different than the default for a given severity, depending on global and local congifuration
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
 
 <table class="params">
     <thead>
@@ -994,36 +1431,6 @@ TODO: Get this setting from client configuration and override the system config 
         </tr>
 
     
-
-        <tr>
-            
-                <td class="name"><code>extraInput</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Extra input to use in determination of the output</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
     </tbody>
 </table>
 
@@ -1068,7 +1475,7 @@ TODO: Get this setting from client configuration and override the system config 
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_AdviceContent_Local.js.html">CW_AdviceContent_Local.js</a>, <a href="CW_AdviceContent_Local.js.html#line171">line 171</a>
+        <a href="CW_AdviceContent.js.html">CW_AdviceContent.js</a>, <a href="CW_AdviceContent.js.html#line55">line 55</a>
     </li></ul></dd>
     
 

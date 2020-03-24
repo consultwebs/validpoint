@@ -7,7 +7,7 @@ module.exports = {
 			{
 				targets: 
 				{
-				node: "current"
+					node: "current"
 				},
 			},
 		],

@@ -1,3 +1,6 @@
+let CW_Constants = require( "./CW_Constants.js" );
+let CW_AdviceContent = require( "./CW_AdviceContent.js" );
+
 /**
  * Offering advice for "local" tests
  * 
@@ -6,10 +9,6 @@
  * 
  * @author costmo
  */
-
-let CW_Constants = require( "./CW_Constants.js" );
-
-let CW_AdviceContent = require( "./CW_AdviceContent.js" );
 class CW_AdviceContent_Local extends CW_AdviceContent
 {
 	/**
@@ -34,12 +33,13 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	/**
 	 * Offers advice while tests are in-progress
 	 * 
-	 * @returns	mixed			Returns an objcet or prints to the screen
+	 * @returns	{string}			Returns an object or prints to the screen
 	 * @author costmo
 	 * 
-	 * @param {*} testKey		A key to identify what is being tested
-	 * @param {*} configObject	A constructed configuration object
-	 * @param {*} returnType	"screen" to display the results, anything else to get an object 
+	 * @param {object} input					Named parameters for input
+	 * @param {string} input.testKey		A key to identify what is being tested
+	 * @param {object} input.configObject	A constructed configuration object
+	 * @param {string} input.returnType	"screen" to display the results, anything else to get an object 
 	 */
 	inProgressAdvice( {testKey = null, configObject = null, returnType = "screen"} )
 	{
@@ -123,7 +123,10 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	 * Commands in the "local" category only need content for ESSENTIAL and URGENT
 	 * 
 	 * @author costmo
-	 * @param {*} severity		The severity for which content is needed 
+	 * @returns {string}		A string with the content for the given severity and test parameters
+	 * 
+	 * @param {object} input					Named parameters for input
+	 * @param {number} input.severity		The severity for which content is needed 
 	 */
 	contentForSeverity( { severity = null } )
 	{
@@ -149,6 +152,21 @@ class CW_AdviceContent_Local extends CW_AdviceContent
 	 * TODO: Get this setting from client configuration and override the system config setting
 	 * 
 	 * @param {*} resultTag				The result tag to map  
+	 */
+
+	/**
+	 * Override default "tag to severity" mapping for this specific "local" request
+	 * 
+	 * Uses the system default for anything other than "FAIL"
+	 * 
+	 * TODO: Get this setting from system configuration
+	 * TODO: Get this setting from client configuration and override the system config setting
+	 * 
+	 * @author costmo
+	 * @returns {number}					The constant resolving to the given severity
+	 * @param {object} input					Named parameters for input
+	 * @param {string} input.resultTag				The result tag to map 
+	 * @param {string} input.extraInput				Extra input to use in determination of the output
 	 */
 	resultTagToSeverity( { resultTag = null, extraInput = null } )
 	{

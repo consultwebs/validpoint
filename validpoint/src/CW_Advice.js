@@ -1,3 +1,5 @@
+let CW_Constants = require( "./CW_Constants.js" );
+
 /**
  * Produce human-meaningful advice.
  * 
@@ -9,9 +11,6 @@
  * 
  * @author costmo
  */
-
-let CW_Constants = require( "./CW_Constants.js" );
-
 class CW_Advice
 {
     /**
@@ -23,16 +22,30 @@ class CW_Advice
     {
 		/**
 		 * Have a caller set a config object that can be used for the entire instance
+		 * 
+		 * @type {object}
 		 */
 		this.configObject = null;
 
 		/**
 		 * The domain name for the instance
+		 * 
+		 * @type {string}
 		 */
 		this.domain = "";
+
+		/**
+		 * The greatest severity seen during the current test run
+		 * 
+		 * @type {number}
+		 */
 		this.greatest_severity = CW_Constants.SEVERITY_IGNORE; // not camelCase because this member is used in JSON output
 
-		// An empty "full results" array of result and action objects for callers to populate for later parsing
+		/**
+		 * An empty "full results" array of result and action objects for callers to populate for later parsing
+		 * 
+		 * @type {object}
+		 */
 		this.test_result = {
 			"results": [],		// Results of individual tests to iterate and parse when all tests are complete for a given domain.
 			"actions": []		// Things to do in response to the results. To be populated during a finalization process.
@@ -65,6 +78,7 @@ class CW_Advice
 	 * Get yer clean Action object here. Constrain the members of an action object
 	 * 
 	 * @author costmo
+	 * @returns {object}		An object with pre-populated empty members
 	 */
 	getEmptyActionObject()
 	{
@@ -122,7 +136,7 @@ class CW_Advice
 	 * Farm out the work of parsing a resultItem and pushing actionable items to the `actions` array
 	 * 
 	 * @author costmo
-	 * @param {*} result		The resultItem to parse 
+	 * @returns {object}	An object with the result
 	 */
 	parseResult()
 	{
