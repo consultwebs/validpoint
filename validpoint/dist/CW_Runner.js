@@ -308,11 +308,10 @@ domain=input.domain.domain;
 let cmds=input.inputOptions.domain[domain].commands;
 let config=input.inputOptions.domain[domain];
 
-// TODO: Get input options from "-i " one level above this
-
 let CW_Advice=require("../dist/CW_Advice.js");
 let runner=new CW_Runner();
 
+// normalize the 'show_raw' option
 if(undefined!==input.inputOptions.show_raw)
 {
 config.show_raw=input.inputOptions.show_raw;
@@ -322,6 +321,7 @@ config.show_raw=input.inputOptions.show_raw;
 config.show_raw=false;
 }
 
+// normalize the 'quiet' option
 if(undefined!==input.inputOptions.quiet)
 {
 config.be_quiet=input.inputOptions.quiet;
@@ -392,7 +392,6 @@ console.log(error);
 /**
 	 * Run a command
 	 * 
-	 * TODO: input checking and delegating work to adaptors needs to negate the need to add to the validCommands array and add a new case
 	 * @author costmo
 	 * @param {*} command 			The command to run
 	 * @param {*} configObject		An object holding the ingested configuration values

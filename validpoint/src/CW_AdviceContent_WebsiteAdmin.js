@@ -534,11 +534,6 @@ class CW_AdviceContent_WebsiteAdmin extends CW_AdviceContent
 	/**
 	 * Override default "tag to severity" mapping for this specific "local" request
 	 * 
-	 * Uses the system default for anything other than "FAIL"
-	 * 
-	 * TODO: Get this setting from system configuration
-	 * TODO: Get this setting from client configuration and override the system config setting
-	 * 
 	 * @param {*} resultTag				The result tag to map  
 	 * @param {*} extraInput			Extra input to consider
 	 */

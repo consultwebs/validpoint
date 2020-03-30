@@ -29,7 +29,7 @@ class CW_Network
 		return new Promise(
 			(resolve, reject ) =>
 			{
-				resolver.resolve_localNetwork( resolve, reject );
+				resolver.resolve_localNetwork( resolve, reject, {pingHosts: null} );
 			}
 		);	
 	} // checkLocalNetwork()
@@ -48,7 +48,7 @@ class CW_Network
 		return new Promise( 
 			(resolve, reject ) => 
 			{
-				resolver.resolve_checkLocalDns( resolve, reject );
+				resolver.resolve_checkLocalDns( resolve, reject, {dnsHost: null} );
 			});
 	} // checkDns()
 

@@ -137,7 +137,6 @@ switch(severity){
 case CW_Constants.SEVERITY_ESSENTIAL:
 case CW_Constants.SEVERITY_URGENT:
 return strings[this.command][CW_Constants.NAME_SEVERITY_URGENT];
-// TODO: Verify this
 default:
 return"";}
 
@@ -148,9 +147,6 @@ return"";}
 	 * 
 	 * Uses the system default for anything other than "FAIL"
 	 * 
-	 * TODO: Get this setting from system configuration
-	 * TODO: Get this setting from client configuration and override the system config setting
-	 * 
 	 * @param {*} resultTag				The result tag to map  
 	 */
 
@@ -158,9 +154,6 @@ return"";}
 	 * Override default "tag to severity" mapping for this specific "local" request
 	 * 
 	 * Uses the system default for anything other than "FAIL"
-	 * 
-	 * TODO: Get this setting from system configuration
-	 * TODO: Get this setting from client configuration and override the system config setting
 	 * 
 	 * @author costmo
 	 * @returns {number}					The constant resolving to the given severity

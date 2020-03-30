@@ -167,9 +167,6 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 	 * 
 	 * Uses the system default for anything other than "FAIL"
 	 * 
-	 * TODO: Get this setting from system configuration
-	 * TODO: Get this setting from client configuration and override the system config setting
-	 * 
 	 * @param {*} resultTag				The result tag to map  
 	 * @param {*} extraKey				An optional extra key to help refine the lookup
 	 */
@@ -323,7 +320,6 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 		let tags = [];
 		if( !configObject.be_quiet )
 		{
-
 			// which test to run
 			switch( testKey )
 			{
@@ -395,8 +391,6 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 					}
 					else
 					{
-						// TODO: Look for "HTML" tag
-
 						let content = "";
 
 						// These can all be done at once, but are separated here to show "progress"
@@ -529,7 +523,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 						{
 							process.stdout.write( "good\n\n".ok );
 						}
-						else // TODO: Warn/fail on bad response codes 
+						else // Warn/fail on bad response codes 
 						{
 							process.stdout.write( "warning\n".warn );
 							process.stdout.write( responseInput.warn + "\n\n" );
@@ -549,16 +543,8 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 			} // switch( testKey )
 		} // if( !configObject.be_quiet )
 
-
-
-		// TODO: Make returnValue something useful
-
-		// For live progress, display results on the screen
-		if( returnType == "screen" )
-		{
-			// process.stdout.write( returnValue.printAnswer + "\n" );
-		}
-		else // or else, return the info we've gathered so the caller can process and respond
+		// output of "screen" is handled through the be_quiet flag
+		if( returnType !== "screen" )
 		{
 			return returnValue;
 		}

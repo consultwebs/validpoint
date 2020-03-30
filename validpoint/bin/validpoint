@@ -50,7 +50,6 @@ require( "strict-mode" )(
 								}
 								domainCounter++;
 
-								// TODO: Print response only if not quiet
 								await CW_Runner.printDomainHeadline( {config: runParameters.inputOptions, domain: runParameters.domain} )
 									.then(
 										async (response) =>

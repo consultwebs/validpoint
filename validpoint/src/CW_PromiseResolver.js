@@ -5,7 +5,7 @@
  * The PromiseResolver handles all rejections and allows callers to to turn rejections into resolvable messages
  * 
  * @author costmo
- * TODO: The PromiseResolver will need to be divided into subclasses for maintainability
+ * TODO: The PromiseResolver may need to be divided into subclasses for maintainability
  */
 
 let CW_Constants = require( "./CW_Constants" );
@@ -33,15 +33,21 @@ class CW_PromiseResolver
 	 * @param	{*}		resolve		Resolve function	
 	 * @param	{*}		reject		Reject function
 	 */
-	resolve_localNetwork( resolve, reject )
+	resolve_localNetwork( resolve, reject, { pingHosts = null } )
 	{
 		try
 		{
+
 			// Set the default status to "down"
 			let ping = require( "../node_modules/ping" );
 			let resolved = false;
 
-			PING_HOSTS.forEach(
+			if( !pingHosts || !Array.isArray( pingHosts ) || pingHosts.length < 1 )
+			{
+				pingHosts = PING_HOSTS;
+			}
+
+			pingHosts.forEach(
 				(pingHost, index) =>
 				{
 					// Perform a ping to prove the default status
@@ -58,7 +64,7 @@ class CW_PromiseResolver
 								}
 							}
 
-							if( ((index + 1) == PING_HOSTS.length) && !resolved )
+							if( ((index + 1) == pingHosts.length) && !resolved )
 							{
 								resolve( CW_Constants.RESULT_FAIL );
 							}
@@ -71,6 +77,8 @@ class CW_PromiseResolver
 		}
 		catch( error)
 		{
+			console.log( "E" );
+			console.log( error );
 			let returnError = 
 			{	...new Error(),
 				raw_response: error,
@@ -87,14 +95,19 @@ class CW_PromiseResolver
 	 * @param	{*}		resolve		Resolve function	
 	 * @param	{*}		reject		Reject function
 	 */
-	resolve_checkLocalDns( resolve, reject )
+	resolve_checkLocalDns( resolve, reject, {dnsHost = null} )
 	{
 		try
 		{
 			let dns = require( "dns" );
 			let msg = CW_Constants.RESULT_FAIL;
 
-			dns.resolve4( DNS_HOST,
+			if( !dnsHost || dnsHost.length < 1 )
+			{
+				dnsHost = DNS_HOST;
+			}
+
+			dns.resolve4( dnsHost,
 				( error, addresses ) =>
 				{
 					// If there was no error, it's a pass
