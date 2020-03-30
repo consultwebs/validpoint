@@ -746,7 +746,11 @@ class CW_Runner
 							( result ) =>
 							{
 								AdviceContent.progressContent( { configObject: configObject,
-									input: "done\n".ok 
+									input: "done\n\n".ok 
+								});
+								
+								AdviceContent.progressContent( { configObject: configObject,
+									input: "Testing content from ".header + configObject.url.subject + "...\n\n".header 
 								});
 
 								// Parse the incoming HTML to find important elements
@@ -1081,7 +1085,7 @@ class CW_Runner
 		let AdviceContent = require( "./CW_AdviceContent.js" );
 
 		AdviceContent.progressContent( { configObject: configObject,
-			input: "Beginning domain tests for ".text + configObject.domain.header + "...   \n".text 
+			input: "Beginning domain tests for ".text + configObject.domain.header + "...   \n\n".text 
 		});
 
 		adviceObject.item_result.command = "domain";
@@ -1116,7 +1120,7 @@ class CW_Runner
 							{
 								
 								AdviceContent.progressContent( { configObject: configObject,
-									input: "Testing name server records for ".header + configObject.domain.subject + "...   ".header 
+									input: "Testing DNS server records for ".header + configObject.domain.subject + "...   ".header 
 								});
 
 								// get nameserver records first so that we can get all the other data from an authority because non-authorities don't always answer completely
@@ -1146,9 +1150,9 @@ class CW_Runner
 							},
 							( result, completion ) => // Step 2. Parse the initial response and perform a dig query against an authoritative name server to get complete MX records fot the TLD
 							{
-								AdviceContent.progressContent( { configObject: configObject,
-									input: "Testing mail server records for ".header + configObject.domain.subject + "...   ".header
-								});
+								// AdviceContent.progressContent( { configObject: configObject,
+								// 	input: "Testing mail server records for ".header + configObject.domain.subject + "...   ".header
+								// });
 
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "MX" } )
 								.then(
@@ -1176,9 +1180,9 @@ class CW_Runner
 							},
 							( result, completion ) => // Step 3. Perform a dig query against an authoritative name server to get an A record for the domain (should be the @ record)
 							{
-								AdviceContent.progressContent( { configObject: configObject,
-									input: "Testing \"A\" records for domain ".header + configObject.domain.subject + "...   ".header
-								});
+								// AdviceContent.progressContent( { configObject: configObject,
+								// 	input: "Testing \"A\" records for domain ".header + configObject.domain.subject + "...   ".header
+								// });
 
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
 								.then(
@@ -1207,9 +1211,9 @@ class CW_Runner
 							},
 							( result, completion ) => // Step 4. Perform a dig query against an authoritative name server to get an A record for the www.<domain> 
 							{
-								AdviceContent.progressContent( { configObject: configObject,
-									input: "Testing \"A\" records for URL ".header + configObject.url.subject + "...   ".header
-								});
+								// AdviceContent.progressContent( { configObject: configObject,
+								// 	input: "Testing \"A\" records for URL ".header + configObject.url.subject + "...   ".header
+								// });
 
 								CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "A", queryServer: result.domainResponses.servers.ns[0] } )
 								.then(
@@ -1256,9 +1260,9 @@ class CW_Runner
 							},
 							( result, completion ) => // Step 5. Perform a dig query against an authoritative name server to get a CNAME record for the URL
 							{
-								AdviceContent.progressContent( { configObject: configObject,
-									input: "Testing \"CNAME\" records for URL ".header + configObject.url.subject + "...   ".header
-								});
+								// AdviceContent.progressContent( { configObject: configObject,
+								// 	input: "Testing \"CNAME\" records for URL ".header + configObject.url.subject + "...   ".header
+								// });
 
 								CW_Runner.network.checkDomain( { domain: configObject.url, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
 								.then(
@@ -1297,9 +1301,9 @@ class CW_Runner
 							},
 							( result, completion ) => // Step 6. Perform a dig query against an authoritative name server to get a CNAME record for the domain
 							{
-								AdviceContent.progressContent( { configObject: configObject,
-									input: "Testing \"CNAME\" records for domain ".header + configObject.domain.subject + "...   ".header
-								});
+								// AdviceContent.progressContent( { configObject: configObject,
+								// 	input: "Testing \"CNAME\" records for domain ".header + configObject.domain.subject + "...   ".header
+								// });
 
 								CW_Runner.network.checkDomain( { domain: configObject.domain, recordType: "CNAME", queryServer: result.domainResponses.servers.ns[0] } )
 								.then(
