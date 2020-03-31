@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1585619915642" clover="3.2.0">
-  <project timestamp="1585619915642" name="All files">
+<coverage generated="1585621564077" clover="3.2.0">
+  <project timestamp="1585621564077" name="All files">
     <metrics statements="814" coveredstatements="119" conditionals="478" coveredconditionals="49" methods="181" coveredmethods="25" elements="1473" coveredelements="193" complexity="0" loc="814" ncloc="814" packages="1" files="8" classes="8"/>
     <file name="CW_Advice.js" path="/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_Advice.js">
       <metrics statements="41" coveredstatements="2" conditionals="26" coveredconditionals="0" methods="6" coveredmethods="0"/>

@@ -195,9 +195,6 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 	 * 
 	 * Uses the system default for anything other than "FAIL"
 	 * 
-	 * TODO: Get this setting from system configuration
-	 * TODO: Get this setting from client configuration and override the system config setting
-	 * 
 	 * @param {*} resultTag				The result tag to map  
 	 * @param {*} extraKey				An optional extra key to help refine the lookup
 	 */
@@ -351,7 +348,6 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 		let tags = [];
 		if( !configObject.be_quiet )
 		{
-
 			// which test to run
 			switch( testKey )
 			{
@@ -362,12 +358,12 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 					{
 						process.stdout.write( "good\n".ok );
 						process.stdout.write( "Received grade: ".text );
-						process.stdout.write( this.test_result.raw_response.grade.ok + "\n" );
+						process.stdout.write( this.test_result.raw_response.grade.ok + "\n\n" );
 					}
 					else
 					{
 						process.stdout.write( "failed\n".error );
-						process.stdout.write( this.test_result.raw_response.message.error + "\n" );
+						process.stdout.write( this.test_result.raw_response.message.error + "\n\n" );
 					}
 
 					break;
@@ -375,13 +371,13 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 					if( this.test_result.result == CW_Constants.RESULT_FAIL )
 					{
 						process.stdout.write( "failed\n".error );
-						process.stdout.write( this.test_result.raw_response.message.error + "\n" );
+						process.stdout.write( this.test_result.raw_response.message.error + "\n\n" );
 					}
 					else if( this.test_result.raw_response.daysLeft > 30 )
 					{
 						process.stdout.write( "good\n".ok );
 						process.stdout.write( "Days until expiration: ".text );
-						process.stdout.write( this.test_result.raw_response.daysLeft.toString().result + "\n" );
+						process.stdout.write( this.test_result.raw_response.daysLeft.toString().result + "\n\n" );
 					}
 					else if( this.test_result.raw_response.daysLeft > 0 )
 					{
@@ -392,7 +388,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 						severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PUNT } );
 						let content = this.contentForSeverity( { severity: severity, extraInput: "EXPIRE_SOON" } );
 
-						process.stdout.write( content.warn + "\n" );
+						process.stdout.write( content.warn + "\n\n" );
 					}
 					else
 					{
@@ -401,7 +397,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 						severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_FAIL } );
 						let content = this.contentForSeverity( { severity: severity, extraInput: "EXPIRED" } );
 
-						process.stdout.write( content.error + "\n" );
+						process.stdout.write( content.error + "\n\n" );
 					}
 
 					break;
@@ -423,8 +419,6 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 					}
 					else
 					{
-						// TODO: Look for "HTML" tag
-
 						let content = "";
 
 						// These can all be done at once, but are separated here to show "progress"
@@ -435,11 +429,11 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 							process.stdout.write( "failed\n".error );
 							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_FAIL } );
 							content = this.contentForSeverity( { severity: severity, extraInput: "HEAD_NONE" } );
-							process.stdout.write( content.error + "\n" );
+							process.stdout.write( content.error + "\n\n" );
 						}
 						else
 						{
-							process.stdout.write( "good\n".ok );
+							process.stdout.write( "good\n\n".ok );
 						}
 
 						process.stdout.write( "Looking for HTML \"BODY\" tag...   ".header );
@@ -450,11 +444,11 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 							process.stdout.write( "failed\n".error );
 							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_FAIL } );
 							content = this.contentForSeverity( { severity: severity, extraInput: "BODY_NONE" } );
-							process.stdout.write( content.error + "\n" );
+							process.stdout.write( content.error + "\n\n" );
 						}
 						else
 						{
-							process.stdout.write( "good\n".ok );
+							process.stdout.write( "good\n\n".ok );
 						}
 
 						process.stdout.write( "Looking for HTML \"TITLE\" tag...   ".header );
@@ -465,11 +459,11 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 							process.stdout.write( "failed\n".error );
 							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_FAIL } );
 							content = this.contentForSeverity( { severity: severity, extraInput: "TITLE_NONE" } );
-							process.stdout.write( content.error + "\n" );
+							process.stdout.write( content.error + "\n\n" );
 						}
 						else
 						{
-							process.stdout.write( "good\n".ok );
+							process.stdout.write( "good\n\n".ok );
 						}
 
 
@@ -481,11 +475,11 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 							severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PUNT } );
 							let content = this.contentForSeverity( { severity: severity, extraInput: "H1_NONE" } );
 
-							process.stdout.write( content.warn + "\n" );
+							process.stdout.write( content.warn + "\n\n" );
 						}
 						else
 						{
-							process.stdout.write( "good\n".ok );
+							process.stdout.write( "good\n\n".ok );
 						}
 
 						let foundNoindex = false;
@@ -510,11 +504,11 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 								severity = this.resultTagToSeverity( { resultTag: CW_Constants.RESULT_PUNT } );
 								let content = this.contentForSeverity( { severity: severity, extraInput: "NOINDEX" } );
 
-								process.stdout.write( content.warn + "\n" );
+								process.stdout.write( content.warn + "\n\n" );
 							}
 							else
 							{
-								process.stdout.write( "good\n".ok );
+								process.stdout.write( "good\n\n".ok );
 							}
 
 						}
@@ -541,7 +535,7 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 					}
 					else
 					{
-						process.stdout.write( "good\n".ok );
+						process.stdout.write( "good\n\n".ok );
 					}
 
 					break; // case "WEBSITE_AVAILABILITY":
@@ -555,38 +549,30 @@ class CW_AdviceContent_Website extends CW_AdviceContent
 
 						if( responseInput.raw_response.indexOf( configObject.domain ) > -1 )
 						{
-							process.stdout.write( "good\n".ok );
+							process.stdout.write( "good\n\n".ok );
 						}
-						else // TODO: Warn/fail on bad response codes 
+						else // Warn/fail on bad response codes 
 						{
 							process.stdout.write( "warning\n".warn );
-							process.stdout.write( responseInput.warn + "\n" );
+							process.stdout.write( responseInput.warn + "\n\n" );
 						}
 					}
 					else if( responseInput.result == CW_Constants.RESULT_PASS )
 					{
-						process.stdout.write( "good\n".ok );
+						process.stdout.write( "good\n\n".ok );
 					}
 					else
 					{
 						process.stdout.write( "fail\n".error );
-						process.stdout.write( responseInput.error + "\n" );
+						process.stdout.write( responseInput.error + "\n\n" );
 					}
 
 					break; // case "WEBSITE_AVAILABILITY":
 			} // switch( testKey )
 		} // if( !configObject.be_quiet )
 
-
-
-		// TODO: Make returnValue something useful
-
-		// For live progress, display results on the screen
-		if( returnType == "screen" )
-		{
-			// process.stdout.write( returnValue.printAnswer + "\n" );
-		}
-		else // or else, return the info we've gathered so the caller can process and respond
+		// output of "screen" is handled through the be_quiet flag
+		if( returnType !== "screen" )
 		{
 			return returnValue;
 		}
@@ -611,7 +597,7 @@ module.exports =  CW_AdviceContent_Website;</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Tue Mar 24 2020 01:46:48 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Mon Mar 30 2020 19:26:05 GMT-0700 (Pacific Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>

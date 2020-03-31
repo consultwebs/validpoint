@@ -15,7 +15,7 @@
   "scripts": {
     "start": "./bin/validpoint help",
     "help": "./bin/validpoint help",
-    "test": "npm run transpile && jest --coverage --coverage-directory docs/coverage && npm run complex",
+    "test": "npm run transpile && jest --coverage --coverage-directory docs/coverage && npm run docs && npm run complex",
     "transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs,transform-dynamic-import,search-and-replace src --out-dir dist --copy-files",
     "docs": "jsdoc -d docs/ -r src/*",
     "webpack": "webpack --mode production --display verbose",
