@@ -162,7 +162,7 @@ class CW_Advice
 		}
 		else // Farm out logic for parsing FAIL and PUNT conditions
 		{
-			let adviceContent;
+			let adviceContent = null;
 
 			// Use separate handlers for each command category	
 			if( returnValue.category == "local" )
@@ -199,16 +199,19 @@ class CW_Advice
 			} // category: "website-admin"
 
 			// We've got a category-specific object, now advise
-			adviceContent.advise();
-			returnValue.result =  adviceContent.result;
+			if( adviceContent ) // weeds out addons
+			{
+				adviceContent.advise();
+				returnValue.result =  adviceContent.result;
 
-			// If this is the greatest severity we've seen, set the new top-level
-			this.greatest_severity = ( adviceContent.severity > this.greatest_severity ) 
-				? adviceContent.severity : this.greatest_severity;
+				// If this is the greatest severity we've seen, set the new top-level
+				this.greatest_severity = ( adviceContent.severity > this.greatest_severity ) 
+					? adviceContent.severity : this.greatest_severity;
 
-			
-			returnValue.severity = adviceContent.severity;
-			returnValue.content = adviceContent.content;
+				
+				returnValue.severity = adviceContent.severity;
+				returnValue.content = adviceContent.content;
+			}
 			
 		}
 

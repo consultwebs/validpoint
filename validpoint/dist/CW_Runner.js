@@ -544,7 +544,7 @@ return new Promise(
 let currentDir=process.cwd();
 let packageJsonPath=currentDir+"/package.json";
 
-var readJson=require("read-package-json");
+var readJson=require("../node_modules/read-package-json");
 readJson(packageJsonPath,console.error,false,
 async(error,data)=>
 {
