@@ -1,6 +1,6 @@
 {
   "name": "@consultwebs/validpoint",
-  "version": "1.0.0-beta.0",
+  "version": "1.0.0-beta.1",
   "description": "Consultwebs service validator",
   "readme": "Consultwebs service validator",
   "license": "MIT",
@@ -13,7 +13,7 @@
     "url": "git+https://github.com/consultwebs/validpoint"
   },
   "publishConfig": {
-	"access": "public"
+    "access": "public"
   },
   "scripts": {
     "start": "./bin/validpoint help",
@@ -23,8 +23,8 @@
     "docs": "npm run complex && jsdoc -d docs/ -r src/* ",
     "webpack": "webpack --mode production --display verbose",
     "build": "npm run transpile && npm run docs && npm run test && npm run webpack",
-	"linter": "./node_modules/.bin/eslint ./src/",
-	"complex": "./node_modules/.bin/cr src"
+    "linter": "./node_modules/.bin/eslint ./src/",
+    "complex": "./node_modules/.bin/cr src"
   },
   "babel": {
     "retainLines": true,

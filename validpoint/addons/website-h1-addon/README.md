@@ -1,5 +1,5 @@
 # Introduction 
-This validpoint addon module checks a website for the existence of at least one H1 tag.
+This sample validpoint addon module checks a website for the existence of at least one H1 tag.
 
 Use this as an example for creating validpoint addons.
 
@@ -18,7 +18,7 @@ mkdir newapp
 cd newapp
 npm init -y
 npm install --save ../validpoint
-npm install --save ../laweval-website-h1-addon
+npm install --save ../website-h1-addon
 ```
 
 Next, add a `validpoint` entry to your newapp's `package.json`:
@@ -26,7 +26,7 @@ Next, add a `validpoint` entry to your newapp's `package.json`:
 ```
   "validpoint": {
     "addons": [
-	  "laweval-website-h1-addon"
+	  "website-h1-addon"
     ]
   },
 ```

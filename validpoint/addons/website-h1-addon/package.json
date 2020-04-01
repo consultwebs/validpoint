@@ -1,7 +1,7 @@
 {
-  "name": "laweval-website-h1-addon",
-  "version": "1.0.0",
-  "description": "LawEval website gag checking add-on",
+  "name": "website-h1-addon",
+  "version": "1.0.0-beta.0",
+  "description": "Sample validpoint add-on to check websites for an H1 tag presence",
   "main": "index.mjs",
   "scripts": {
     "test": "'"
@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/consultwebs/validpoint"
   },
-  "license": "UNLICENSED",
+  "license": "MIT",
   "dependencies": {
     "async": "^3.2.0",
     "colors": "^1.4.0",

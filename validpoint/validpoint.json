@@ -11,10 +11,10 @@
 				"domain": {}
 			}
 		},
-		"bravoreviews.com": {
-			"domain": "meta.bravoreviews.com",
-			"url": "meta.bravoreviews.com",
-			"name": "Bravo Reviews",
+		"consultwebs.com": {
+			"domain": "www.consultwebs.com",
+			"url": "www.consultwebs.com",
+			"name": "Consultwebs",
 			"commands":
 			{
 				"https-response": {},
