@@ -1,9 +1,13 @@
 {
   "name": "@consultwebs/validpoint",
-  "version": "1.0.0-beta.4",
-  "description": "Consultwebs service validator",
-  "readme": "Consultwebs service validator",
+  "version": "1.0.0-beta.5",
+  "description": "A multipoint validation tool for your web and digital assets",
   "license": "MIT",
+  "author": {
+    "name": "Consultwebs",
+    "email": "open.source@consultwebs.com",
+    "url": "https://github.com/consultwebs/validpoint"
+  },
   "main": "./index.mjs",
   "bin": {
     "validpoint": "./bin/validpoint"
