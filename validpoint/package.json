@@ -1,5 +1,5 @@
 {
-  "name": "validpoint",
+  "name": "@consultwebs/validpoint",
   "version": "1.0.0",
   "description": "Consultwebs service validator",
   "readme": "Consultwebs service validator",
@@ -11,6 +11,9 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/consultwebs/validpoint"
+  },
+  "publishConfig": {
+	"access": "public"
   },
   "scripts": {
     "start": "./bin/validpoint help",
