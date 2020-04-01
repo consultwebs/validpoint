@@ -12,6 +12,13 @@ class CW_StringUtil
 	{
 	}
 
+	/**
+	 * Strips trailing dots (periods) from the end of a string. Useful for whois data.
+	 * 
+	 * @author costmo
+	 * @returns {string}			Returns an altered/fixed string
+	 * @param {string} input 		The string to examine/munge
+	 */
 	static stripTrailingDot( input )
 	{
 		if( input[ (input.length - 1) ] === "." )

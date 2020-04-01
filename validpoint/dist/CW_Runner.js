@@ -1,9 +1,4 @@
-"use strict";/**
- * Convenience class for running commands
- * 
- * @author costmo
- */
-const CW_Network=require("./CW_Network");
+"use strict";const CW_Network=require("./CW_Network");
 const network=new CW_Network();
 
 let CW_Constants=require("./CW_Constants");
@@ -14,8 +9,11 @@ let async=require("../node_modules/async");
 
 const colors=require("../node_modules/colors");
 
-// TODO: Running "all" commands causes the headers to be printed first, then the results - get them (a)synced up
-
+/**
+ * Convenience class for running commands
+ * 
+ * @author costmo
+ */
 class CW_Runner
 {
 /**
@@ -278,6 +276,13 @@ domains=tmpOutput;
 return domains;
 }
 
+/**
+	 * Outputs a headline for a domain when !quiet
+	 * 
+	 * @param {object} input			input object for the print
+	 * @param {object} input.config		Configuration input
+	 * @param {string} input.domain		The domain for the request
+	 */
 static printDomainHeadline({config=null,domain=null})
 {
 return new Promise(
@@ -294,6 +299,12 @@ resolve(true);
 
 }
 
+/**
+	 * Run a command for a domain
+	 * 
+	 * @param {object} input			input object for the command
+	 * @param {object} input.input		An object with runner input
+	 */
 static domainCommandRunner({input=null})
 {
 return new Promise(
@@ -356,7 +367,15 @@ console.log(error);
 
 }
 
-// Abstract command Promises so that the first returned Promise doesn't end a loop
+// 
+/**
+	 * Abstract command Promises so that the first returned Promise doesn't end a loop
+	 * 
+	 * @param {object} input					input object for the print
+	 * @param {object} input.command			The command to run
+	 * @param {object} input.configObject		A constructed configuration object
+	 * @param {object} input.adviceObject		A constructed Advice object
+	 */
 commandResolutionWrapper({command:command,configObject:config,adviceObject:advice})
 {
 return new Promise(
@@ -1568,6 +1587,12 @@ static get network()
 return network;
 }
 
+/**
+	 * Get an instance of yargs for convenience
+	 * 
+	 * @author costmo
+	 * @returns {object}		An instance of yargs
+	 */
 static getYargs()
 {
 let yargs=require("../node_modules/yargs");
@@ -1630,6 +1655,12 @@ help("help","Show this help screen");
 return yargs;
 }
 
+/**
+	 * Normalizes input arguments and passes them through the used configuration structure.
+	 * 
+	 * @author costmo
+	 * @returns {object}		Returns a promise with payload containing an object for runner configuration
+	 */
 static processinputArguments()
 {
 return new Promise(

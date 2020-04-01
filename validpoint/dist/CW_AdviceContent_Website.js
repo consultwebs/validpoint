@@ -1,4 +1,7 @@
-"use strict";
+"use strict";let CW_Constants=require("./CW_Constants");
+
+let CW_AdviceContent=require("./CW_AdviceContent");
+
 /**
  * Offering advice for "website" tests
  * 
@@ -6,10 +9,6 @@
  * 
  * @author costmo
  */
-
-let CW_Constants=require("./CW_Constants");
-
-let CW_AdviceContent=require("./CW_AdviceContent");
 class CW_AdviceContent_Website extends CW_AdviceContent
 {
 /**

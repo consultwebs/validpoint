@@ -1,4 +1,9 @@
-"use strict";
+"use strict";let CW_Constants=require("./CW_Constants");
+
+const PING_HOSTS=["8.8.8.8","1.1.1.1","1.0.0.1","139.130.4.5"];// Google, Cloudflare, Cloudflare, Telstra
+const DNS_HOST="www.google.com";
+const MAX_HTTTP_RESPONSE_TIME=5000;// TODO: Move this to constants
+
 /**
  * A convenience wrapper to abstract code from Promise input parameters
  * 
@@ -7,13 +12,6 @@
  * @author costmo
  * TODO: The PromiseResolver may need to be divided into subclasses for maintainability
  */
-
-let CW_Constants=require("./CW_Constants");
-
-const PING_HOSTS=["8.8.8.8","1.1.1.1","1.0.0.1","139.130.4.5"];// Google, Cloudflare, Cloudflare, Telstra
-const DNS_HOST="www.google.com";
-const MAX_HTTTP_RESPONSE_TIME=5000;// TODO: Move this to constants
-
 class CW_PromiseResolver
 {
 /**
@@ -597,6 +595,15 @@ throw returnError;
 }
 }// resolve_checkDomain()
 
+/**
+	 * Make objects with data that can be used for a command run
+	 * 
+	 * @param {Promise.resolve} resolve 	An incoming resolve function
+	 * @param {Promise.reject} reject 		An incoming reject function
+	 * @param {object} input 				Input parameters for the runner objects
+	 * @param {string} input.domain			The domain name for the runner objects
+	 * @param {string} input.directory		A directory to look for input/configuration files
+	 */
 resolve_makeRunnerObjects(resolve,reject,{domain=null,directory=null})
 {
 let returnValue=[];

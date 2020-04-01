@@ -3,7 +3,6 @@
  * 
  * @author costmo
  */
-
 class CW_InputParser
 {
 

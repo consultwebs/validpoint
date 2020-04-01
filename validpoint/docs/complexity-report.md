@@ -1,4 +1,4 @@
-# Complexity report, 3/31/2020
+# Complexity report, 4/1/2020
 
 * Mean per-function logical LOC: 8.625
 * Mean per-function parameter count: 0
@@ -31,7 +31,7 @@
 
 ## /Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_AdviceContent_Website.js
 
-* Physical LOC: 547
+* Physical LOC: 555
 * Logical LOC: 3
 * Mean parameter count: 0
 * Cyclomatic complexity: 1
@@ -41,7 +41,7 @@
 
 ## /Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_AdviceContent_WebsiteAdmin.js
 
-* Physical LOC: 555
+* Physical LOC: 563
 * Logical LOC: 3
 * Mean parameter count: 0
 * Cyclomatic complexity: 1
@@ -81,7 +81,7 @@
 
 ## /Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_StringUtil.js
 
-* Physical LOC: 21
+* Physical LOC: 28
 * Logical LOC: 1
 * Mean parameter count: 0
 * Cyclomatic complexity: 1

@@ -30,6 +30,10 @@
     
         <h2><span class="attribs"><span class="type-signature"></span></span>CW_PromiseResolver<span class="signature">()</span><span class="type-signature"></span></h2>
         
+            <div class="class-description">A convenience wrapper to abstract code from Promise input parameters
+
+The PromiseResolver handles all rejections and allows callers to to turn rejections into resolvable messages</div>
+        
     
 </header>
 
@@ -38,6 +42,8 @@
     
         
 
+    
+    <h2>Constructor</h2>
     
 
     
@@ -100,7 +106,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line24">line 24</a>
+        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line22">line 22</a>
     </li></ul></dd>
     
 
@@ -349,7 +355,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line563">line 563</a>
+        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line561">line 561</a>
     </li></ul></dd>
     
 
@@ -526,7 +532,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line98">line 98</a>
+        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line96">line 96</a>
     </li></ul></dd>
     
 
@@ -716,7 +722,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line142">line 142</a>
+        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line140">line 140</a>
     </li></ul></dd>
     
 
@@ -906,7 +912,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line210">line 210</a>
+        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line208">line 208</a>
     </li></ul></dd>
     
 
@@ -1119,7 +1125,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line434">line 434</a>
+        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line432">line 432</a>
     </li></ul></dd>
     
 
@@ -1319,7 +1325,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line252">line 252</a>
+        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line250">line 250</a>
     </li></ul></dd>
     
 
@@ -1532,7 +1538,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line316">line 316</a>
+        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line314">line 314</a>
     </li></ul></dd>
     
 
@@ -1724,7 +1730,7 @@ IMPORTANT NOTE: The keys and values that are returned by the query are strings t
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line525">line 525</a>
+        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line523">line 523</a>
     </li></ul></dd>
     
 
@@ -1901,7 +1907,7 @@ IMPORTANT NOTE: The keys and values that are returned by the query are strings t
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line36">line 36</a>
+        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line34">line 34</a>
     </li></ul></dd>
     
 
@@ -1942,6 +1948,261 @@ IMPORTANT NOTE: The keys and values that are returned by the query are strings t
 
 
         
+            
+
+    
+
+    
+    <h4 class="name" id="resolve_makeRunnerObjects"><span class="type-signature"></span>resolve_makeRunnerObjects<span class="signature">(resolve, reject, input)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Make objects with data that can be used for a command run
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>resolve</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Promise.resolve</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An incoming resolve function</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>reject</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Promise.reject</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An incoming reject function</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Input parameters for the runner objects
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>domain</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The domain name for the runner objects</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>directory</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A directory to look for input/configuration files</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CW_PromiseResolver.js.html">CW_PromiseResolver.js</a>, <a href="CW_PromiseResolver.js.html#line607">line 607</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
     
 
     
@@ -1957,13 +2218,13 @@ IMPORTANT NOTE: The keys and values that are returned by the query are strings t
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CW_Advice.html">CW_Advice</a></li><li><a href="CW_AdviceContent.html">CW_AdviceContent</a></li><li><a href="CW_AdviceContent_Local.html">CW_AdviceContent_Local</a></li><li><a href="CW_AdviceContent_Website.html">CW_AdviceContent_Website</a></li><li><a href="CW_AdviceContent_WebsiteAdmin.html">CW_AdviceContent_WebsiteAdmin</a></li><li><a href="CW_InputParser.html">CW_InputParser</a></li><li><a href="global.html#CW_Network">CW_Network</a></li><li><a href="CW_PromiseResolver.html">CW_PromiseResolver</a></li><li><a href="CW_Runner.html">CW_Runner</a></li><li><a href="CW_StringUtil.html">CW_StringUtil</a></li></ul><h3>Global</h3><ul><li><a href="global.html#CW_Constants">CW_Constants</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CW_Advice.html">CW_Advice</a></li><li><a href="CW_AdviceContent.html">CW_AdviceContent</a></li><li><a href="CW_AdviceContent_Local.html">CW_AdviceContent_Local</a></li><li><a href="CW_AdviceContent_Website.html">CW_AdviceContent_Website</a></li><li><a href="CW_AdviceContent_WebsiteAdmin.html">CW_AdviceContent_WebsiteAdmin</a></li><li><a href="CW_InputParser.html">CW_InputParser</a></li><li><a href="CW_Network.html">CW_Network</a></li><li><a href="CW_PromiseResolver.html">CW_PromiseResolver</a></li><li><a href="CW_Runner.html">CW_Runner</a></li><li><a href="CW_StringUtil.html">CW_StringUtil</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Tue Mar 31 2020 08:17:49 GMT-0700 (Pacific Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Wed Apr 01 2020 01:25:03 GMT-0700 (Pacific Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
