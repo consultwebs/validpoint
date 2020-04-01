@@ -8,10 +8,10 @@ Copy the addon to a directory that is at the same level as  validpoint, then run
 
 ```
 npm install
-npm install --save validpoint
+npm install --save ../validpoint
 ```
 
-To use validpoint and its addon, initialize a new app, then add validpoint and any addons:
+To use validpoint and this addon, initialize a new app, then add validpoint and any addons:
 
 ```
 mkdir newapp
@@ -19,6 +19,16 @@ cd newapp
 npm init -y
 npm install --save ../validpoint
 npm install --save ../laweval-website-h1-addon
+```
+
+Next, add a `validpoint` entry to your newapp's `package.json`:
+
+```
+  "validpoint": {
+    "addons": [
+	  "laweval-website-h1-addon"
+    ]
+  },
 ```
 
 Then run your command:
