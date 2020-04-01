@@ -1,0 +1,46 @@
+{
+	"domains": 
+	{
+		"consultwebs.com":
+		{
+			"domain": "consultwebs.com",
+			"name": "Consultwebs",
+			"url": "www.consultwebs.com",
+			"preflight_commands":
+			{
+				"local-network": {},
+				"local-dns": {}
+			},
+			"commands":
+			{
+				"https-port": {}, 
+				"domain": {},
+				"https-response": {}, 
+				"secure-website": {},  
+				"website-content": {}, 
+				"website-custom-text": {}
+			}
+		},
+		"appideas.com":
+		{
+			"domain": "appideas.com",
+			"name": "APPideas"
+		}
+	},
+	"preflight_commands":
+	{
+		"local-network": {},
+		"local-dns": {}
+	},
+	"commands":
+	{
+		"http-port": {}, 
+		"https-port": {},
+		"domain": {},
+		"http-response": {}, 
+		"https-response": {}, 
+		"website": {}, 
+		"secure-website": {},  
+		"website-content": {}
+	}
+}

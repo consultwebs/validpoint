@@ -1,0 +1,20 @@
+{
+  "name": "laweval-website-h1-addon",
+  "version": "1.0.0",
+  "description": "LawEval website gag checking add-on",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "'"
+  },
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/consultwebs/validpoint"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "async": "^3.2.0",
+    "colors": "^1.4.0",
+	"puppeteer": "^2.1.1"
+  }
+}
