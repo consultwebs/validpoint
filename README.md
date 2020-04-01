@@ -9,12 +9,12 @@ With `validpoint`'s built-in commands, you can test many common health metrics o
 
 For local installation
 ```
-npm install --save @consultwebs/validpoint
+npm install --save @laweval/validpoint
 ```
 
 For global installation:
 ```
-npm install -g @consultwebs/validpoint
+npm install -g @laweval/validpoint
 ```
 
 # Usage

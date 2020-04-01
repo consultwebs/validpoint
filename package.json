@@ -1,6 +1,6 @@
 {
-  "name": "@consultwebs/validpoint",
-  "version": "1.0.0-beta.6",
+  "name": "@laweval/validpoint",
+  "version": "1.0.0-beta.7",
   "description": "A multipoint validation tool for your web and digital assets",
   "license": "MIT",
   "author": {
@@ -17,8 +17,7 @@
     "url": "git+https://github.com/consultwebs/validpoint"
   },
   "publishConfig": {
-    "access": "public",
-    "registry":"https://registry.npmjs.org/"
+    "access": "public"
   },
   "scripts": {
     "start": "./bin/validpoint help",
@@ -27,7 +26,7 @@
     "transpile": "./node_modules/.bin/babel --plugins @babel/plugin-transform-modules-commonjs,transform-dynamic-import,search-and-replace src --out-dir dist --copy-files",
     "docs": "npm run complex && jsdoc -d docs/ -r src/* ",
     "webpack": "webpack --mode production --display verbose",
-    "build": "npm run transpile && npm run docs && npm run test && npm run webpack",
+    "build": "npm install && npm run transpile && npm run docs && npm run test && npm run webpack",
     "linter": "./node_modules/.bin/eslint ./src/",
     "complex": "./node_modules/.bin/cr src",
     "publish": "npm run build && npm publish --access public"
