@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1585729644519" clover="3.2.0">
-  <project timestamp="1585729644519" name="All files">
+<coverage generated="1585746099935" clover="3.2.0">
+  <project timestamp="1585746099935" name="All files">
     <metrics statements="814" coveredstatements="119" conditionals="478" coveredconditionals="49" methods="181" coveredmethods="25" elements="1473" coveredelements="193" complexity="0" loc="814" ncloc="814" packages="1" files="8" classes="8"/>
-    <file name="CW_Advice.js" path="/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_Advice.js">
+    <file name="CW_Advice.js" path="/tmp/validpoint/validpoint/dist/CW_Advice.js">
       <metrics statements="41" coveredstatements="2" conditionals="26" coveredconditionals="0" methods="6" coveredmethods="0"/>
       <line num="1" count="1" type="stmt"/>
       <line num="28" count="0" type="stmt"/>
@@ -46,7 +46,7 @@
       <line num="218" count="0" type="stmt"/>
       <line num="222" count="1" type="stmt"/>
     </file>
-    <file name="CW_AdviceContent.js" path="/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_AdviceContent.js">
+    <file name="CW_AdviceContent.js" path="/tmp/validpoint/validpoint/dist/CW_AdviceContent.js">
       <metrics statements="37" coveredstatements="4" conditionals="43" coveredconditionals="0" methods="7" coveredmethods="0"/>
       <line num="1" count="1" type="stmt"/>
       <line num="2" count="1" type="stmt"/>
@@ -86,11 +86,11 @@
       <line num="164" count="0" type="stmt"/>
       <line num="171" count="1" type="stmt"/>
     </file>
-    <file name="CW_Constants.js" path="/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_Constants.js">
+    <file name="CW_Constants.js" path="/tmp/validpoint/validpoint/dist/CW_Constants.js">
       <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
       <line num="1" count="1" type="stmt"/>
     </file>
-    <file name="CW_InputParser.js" path="/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_InputParser.js">
+    <file name="CW_InputParser.js" path="/tmp/validpoint/validpoint/dist/CW_InputParser.js">
       <metrics statements="27" coveredstatements="6" conditionals="7" coveredconditionals="2" methods="6" coveredmethods="1"/>
       <line num="17" count="2" type="stmt"/>
       <line num="18" count="2" type="cond" truecount="2" falsecount="0"/>
@@ -120,7 +120,7 @@
       <line num="107" count="0" type="stmt"/>
       <line num="115" count="1" type="stmt"/>
     </file>
-    <file name="CW_Network.js" path="/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_Network.js">
+    <file name="CW_Network.js" path="/tmp/validpoint/validpoint/dist/CW_Network.js">
       <metrics statements="38" coveredstatements="1" conditionals="11" coveredconditionals="0" methods="20" coveredmethods="1"/>
       <line num="26" count="0" type="stmt"/>
       <line num="27" count="0" type="stmt"/>
@@ -161,7 +161,7 @@
       <line num="196" count="0" type="stmt"/>
       <line num="204" count="1" type="stmt"/>
     </file>
-    <file name="CW_PromiseResolver.js" path="/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_PromiseResolver.js">
+    <file name="CW_PromiseResolver.js" path="/tmp/validpoint/validpoint/dist/CW_PromiseResolver.js">
       <metrics statements="163" coveredstatements="93" conditionals="103" coveredconditionals="45" methods="27" coveredmethods="21"/>
       <line num="1" count="1" type="stmt"/>
       <line num="3" count="1" type="stmt"/>
@@ -327,7 +327,7 @@
       <line num="665" count="0" type="stmt"/>
       <line num="672" count="1" type="stmt"/>
     </file>
-    <file name="CW_Runner.js" path="/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_Runner.js">
+    <file name="CW_Runner.js" path="/tmp/validpoint/validpoint/dist/CW_Runner.js">
       <metrics statements="503" coveredstatements="8" conditionals="286" coveredconditionals="0" methods="113" coveredmethods="0"/>
       <line num="1" count="1" type="stmt"/>
       <line num="2" count="1" type="stmt"/>
@@ -833,7 +833,7 @@
       <line num="1788" count="0" type="stmt"/>
       <line num="1795" count="1" type="stmt"/>
     </file>
-    <file name="CW_StringUtil.js" path="/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_StringUtil.js">
+    <file name="CW_StringUtil.js" path="/tmp/validpoint/validpoint/dist/CW_StringUtil.js">
       <metrics statements="4" coveredstatements="4" conditionals="2" coveredconditionals="2" methods="2" coveredmethods="2"/>
       <line num="24" count="2" type="cond" truecount="2" falsecount="0"/>
       <line num="26" count="1" type="stmt"/>

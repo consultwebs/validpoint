@@ -9,7 +9,7 @@
 * Change cost: 23.4375%
 * Core size: 50%
 
-## /Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_AdviceContent.js
+## /tmp/validpoint/validpoint/src/CW_AdviceContent.js
 
 * Physical LOC: 171
 * Logical LOC: 4
@@ -19,7 +19,7 @@
 * Maintainability index: 128.98151016029632
 * Dependency count: 2
 
-## /Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_AdviceContent_Local.js
+## /tmp/validpoint/validpoint/src/CW_AdviceContent_Local.js
 
 * Physical LOC: 178
 * Logical LOC: 3
@@ -29,7 +29,7 @@
 * Maintainability index: 136.3730317397458
 * Dependency count: 2
 
-## /Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_AdviceContent_Website.js
+## /tmp/validpoint/validpoint/src/CW_AdviceContent_Website.js
 
 * Physical LOC: 555
 * Logical LOC: 3
@@ -39,7 +39,7 @@
 * Maintainability index: 136.3730317397458
 * Dependency count: 2
 
-## /Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_AdviceContent_WebsiteAdmin.js
+## /tmp/validpoint/validpoint/src/CW_AdviceContent_WebsiteAdmin.js
 
 * Physical LOC: 563
 * Logical LOC: 3
@@ -49,7 +49,7 @@
 * Maintainability index: 136.3730317397458
 * Dependency count: 2
 
-## /Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_Constants.js
+## /tmp/validpoint/validpoint/src/CW_Constants.js
 
 * Physical LOC: 70
 * Logical LOC: 53
@@ -59,7 +59,7 @@
 * Maintainability index: 76.36131757389678
 * Dependency count: 0
 
-## /Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_InputParser.js
+## /tmp/validpoint/validpoint/src/CW_InputParser.js
 
 * Physical LOC: 110
 * Logical LOC: 1
@@ -69,7 +69,7 @@
 * Maintainability index: 162.61472146706737
 * Dependency count: 0
 
-## /Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_Network.js
+## /tmp/validpoint/validpoint/src/CW_Network.js
 
 * Physical LOC: 199
 * Logical LOC: 1
@@ -79,7 +79,7 @@
 * Maintainability index: 162.61472146706737
 * Dependency count: 0
 
-## /Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/src/CW_StringUtil.js
+## /tmp/validpoint/validpoint/src/CW_StringUtil.js
 
 * Physical LOC: 28
 * Logical LOC: 1

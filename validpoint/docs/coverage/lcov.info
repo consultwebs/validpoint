@@ -1,5 +1,5 @@
 TN:
-SF:/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_Advice.js
+SF:/tmp/validpoint/validpoint/dist/CW_Advice.js
 FN:21,(anonymous_0)
 FN:65,(anonymous_1)
 FN:83,(anonymous_2)
@@ -87,7 +87,7 @@ BRF:26
 BRH:0
 end_of_record
 TN:
-SF:/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_AdviceContent.js
+SF:/tmp/validpoint/validpoint/dist/CW_AdviceContent.js
 FN:20,(anonymous_0)
 FN:40,(anonymous_1)
 FN:55,(anonymous_2)
@@ -190,7 +190,7 @@ BRF:43
 BRH:0
 end_of_record
 TN:
-SF:/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_Constants.js
+SF:/tmp/validpoint/validpoint/dist/CW_Constants.js
 FNF:0
 FNH:0
 DA:1,1
@@ -200,7 +200,7 @@ BRF:0
 BRH:0
 end_of_record
 TN:
-SF:/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_InputParser.js
+SF:/tmp/validpoint/validpoint/dist/CW_InputParser.js
 FN:15,(anonymous_0)
 FN:34,(anonymous_1)
 FN:43,(anonymous_2)
@@ -255,7 +255,7 @@ BRF:7
 BRH:2
 end_of_record
 TN:
-SF:/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_Network.js
+SF:/tmp/validpoint/validpoint/dist/CW_Network.js
 FN:14,(anonymous_0)
 FN:24,(anonymous_1)
 FN:30,(anonymous_2)
@@ -353,7 +353,7 @@ BRF:11
 BRH:0
 end_of_record
 TN:
-SF:/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_PromiseResolver.js
+SF:/tmp/validpoint/validpoint/dist/CW_PromiseResolver.js
 FN:22,(anonymous_0)
 FN:34,(anonymous_1)
 FN:49,(anonymous_2)
@@ -682,7 +682,7 @@ BRF:103
 BRH:45
 end_of_record
 TN:
-SF:/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_Runner.js
+SF:/tmp/validpoint/validpoint/dist/CW_Runner.js
 FN:24,(anonymous_0)
 FN:35,(anonymous_1)
 FN:50,(anonymous_2)
@@ -1706,7 +1706,7 @@ BRF:286
 BRH:0
 end_of_record
 TN:
-SF:/Users/costmo/Documents/dev/consultwebs/LawEval/validpoint/dist/CW_StringUtil.js
+SF:/tmp/validpoint/validpoint/dist/CW_StringUtil.js
 FN:11,(anonymous_0)
 FN:22,(anonymous_1)
 FNF:2
