@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1585746531616" clover="3.2.0">
-  <project timestamp="1585746531616" name="All files">
-    <metrics statements="814" coveredstatements="119" conditionals="478" coveredconditionals="49" methods="181" coveredmethods="25" elements="1473" coveredelements="193" complexity="0" loc="814" ncloc="814" packages="1" files="8" classes="8"/>
+<coverage generated="1585748156923" clover="3.2.0">
+  <project timestamp="1585748156923" name="All files">
+    <metrics statements="814" coveredstatements="107" conditionals="478" coveredconditionals="43" methods="181" coveredmethods="22" elements="1473" coveredelements="172" complexity="0" loc="814" ncloc="814" packages="1" files="8" classes="8"/>
     <file name="CW_Advice.js" path="/tmp/validpoint/dist/CW_Advice.js">
       <metrics statements="41" coveredstatements="2" conditionals="26" coveredconditionals="0" methods="6" coveredmethods="0"/>
       <line num="1" count="1" type="stmt"/>
@@ -162,7 +162,7 @@
       <line num="204" count="1" type="stmt"/>
     </file>
     <file name="CW_PromiseResolver.js" path="/tmp/validpoint/dist/CW_PromiseResolver.js">
-      <metrics statements="163" coveredstatements="93" conditionals="103" coveredconditionals="45" methods="27" coveredmethods="21"/>
+      <metrics statements="163" coveredstatements="81" conditionals="103" coveredconditionals="39" methods="27" coveredmethods="18"/>
       <line num="1" count="1" type="stmt"/>
       <line num="3" count="1" type="stmt"/>
       <line num="4" count="1" type="stmt"/>
@@ -195,23 +195,23 @@
       <line num="116" count="1" type="stmt"/>
       <line num="124" count="0" type="stmt"/>
       <line num="128" count="0" type="stmt"/>
-      <line num="144" count="1" type="stmt"/>
-      <line num="146" count="1" type="stmt"/>
-      <line num="152" count="1" type="stmt"/>
-      <line num="159" count="1" type="stmt"/>
-      <line num="162" count="1" type="cond" truecount="1" falsecount="1"/>
-      <line num="169" count="1" type="stmt"/>
-      <line num="172" count="1" type="cond" truecount="1" falsecount="1"/>
+      <line num="144" count="0" type="stmt"/>
+      <line num="146" count="0" type="stmt"/>
+      <line num="152" count="0" type="stmt"/>
+      <line num="159" count="0" type="stmt"/>
+      <line num="162" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="169" count="0" type="stmt"/>
+      <line num="172" count="0" type="cond" truecount="0" falsecount="2"/>
       <line num="174" count="0" type="stmt"/>
-      <line num="176" count="1" type="cond" truecount="3" falsecount="1"/>
+      <line num="176" count="0" type="cond" truecount="0" falsecount="4"/>
       <line num="178" count="0" type="stmt"/>
       <line num="179" count="0" type="stmt"/>
-      <line num="181" count="1" type="cond" truecount="1" falsecount="1"/>
-      <line num="183" count="1" type="stmt"/>
-      <line num="184" count="1" type="stmt"/>
+      <line num="181" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="183" count="0" type="stmt"/>
+      <line num="184" count="0" type="stmt"/>
       <line num="188" count="0" type="stmt"/>
       <line num="189" count="0" type="stmt"/>
-      <line num="193" count="1" type="stmt"/>
+      <line num="193" count="0" type="stmt"/>
       <line num="212" count="1" type="stmt"/>
       <line num="218" count="1" type="stmt"/>
       <line num="220" count="1" type="stmt"/>
