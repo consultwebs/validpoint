@@ -1,6 +1,6 @@
 {
   "name": "@consultwebs/validpoint",
-  "version": "1.0.0-beta.5",
+  "version": "1.0.0-beta.6",
   "description": "A multipoint validation tool for your web and digital assets",
   "license": "MIT",
   "author": {
@@ -17,7 +17,8 @@
     "url": "git+https://github.com/consultwebs/validpoint"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry":"https://registry.npmjs.org/"
   },
   "scripts": {
     "start": "./bin/validpoint help",
