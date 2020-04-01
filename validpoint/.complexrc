@@ -18,9 +18,9 @@
   "maxhv": 500,
   "maxhe": 2000,
   "silent": false,
-  "logicalor": false,
-  "switchcase": false,
-  "forin": false,
-  "trycatch": false,
+  "logicalor": true,
+  "switchcase": true,
+  "forin": true,
+  "trycatch": true,
   "newmi": false
 }
