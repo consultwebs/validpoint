@@ -14,7 +14,7 @@ npm install --save @laweval/validpoint
 
 For global installation:
 ```
-npm install -g @laweval/validpoint
+sudo npm install -g @laweval/validpoint
 ```
 
 # Usage
