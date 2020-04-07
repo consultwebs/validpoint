@@ -32,7 +32,7 @@
     "build": "npm install && npm run transpile && npm run docs && npm run test && npm run webpack",
     "linter": "./node_modules/.bin/eslint ./src/",
     "complex": "./node_modules/.bin/cr src",
-    "publish": "npm run build && npm publish --access public"
+    "publish": "npm run build && npm version patch && npm publish --access public"
   },
   "babel": {
     "retainLines": true,
