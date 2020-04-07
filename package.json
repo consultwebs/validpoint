@@ -16,6 +16,9 @@
     "type": "git",
     "url": "git+https://github.com/consultwebs/validpoint"
   },
+  "config": {
+    "unsafe-perm": true
+  },
   "publishConfig": {
     "access": "public"
   },
